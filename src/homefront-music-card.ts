@@ -87,7 +87,10 @@ export class HomefrontMusicCard extends LitElement {
         overflow: hidden;
         font-family: var(--hf-font);
         border: 1px solid var(--hf-border);
-        min-height: 700px;
+        /* Keep the card a fixed height so the body scrolls internally,
+           never the dashboard. Capped at 90vh so it always fits the
+           viewport (mobile included). */
+        height: min(820px, 90vh);
       }
       .frame {
         display: flex;

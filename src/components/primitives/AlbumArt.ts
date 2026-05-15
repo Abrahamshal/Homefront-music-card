@@ -52,8 +52,16 @@ export class AlbumArt extends LitElement {
   `;
 
   protected render() {
-    const sizeCss = typeof this.size === 'number' ? `${this.size}px` : this.size;
-    const glyphSize = typeof this.size === 'number' ? this.size * 0.34 : 16;
+    // Numeric attributes arrive here as strings ("40") — append "px" so the
+    // resulting CSS is valid. CSS-length strings like "100%" pass through.
+    const numericSize =
+      typeof this.size === 'number'
+        ? this.size
+        : /^\d+(\.\d+)?$/.test(this.size)
+          ? Number(this.size)
+          : null;
+    const sizeCss = numericSize !== null ? `${numericSize}px` : (this.size as string);
+    const glyphSize = numericSize !== null ? numericSize * 0.34 : 16;
     const bg = artGradient(this.obj);
     const wrapStyle = `width:${sizeCss};height:${sizeCss};border-radius:${this.radius}px;background:${bg};${this.boxShadow ? `box-shadow:${this.boxShadow}` : ''}`;
     return html`
