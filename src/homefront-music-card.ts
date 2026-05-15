@@ -7,6 +7,12 @@ import { Icons } from './components/Icons.js';
 import { Store, type Tab } from './state/store.js';
 import { StoreController } from './state/storeController.js';
 import './components/PlayerTab.js';
+import './components/BrowseTab.js';
+import './components/SearchTab.js';
+import './components/QueueTab.js';
+import './components/OutputTab.js';
+import './components/GroupChipRail.js';
+import './components/GroupSheet.js';
 
 declare global {
   interface Window {
@@ -74,13 +80,14 @@ export class HomefrontMusicCard extends LitElement {
     css`
       :host {
         display: block;
+        position: relative;
         background: var(--hf-bg);
         color: var(--hf-text);
         border-radius: 16px;
         overflow: hidden;
         font-family: var(--hf-font);
         border: 1px solid var(--hf-border);
-        min-height: 620px;
+        min-height: 700px;
       }
       .frame {
         display: flex;
@@ -93,7 +100,6 @@ export class HomefrontMusicCard extends LitElement {
         align-items: center;
         gap: 8px;
         padding: 10px 14px 8px;
-        border-bottom: 1px solid var(--hf-divider);
       }
       .title-icon {
         color: var(--hf-text);
@@ -113,16 +119,6 @@ export class HomefrontMusicCard extends LitElement {
         flex: 1;
         min-height: 0;
         position: relative;
-      }
-      .stub {
-        height: 100%;
-        display: grid;
-        place-items: center;
-        padding: 24px;
-        color: var(--hf-text-dim);
-        font-size: 13px;
-        text-align: center;
-        line-height: 1.5;
       }
       .tab-bar {
         display: grid;
@@ -169,39 +165,43 @@ export class HomefrontMusicCard extends LitElement {
     return html`
       <div class="frame">
         ${this._renderTitle()}
+        <hf-group-chip-rail .store=${this._store}></hf-group-chip-rail>
         <div class="body">${this._renderActiveTab()}</div>
         ${this._renderTabBar()}
       </div>
+      <hf-group-sheet .store=${this._store}></hf-group-sheet>
     `;
   }
 
   private _renderTitle() {
     const zoneCount = this._config?.zones?.length ?? 0;
     const playingGroups = this._store.groups.filter((g) => g.playing).length;
-    const sub =
-      zoneCount > 0
-        ? `· ${playingGroups} group${playingGroups === 1 ? '' : 's'} playing · ${zoneCount} zone${zoneCount === 1 ? '' : 's'}`
-        : `· ${playingGroups} group${playingGroups === 1 ? '' : 's'} playing · mock`;
+    const zoneNote = zoneCount > 0 ? ` · ${zoneCount} zone${zoneCount === 1 ? '' : 's'}` : ' · mock';
     return html`
       <div class="title-row">
         <span class="title-icon">${Icons.note({ size: 14 })}</span>
         <span class="title-label">Music Assistant</span>
-        <span class="title-sub">${sub}</span>
+        <span class="title-sub">
+          ${playingGroups} group${playingGroups === 1 ? '' : 's'} playing${zoneNote}
+        </span>
       </div>
     `;
   }
 
   private _renderActiveTab() {
     const tab = this._store.tab;
-    if (tab === 'player') {
-      return html`<hf-player-tab .store=${this._store}></hf-player-tab>`;
+    switch (tab) {
+      case 'player':
+        return html`<hf-player-tab .store=${this._store}></hf-player-tab>`;
+      case 'browser':
+        return html`<hf-browse-tab .store=${this._store}></hf-browse-tab>`;
+      case 'search':
+        return html`<hf-search-tab .store=${this._store}></hf-search-tab>`;
+      case 'queue':
+        return html`<hf-queue-tab .store=${this._store}></hf-queue-tab>`;
+      case 'group':
+        return html`<hf-output-tab .store=${this._store}></hf-output-tab>`;
     }
-    return html`
-      <div class="stub">
-        ${TABS.find((t) => t.id === tab)?.label} tab<br />
-        coming next in Phase 1.
-      </div>
-    `;
   }
 
   private _renderTabBar() {
@@ -225,4 +225,3 @@ export class HomefrontMusicCard extends LitElement {
     `;
   }
 }
-

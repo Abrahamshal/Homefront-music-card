@@ -1,50 +1,50 @@
-function t(t,e,s,r){var o,n=arguments.length,a=n<3?e:null===r?r=Object.getOwnPropertyDescriptor(e,s):r;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)a=Reflect.decorate(t,e,s,r);else for(var h=t.length-1;h>=0;h--)(o=t[h])&&(a=(n<3?o(a):n>3?o(e,s,a):o(e,s))||a);return n>3&&a&&Object.defineProperty(e,s,a),a}"function"==typeof SuppressedError&&SuppressedError;const e=globalThis,s=e.ShadowRoot&&(void 0===e.ShadyCSS||e.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,r=Symbol(),o=new WeakMap;let n=class{constructor(t,e,s){if(this._$cssResult$=!0,s!==r)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t,this.t=e}get styleSheet(){let t=this.o;const e=this.t;if(s&&void 0===t){const s=void 0!==e&&1===e.length;s&&(t=o.get(e)),void 0===t&&((this.o=t=new CSSStyleSheet).replaceSync(this.cssText),s&&o.set(e,t))}return t}toString(){return this.cssText}};const a=t=>new n("string"==typeof t?t:t+"",void 0,r),h=(t,...e)=>{const s=1===t.length?t[0]:e.reduce((e,s,r)=>e+(t=>{if(!0===t._$cssResult$)return t.cssText;if("number"==typeof t)return t;throw Error("Value passed to 'css' function must be a 'css' function result: "+t+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(s)+t[r+1],t[0]);return new n(s,t,r)},l=s?t=>t:t=>t instanceof CSSStyleSheet?(t=>{let e="";for(const s of t.cssRules)e+=s.cssText;return a(e)})(t):t,{is:c,defineProperty:d,getOwnPropertyDescriptor:p,getOwnPropertyNames:u,getOwnPropertySymbols:f,getPrototypeOf:m}=Object,g=globalThis,v=g.trustedTypes,y=v?v.emptyScript:"",b=g.reactiveElementPolyfillSupport,$=(t,e)=>t,_={toAttribute(t,e){switch(e){case Boolean:t=t?y:null;break;case Object:case Array:t=null==t?t:JSON.stringify(t)}return t},fromAttribute(t,e){let s=t;switch(e){case Boolean:s=null!==t;break;case Number:s=null===t?null:Number(t);break;case Object:case Array:try{s=JSON.parse(t)}catch(t){s=null}}return s}},x=(t,e)=>!c(t,e),w={attribute:!0,type:String,converter:_,reflect:!1,useDefault:!1,hasChanged:x};Symbol.metadata??=Symbol("metadata"),g.litPropertyMetadata??=new WeakMap;let A=class extends HTMLElement{static addInitializer(t){this._$Ei(),(this.l??=[]).push(t)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(t,e=w){if(e.state&&(e.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(t)&&((e=Object.create(e)).wrapped=!0),this.elementProperties.set(t,e),!e.noAccessor){const s=Symbol(),r=this.getPropertyDescriptor(t,s,e);void 0!==r&&d(this.prototype,t,r)}}static getPropertyDescriptor(t,e,s){const{get:r,set:o}=p(this.prototype,t)??{get(){return this[e]},set(t){this[e]=t}};return{get:r,set(e){const n=r?.call(this);o?.call(this,e),this.requestUpdate(t,n,s)},configurable:!0,enumerable:!0}}static getPropertyOptions(t){return this.elementProperties.get(t)??w}static _$Ei(){if(this.hasOwnProperty($("elementProperties")))return;const t=m(this);t.finalize(),void 0!==t.l&&(this.l=[...t.l]),this.elementProperties=new Map(t.elementProperties)}static finalize(){if(this.hasOwnProperty($("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty($("properties"))){const t=this.properties,e=[...u(t),...f(t)];for(const s of e)this.createProperty(s,t[s])}const t=this[Symbol.metadata];if(null!==t){const e=litPropertyMetadata.get(t);if(void 0!==e)for(const[t,s]of e)this.elementProperties.set(t,s)}this._$Eh=new Map;for(const[t,e]of this.elementProperties){const s=this._$Eu(t,e);void 0!==s&&this._$Eh.set(s,t)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(t){const e=[];if(Array.isArray(t)){const s=new Set(t.flat(1/0).reverse());for(const t of s)e.unshift(l(t))}else void 0!==t&&e.push(l(t));return e}static _$Eu(t,e){const s=e.attribute;return!1===s?void 0:"string"==typeof s?s:"string"==typeof t?t.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(t=>this.enableUpdating=t),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(t=>t(this))}addController(t){(this._$EO??=new Set).add(t),void 0!==this.renderRoot&&this.isConnected&&t.hostConnected?.()}removeController(t){this._$EO?.delete(t)}_$E_(){const t=new Map,e=this.constructor.elementProperties;for(const s of e.keys())this.hasOwnProperty(s)&&(t.set(s,this[s]),delete this[s]);t.size>0&&(this._$Ep=t)}createRenderRoot(){const t=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return((t,r)=>{if(s)t.adoptedStyleSheets=r.map(t=>t instanceof CSSStyleSheet?t:t.styleSheet);else for(const s of r){const r=document.createElement("style"),o=e.litNonce;void 0!==o&&r.setAttribute("nonce",o),r.textContent=s.cssText,t.appendChild(r)}})(t,this.constructor.elementStyles),t}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach(t=>t.hostConnected?.())}enableUpdating(t){}disconnectedCallback(){this._$EO?.forEach(t=>t.hostDisconnected?.())}attributeChangedCallback(t,e,s){this._$AK(t,s)}_$ET(t,e){const s=this.constructor.elementProperties.get(t),r=this.constructor._$Eu(t,s);if(void 0!==r&&!0===s.reflect){const o=(void 0!==s.converter?.toAttribute?s.converter:_).toAttribute(e,s.type);this._$Em=t,null==o?this.removeAttribute(r):this.setAttribute(r,o),this._$Em=null}}_$AK(t,e){const s=this.constructor,r=s._$Eh.get(t);if(void 0!==r&&this._$Em!==r){const t=s.getPropertyOptions(r),o="function"==typeof t.converter?{fromAttribute:t.converter}:void 0!==t.converter?.fromAttribute?t.converter:_;this._$Em=r;const n=o.fromAttribute(e,t.type);this[r]=n??this._$Ej?.get(r)??n,this._$Em=null}}requestUpdate(t,e,s,r=!1,o){if(void 0!==t){const n=this.constructor;if(!1===r&&(o=this[t]),s??=n.getPropertyOptions(t),!((s.hasChanged??x)(o,e)||s.useDefault&&s.reflect&&o===this._$Ej?.get(t)&&!this.hasAttribute(n._$Eu(t,s))))return;this.C(t,e,s)}!1===this.isUpdatePending&&(this._$ES=this._$EP())}C(t,e,{useDefault:s,reflect:r,wrapped:o},n){s&&!(this._$Ej??=new Map).has(t)&&(this._$Ej.set(t,n??e??this[t]),!0!==o||void 0!==n)||(this._$AL.has(t)||(this.hasUpdated||s||(e=void 0),this._$AL.set(t,e)),!0===r&&this._$Em!==t&&(this._$Eq??=new Set).add(t))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(t){Promise.reject(t)}const t=this.scheduleUpdate();return null!=t&&await t,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[t,e]of this._$Ep)this[t]=e;this._$Ep=void 0}const t=this.constructor.elementProperties;if(t.size>0)for(const[e,s]of t){const{wrapped:t}=s,r=this[e];!0!==t||this._$AL.has(e)||void 0===r||this.C(e,void 0,s,r)}}let t=!1;const e=this._$AL;try{t=this.shouldUpdate(e),t?(this.willUpdate(e),this._$EO?.forEach(t=>t.hostUpdate?.()),this.update(e)):this._$EM()}catch(e){throw t=!1,this._$EM(),e}t&&this._$AE(e)}willUpdate(t){}_$AE(t){this._$EO?.forEach(t=>t.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(t)),this.updated(t)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(t){return!0}update(t){this._$Eq&&=this._$Eq.forEach(t=>this._$ET(t,this[t])),this._$EM()}updated(t){}firstUpdated(t){}};A.elementStyles=[],A.shadowRootOptions={mode:"open"},A[$("elementProperties")]=new Map,A[$("finalized")]=new Map,b?.({ReactiveElement:A}),(g.reactiveElementVersions??=[]).push("2.1.2");const M=globalThis,E=t=>t,C=M.trustedTypes,P=C?C.createPolicy("lit-html",{createHTML:t=>t}):void 0,T="$lit$",O=`lit$${Math.random().toFixed(9).slice(2)}$`,U="?"+O,B=`<${U}>`,N=document,j=()=>N.createComment(""),D=t=>null===t||"object"!=typeof t&&"function"!=typeof t,q=Array.isArray,V="[ \t\n\f\r]",W=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,F=/-->/g,G=/>/g,K=RegExp(`>|${V}(?:([^\\s"'>=/]+)(${V}*=${V}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),Q=/'/g,J=/"/g,Y=/^(?:script|style|textarea|title)$/i,X=(t=>(e,...s)=>({_$litType$:t,strings:e,values:s}))(1),tt=Symbol.for("lit-noChange"),et=Symbol.for("lit-nothing"),it=new WeakMap,st=N.createTreeWalker(N,129);function rt(t,e){if(!q(t)||!t.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==P?P.createHTML(e):e}const ot=(t,e)=>{const s=t.length-1,r=[];let o,n=2===e?"<svg>":3===e?"<math>":"",a=W;for(let e=0;e<s;e++){const s=t[e];let h,l,c=-1,d=0;for(;d<s.length&&(a.lastIndex=d,l=a.exec(s),null!==l);)d=a.lastIndex,a===W?"!--"===l[1]?a=F:void 0!==l[1]?a=G:void 0!==l[2]?(Y.test(l[2])&&(o=RegExp("</"+l[2],"g")),a=K):void 0!==l[3]&&(a=K):a===K?">"===l[0]?(a=o??W,c=-1):void 0===l[1]?c=-2:(c=a.lastIndex-l[2].length,h=l[1],a=void 0===l[3]?K:'"'===l[3]?J:Q):a===J||a===Q?a=K:a===F||a===G?a=W:(a=K,o=void 0);const p=a===K&&t[e+1].startsWith("/>")?" ":"";n+=a===W?s+B:c>=0?(r.push(h),s.slice(0,c)+T+s.slice(c)+O+p):s+O+(-2===c?e:p)}return[rt(t,n+(t[s]||"<?>")+(2===e?"</svg>":3===e?"</math>":"")),r]};class S{constructor({strings:t,_$litType$:e},s){let r;this.parts=[];let o=0,n=0;const a=t.length-1,h=this.parts,[l,c]=ot(t,e);if(this.el=S.createElement(l,s),st.currentNode=this.el.content,2===e||3===e){const t=this.el.content.firstChild;t.replaceWith(...t.childNodes)}for(;null!==(r=st.nextNode())&&h.length<a;){if(1===r.nodeType){if(r.hasAttributes())for(const t of r.getAttributeNames())if(t.endsWith(T)){const e=c[n++],s=r.getAttribute(t).split(O),a=/([.?@])?(.*)/.exec(e);h.push({type:1,index:o,name:a[2],strings:s,ctor:"."===a[1]?I:"?"===a[1]?L:"@"===a[1]?z:H}),r.removeAttribute(t)}else t.startsWith(O)&&(h.push({type:6,index:o}),r.removeAttribute(t));if(Y.test(r.tagName)){const t=r.textContent.split(O),e=t.length-1;if(e>0){r.textContent=C?C.emptyScript:"";for(let s=0;s<e;s++)r.append(t[s],j()),st.nextNode(),h.push({type:2,index:++o});r.append(t[e],j())}}}else if(8===r.nodeType)if(r.data===U)h.push({type:2,index:o});else{let t=-1;for(;-1!==(t=r.data.indexOf(O,t+1));)h.push({type:7,index:o}),t+=O.length-1}o++}}static createElement(t,e){const s=N.createElement("template");return s.innerHTML=t,s}}function nt(t,e,s=t,r){if(e===tt)return e;let o=void 0!==r?s._$Co?.[r]:s._$Cl;const n=D(e)?void 0:e._$litDirective$;return o?.constructor!==n&&(o?._$AO?.(!1),void 0===n?o=void 0:(o=new n(t),o._$AT(t,s,r)),void 0!==r?(s._$Co??=[])[r]=o:s._$Cl=o),void 0!==o&&(e=nt(t,o._$AS(t,e.values),o,r)),e}class R{constructor(t,e){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=e}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){const{el:{content:e},parts:s}=this._$AD,r=(t?.creationScope??N).importNode(e,!0);st.currentNode=r;let o=st.nextNode(),n=0,a=0,h=s[0];for(;void 0!==h;){if(n===h.index){let e;2===h.type?e=new k(o,o.nextSibling,this,t):1===h.type?e=new h.ctor(o,h.name,h.strings,this,t):6===h.type&&(e=new Z(o,this,t)),this._$AV.push(e),h=s[++a]}n!==h?.index&&(o=st.nextNode(),n++)}return st.currentNode=N,r}p(t){let e=0;for(const s of this._$AV)void 0!==s&&(void 0!==s.strings?(s._$AI(t,s,e),e+=s.strings.length-2):s._$AI(t[e])),e++}}class k{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(t,e,s,r){this.type=2,this._$AH=et,this._$AN=void 0,this._$AA=t,this._$AB=e,this._$AM=s,this.options=r,this._$Cv=r?.isConnected??!0}get parentNode(){let t=this._$AA.parentNode;const e=this._$AM;return void 0!==e&&11===t?.nodeType&&(t=e.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,e=this){t=nt(this,t,e),D(t)?t===et||null==t||""===t?(this._$AH!==et&&this._$AR(),this._$AH=et):t!==this._$AH&&t!==tt&&this._(t):void 0!==t._$litType$?this.$(t):void 0!==t.nodeType?this.T(t):(t=>q(t)||"function"==typeof t?.[Symbol.iterator])(t)?this.k(t):this._(t)}O(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}T(t){this._$AH!==t&&(this._$AR(),this._$AH=this.O(t))}_(t){this._$AH!==et&&D(this._$AH)?this._$AA.nextSibling.data=t:this.T(N.createTextNode(t)),this._$AH=t}$(t){const{values:e,_$litType$:s}=t,r="number"==typeof s?this._$AC(t):(void 0===s.el&&(s.el=S.createElement(rt(s.h,s.h[0]),this.options)),s);if(this._$AH?._$AD===r)this._$AH.p(e);else{const t=new R(r,this),s=t.u(this.options);t.p(e),this.T(s),this._$AH=t}}_$AC(t){let e=it.get(t.strings);return void 0===e&&it.set(t.strings,e=new S(t)),e}k(t){q(this._$AH)||(this._$AH=[],this._$AR());const e=this._$AH;let s,r=0;for(const o of t)r===e.length?e.push(s=new k(this.O(j()),this.O(j()),this,this.options)):s=e[r],s._$AI(o),r++;r<e.length&&(this._$AR(s&&s._$AB.nextSibling,r),e.length=r)}_$AR(t=this._$AA.nextSibling,e){for(this._$AP?.(!1,!0,e);t!==this._$AB;){const e=E(t).nextSibling;E(t).remove(),t=e}}setConnected(t){void 0===this._$AM&&(this._$Cv=t,this._$AP?.(t))}}class H{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(t,e,s,r,o){this.type=1,this._$AH=et,this._$AN=void 0,this.element=t,this.name=e,this._$AM=r,this.options=o,s.length>2||""!==s[0]||""!==s[1]?(this._$AH=Array(s.length-1).fill(new String),this.strings=s):this._$AH=et}_$AI(t,e=this,s,r){const o=this.strings;let n=!1;if(void 0===o)t=nt(this,t,e,0),n=!D(t)||t!==this._$AH&&t!==tt,n&&(this._$AH=t);else{const r=t;let a,h;for(t=o[0],a=0;a<o.length-1;a++)h=nt(this,r[s+a],e,a),h===tt&&(h=this._$AH[a]),n||=!D(h)||h!==this._$AH[a],h===et?t=et:t!==et&&(t+=(h??"")+o[a+1]),this._$AH[a]=h}n&&!r&&this.j(t)}j(t){t===et?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,t??"")}}class I extends H{constructor(){super(...arguments),this.type=3}j(t){this.element[this.name]=t===et?void 0:t}}class L extends H{constructor(){super(...arguments),this.type=4}j(t){this.element.toggleAttribute(this.name,!!t&&t!==et)}}class z extends H{constructor(t,e,s,r,o){super(t,e,s,r,o),this.type=5}_$AI(t,e=this){if((t=nt(this,t,e,0)??et)===tt)return;const s=this._$AH,r=t===et&&s!==et||t.capture!==s.capture||t.once!==s.once||t.passive!==s.passive,o=t!==et&&(s===et||r);r&&this.element.removeEventListener(this.name,this,s),o&&this.element.addEventListener(this.name,this,t),this._$AH=t}handleEvent(t){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,t):this._$AH.handleEvent(t)}}class Z{constructor(t,e,s){this.element=t,this.type=6,this._$AN=void 0,this._$AM=e,this.options=s}get _$AU(){return this._$AM._$AU}_$AI(t){nt(this,t)}}const at=M.litHtmlPolyfillSupport;at?.(S,k),(M.litHtmlVersions??=[]).push("3.3.3");const ht=globalThis;class i extends A{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){const t=super.createRenderRoot();return this.renderOptions.renderBefore??=t.firstChild,t}update(t){const e=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Do=((t,e,s)=>{const r=s?.renderBefore??e;let o=r._$litPart$;if(void 0===o){const t=s?.renderBefore??null;r._$litPart$=o=new k(e.insertBefore(j(),t),t,void 0,s??{})}return o._$AI(t),o})(e,this.renderRoot,this.renderOptions)}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(!0)}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(!1)}render(){return tt}}i._$litElement$=!0,i.finalized=!0,ht.litElementHydrateSupport?.({LitElement:i});const lt=ht.litElementPolyfillSupport;lt?.({LitElement:i}),(ht.litElementVersions??=[]).push("4.2.2");const ct=t=>(e,s)=>{void 0!==s?s.addInitializer(()=>{customElements.define(t,e)}):customElements.define(t,e)},dt={attribute:!0,type:String,converter:_,reflect:!1,hasChanged:x},pt=(t=dt,e,s)=>{const{kind:r,metadata:o}=s;let n=globalThis.litPropertyMetadata.get(o);if(void 0===n&&globalThis.litPropertyMetadata.set(o,n=new Map),"setter"===r&&((t=Object.create(t)).wrapped=!0),n.set(s.name,t),"accessor"===r){const{name:r}=s;return{set(s){const o=e.get.call(this);e.set.call(this,s),this.requestUpdate(r,o,t,!0,s)},init(e){return void 0!==e&&this.C(r,void 0,t,e),e}}}if("setter"===r){const{name:r}=s;return function(s){const o=this[r];e.call(this,s),this.requestUpdate(r,o,t,!0,s)}}throw Error("Unsupported decorator location: "+r)};function ut(t){return(e,s)=>"object"==typeof s?pt(t,e,s):((t,e,s)=>{const r=e.hasOwnProperty(s);return e.constructor.createProperty(s,t),r?Object.getOwnPropertyDescriptor(e,s):void 0})(t,e,s)}const ft="#1d2026",mt="#23272f",gt="#ecedef",vt="rgba(236,237,239,0.55)",yt="rgba(255,255,255,0.07)",bt="rgba(255,255,255,0.16)",$t="rgba(255,255,255,0.05)",_t="#e08a4a",xt="#1b0f06",wt="rgba(255,255,255,0.12)",kt="rgba(255,255,255,0.04)",At="rgba(224,138,74,0.12)",St="14px",Mt=h`
+function t(t,e,r,s){var o,a=arguments.length,n=a<3?e:null===s?s=Object.getOwnPropertyDescriptor(e,r):s;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)n=Reflect.decorate(t,e,r,s);else for(var l=t.length-1;l>=0;l--)(o=t[l])&&(n=(a<3?o(n):a>3?o(e,r,n):o(e,r))||n);return a>3&&n&&Object.defineProperty(e,r,n),n}"function"==typeof SuppressedError&&SuppressedError;const e=globalThis,r=e.ShadowRoot&&(void 0===e.ShadyCSS||e.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,s=Symbol(),o=new WeakMap;let a=class{constructor(t,e,r){if(this._$cssResult$=!0,r!==s)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t,this.t=e}get styleSheet(){let t=this.o;const e=this.t;if(r&&void 0===t){const r=void 0!==e&&1===e.length;r&&(t=o.get(e)),void 0===t&&((this.o=t=new CSSStyleSheet).replaceSync(this.cssText),r&&o.set(e,t))}return t}toString(){return this.cssText}};const n=t=>new a("string"==typeof t?t:t+"",void 0,s),l=(t,...e)=>{const r=1===t.length?t[0]:e.reduce((e,r,s)=>e+(t=>{if(!0===t._$cssResult$)return t.cssText;if("number"==typeof t)return t;throw Error("Value passed to 'css' function must be a 'css' function result: "+t+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(r)+t[s+1],t[0]);return new a(r,t,s)},d=r?t=>t:t=>t instanceof CSSStyleSheet?(t=>{let e="";for(const r of t.cssRules)e+=r.cssText;return n(e)})(t):t,{is:c,defineProperty:h,getOwnPropertyDescriptor:p,getOwnPropertyNames:u,getOwnPropertySymbols:f,getPrototypeOf:v}=Object,m=globalThis,g=m.trustedTypes,b=g?g.emptyScript:"",x=m.reactiveElementPolyfillSupport,y=(t,e)=>t,$={toAttribute(t,e){switch(e){case Boolean:t=t?b:null;break;case Object:case Array:t=null==t?t:JSON.stringify(t)}return t},fromAttribute(t,e){let r=t;switch(e){case Boolean:r=null!==t;break;case Number:r=null===t?null:Number(t);break;case Object:case Array:try{r=JSON.parse(t)}catch(t){r=null}}return r}},w=(t,e)=>!c(t,e),_={attribute:!0,type:String,converter:$,reflect:!1,useDefault:!1,hasChanged:w};Symbol.metadata??=Symbol("metadata"),m.litPropertyMetadata??=new WeakMap;let A=class extends HTMLElement{static addInitializer(t){this._$Ei(),(this.l??=[]).push(t)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(t,e=_){if(e.state&&(e.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(t)&&((e=Object.create(e)).wrapped=!0),this.elementProperties.set(t,e),!e.noAccessor){const r=Symbol(),s=this.getPropertyDescriptor(t,r,e);void 0!==s&&h(this.prototype,t,s)}}static getPropertyDescriptor(t,e,r){const{get:s,set:o}=p(this.prototype,t)??{get(){return this[e]},set(t){this[e]=t}};return{get:s,set(e){const a=s?.call(this);o?.call(this,e),this.requestUpdate(t,a,r)},configurable:!0,enumerable:!0}}static getPropertyOptions(t){return this.elementProperties.get(t)??_}static _$Ei(){if(this.hasOwnProperty(y("elementProperties")))return;const t=v(this);t.finalize(),void 0!==t.l&&(this.l=[...t.l]),this.elementProperties=new Map(t.elementProperties)}static finalize(){if(this.hasOwnProperty(y("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(y("properties"))){const t=this.properties,e=[...u(t),...f(t)];for(const r of e)this.createProperty(r,t[r])}const t=this[Symbol.metadata];if(null!==t){const e=litPropertyMetadata.get(t);if(void 0!==e)for(const[t,r]of e)this.elementProperties.set(t,r)}this._$Eh=new Map;for(const[t,e]of this.elementProperties){const r=this._$Eu(t,e);void 0!==r&&this._$Eh.set(r,t)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(t){const e=[];if(Array.isArray(t)){const r=new Set(t.flat(1/0).reverse());for(const t of r)e.unshift(d(t))}else void 0!==t&&e.push(d(t));return e}static _$Eu(t,e){const r=e.attribute;return!1===r?void 0:"string"==typeof r?r:"string"==typeof t?t.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(t=>this.enableUpdating=t),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(t=>t(this))}addController(t){(this._$EO??=new Set).add(t),void 0!==this.renderRoot&&this.isConnected&&t.hostConnected?.()}removeController(t){this._$EO?.delete(t)}_$E_(){const t=new Map,e=this.constructor.elementProperties;for(const r of e.keys())this.hasOwnProperty(r)&&(t.set(r,this[r]),delete this[r]);t.size>0&&(this._$Ep=t)}createRenderRoot(){const t=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return((t,s)=>{if(r)t.adoptedStyleSheets=s.map(t=>t instanceof CSSStyleSheet?t:t.styleSheet);else for(const r of s){const s=document.createElement("style"),o=e.litNonce;void 0!==o&&s.setAttribute("nonce",o),s.textContent=r.cssText,t.appendChild(s)}})(t,this.constructor.elementStyles),t}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach(t=>t.hostConnected?.())}enableUpdating(t){}disconnectedCallback(){this._$EO?.forEach(t=>t.hostDisconnected?.())}attributeChangedCallback(t,e,r){this._$AK(t,r)}_$ET(t,e){const r=this.constructor.elementProperties.get(t),s=this.constructor._$Eu(t,r);if(void 0!==s&&!0===r.reflect){const o=(void 0!==r.converter?.toAttribute?r.converter:$).toAttribute(e,r.type);this._$Em=t,null==o?this.removeAttribute(s):this.setAttribute(s,o),this._$Em=null}}_$AK(t,e){const r=this.constructor,s=r._$Eh.get(t);if(void 0!==s&&this._$Em!==s){const t=r.getPropertyOptions(s),o="function"==typeof t.converter?{fromAttribute:t.converter}:void 0!==t.converter?.fromAttribute?t.converter:$;this._$Em=s;const a=o.fromAttribute(e,t.type);this[s]=a??this._$Ej?.get(s)??a,this._$Em=null}}requestUpdate(t,e,r,s=!1,o){if(void 0!==t){const a=this.constructor;if(!1===s&&(o=this[t]),r??=a.getPropertyOptions(t),!((r.hasChanged??w)(o,e)||r.useDefault&&r.reflect&&o===this._$Ej?.get(t)&&!this.hasAttribute(a._$Eu(t,r))))return;this.C(t,e,r)}!1===this.isUpdatePending&&(this._$ES=this._$EP())}C(t,e,{useDefault:r,reflect:s,wrapped:o},a){r&&!(this._$Ej??=new Map).has(t)&&(this._$Ej.set(t,a??e??this[t]),!0!==o||void 0!==a)||(this._$AL.has(t)||(this.hasUpdated||r||(e=void 0),this._$AL.set(t,e)),!0===s&&this._$Em!==t&&(this._$Eq??=new Set).add(t))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(t){Promise.reject(t)}const t=this.scheduleUpdate();return null!=t&&await t,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[t,e]of this._$Ep)this[t]=e;this._$Ep=void 0}const t=this.constructor.elementProperties;if(t.size>0)for(const[e,r]of t){const{wrapped:t}=r,s=this[e];!0!==t||this._$AL.has(e)||void 0===s||this.C(e,void 0,r,s)}}let t=!1;const e=this._$AL;try{t=this.shouldUpdate(e),t?(this.willUpdate(e),this._$EO?.forEach(t=>t.hostUpdate?.()),this.update(e)):this._$EM()}catch(e){throw t=!1,this._$EM(),e}t&&this._$AE(e)}willUpdate(t){}_$AE(t){this._$EO?.forEach(t=>t.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(t)),this.updated(t)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(t){return!0}update(t){this._$Eq&&=this._$Eq.forEach(t=>this._$ET(t,this[t])),this._$EM()}updated(t){}firstUpdated(t){}};A.elementStyles=[],A.shadowRootOptions={mode:"open"},A[y("elementProperties")]=new Map,A[y("finalized")]=new Map,x?.({ReactiveElement:A}),(m.reactiveElementVersions??=[]).push("2.1.2");const M=globalThis,C=t=>t,P=M.trustedTypes,E=P?P.createPolicy("lit-html",{createHTML:t=>t}):void 0,T="$lit$",U=`lit$${Math.random().toFixed(9).slice(2)}$`,B="?"+U,O=`<${B}>`,q=document,D=()=>q.createComment(""),j=t=>null===t||"object"!=typeof t&&"function"!=typeof t,N=Array.isArray,G="[ \t\n\f\r]",V=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,F=/-->/g,Q=/>/g,W=RegExp(`>|${G}(?:([^\\s"'>=/]+)(${G}*=${G}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),Y=/'/g,K=/"/g,X=/^(?:script|style|textarea|title)$/i,J=(t=>(e,...r)=>({_$litType$:t,strings:e,values:r}))(1),tt=Symbol.for("lit-noChange"),et=Symbol.for("lit-nothing"),it=new WeakMap,rt=q.createTreeWalker(q,129);function st(t,e){if(!N(t)||!t.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==E?E.createHTML(e):e}const ot=(t,e)=>{const r=t.length-1,s=[];let o,a=2===e?"<svg>":3===e?"<math>":"",n=V;for(let e=0;e<r;e++){const r=t[e];let l,d,c=-1,h=0;for(;h<r.length&&(n.lastIndex=h,d=n.exec(r),null!==d);)h=n.lastIndex,n===V?"!--"===d[1]?n=F:void 0!==d[1]?n=Q:void 0!==d[2]?(X.test(d[2])&&(o=RegExp("</"+d[2],"g")),n=W):void 0!==d[3]&&(n=W):n===W?">"===d[0]?(n=o??V,c=-1):void 0===d[1]?c=-2:(c=n.lastIndex-d[2].length,l=d[1],n=void 0===d[3]?W:'"'===d[3]?K:Y):n===K||n===Y?n=W:n===F||n===Q?n=V:(n=W,o=void 0);const p=n===W&&t[e+1].startsWith("/>")?" ":"";a+=n===V?r+O:c>=0?(s.push(l),r.slice(0,c)+T+r.slice(c)+U+p):r+U+(-2===c?e:p)}return[st(t,a+(t[r]||"<?>")+(2===e?"</svg>":3===e?"</math>":"")),s]};class S{constructor({strings:t,_$litType$:e},r){let s;this.parts=[];let o=0,a=0;const n=t.length-1,l=this.parts,[d,c]=ot(t,e);if(this.el=S.createElement(d,r),rt.currentNode=this.el.content,2===e||3===e){const t=this.el.content.firstChild;t.replaceWith(...t.childNodes)}for(;null!==(s=rt.nextNode())&&l.length<n;){if(1===s.nodeType){if(s.hasAttributes())for(const t of s.getAttributeNames())if(t.endsWith(T)){const e=c[a++],r=s.getAttribute(t).split(U),n=/([.?@])?(.*)/.exec(e);l.push({type:1,index:o,name:n[2],strings:r,ctor:"."===n[1]?I:"?"===n[1]?L:"@"===n[1]?z:H}),s.removeAttribute(t)}else t.startsWith(U)&&(l.push({type:6,index:o}),s.removeAttribute(t));if(X.test(s.tagName)){const t=s.textContent.split(U),e=t.length-1;if(e>0){s.textContent=P?P.emptyScript:"";for(let r=0;r<e;r++)s.append(t[r],D()),rt.nextNode(),l.push({type:2,index:++o});s.append(t[e],D())}}}else if(8===s.nodeType)if(s.data===B)l.push({type:2,index:o});else{let t=-1;for(;-1!==(t=s.data.indexOf(U,t+1));)l.push({type:7,index:o}),t+=U.length-1}o++}}static createElement(t,e){const r=q.createElement("template");return r.innerHTML=t,r}}function at(t,e,r=t,s){if(e===tt)return e;let o=void 0!==s?r._$Co?.[s]:r._$Cl;const a=j(e)?void 0:e._$litDirective$;return o?.constructor!==a&&(o?._$AO?.(!1),void 0===a?o=void 0:(o=new a(t),o._$AT(t,r,s)),void 0!==s?(r._$Co??=[])[s]=o:r._$Cl=o),void 0!==o&&(e=at(t,o._$AS(t,e.values),o,s)),e}class R{constructor(t,e){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=e}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){const{el:{content:e},parts:r}=this._$AD,s=(t?.creationScope??q).importNode(e,!0);rt.currentNode=s;let o=rt.nextNode(),a=0,n=0,l=r[0];for(;void 0!==l;){if(a===l.index){let e;2===l.type?e=new k(o,o.nextSibling,this,t):1===l.type?e=new l.ctor(o,l.name,l.strings,this,t):6===l.type&&(e=new Z(o,this,t)),this._$AV.push(e),l=r[++n]}a!==l?.index&&(o=rt.nextNode(),a++)}return rt.currentNode=q,s}p(t){let e=0;for(const r of this._$AV)void 0!==r&&(void 0!==r.strings?(r._$AI(t,r,e),e+=r.strings.length-2):r._$AI(t[e])),e++}}class k{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(t,e,r,s){this.type=2,this._$AH=et,this._$AN=void 0,this._$AA=t,this._$AB=e,this._$AM=r,this.options=s,this._$Cv=s?.isConnected??!0}get parentNode(){let t=this._$AA.parentNode;const e=this._$AM;return void 0!==e&&11===t?.nodeType&&(t=e.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,e=this){t=at(this,t,e),j(t)?t===et||null==t||""===t?(this._$AH!==et&&this._$AR(),this._$AH=et):t!==this._$AH&&t!==tt&&this._(t):void 0!==t._$litType$?this.$(t):void 0!==t.nodeType?this.T(t):(t=>N(t)||"function"==typeof t?.[Symbol.iterator])(t)?this.k(t):this._(t)}O(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}T(t){this._$AH!==t&&(this._$AR(),this._$AH=this.O(t))}_(t){this._$AH!==et&&j(this._$AH)?this._$AA.nextSibling.data=t:this.T(q.createTextNode(t)),this._$AH=t}$(t){const{values:e,_$litType$:r}=t,s="number"==typeof r?this._$AC(t):(void 0===r.el&&(r.el=S.createElement(st(r.h,r.h[0]),this.options)),r);if(this._$AH?._$AD===s)this._$AH.p(e);else{const t=new R(s,this),r=t.u(this.options);t.p(e),this.T(r),this._$AH=t}}_$AC(t){let e=it.get(t.strings);return void 0===e&&it.set(t.strings,e=new S(t)),e}k(t){N(this._$AH)||(this._$AH=[],this._$AR());const e=this._$AH;let r,s=0;for(const o of t)s===e.length?e.push(r=new k(this.O(D()),this.O(D()),this,this.options)):r=e[s],r._$AI(o),s++;s<e.length&&(this._$AR(r&&r._$AB.nextSibling,s),e.length=s)}_$AR(t=this._$AA.nextSibling,e){for(this._$AP?.(!1,!0,e);t!==this._$AB;){const e=C(t).nextSibling;C(t).remove(),t=e}}setConnected(t){void 0===this._$AM&&(this._$Cv=t,this._$AP?.(t))}}class H{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(t,e,r,s,o){this.type=1,this._$AH=et,this._$AN=void 0,this.element=t,this.name=e,this._$AM=s,this.options=o,r.length>2||""!==r[0]||""!==r[1]?(this._$AH=Array(r.length-1).fill(new String),this.strings=r):this._$AH=et}_$AI(t,e=this,r,s){const o=this.strings;let a=!1;if(void 0===o)t=at(this,t,e,0),a=!j(t)||t!==this._$AH&&t!==tt,a&&(this._$AH=t);else{const s=t;let n,l;for(t=o[0],n=0;n<o.length-1;n++)l=at(this,s[r+n],e,n),l===tt&&(l=this._$AH[n]),a||=!j(l)||l!==this._$AH[n],l===et?t=et:t!==et&&(t+=(l??"")+o[n+1]),this._$AH[n]=l}a&&!s&&this.j(t)}j(t){t===et?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,t??"")}}class I extends H{constructor(){super(...arguments),this.type=3}j(t){this.element[this.name]=t===et?void 0:t}}class L extends H{constructor(){super(...arguments),this.type=4}j(t){this.element.toggleAttribute(this.name,!!t&&t!==et)}}class z extends H{constructor(t,e,r,s,o){super(t,e,r,s,o),this.type=5}_$AI(t,e=this){if((t=at(this,t,e,0)??et)===tt)return;const r=this._$AH,s=t===et&&r!==et||t.capture!==r.capture||t.once!==r.once||t.passive!==r.passive,o=t!==et&&(r===et||s);s&&this.element.removeEventListener(this.name,this,r),o&&this.element.addEventListener(this.name,this,t),this._$AH=t}handleEvent(t){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,t):this._$AH.handleEvent(t)}}class Z{constructor(t,e,r){this.element=t,this.type=6,this._$AN=void 0,this._$AM=e,this.options=r}get _$AU(){return this._$AM._$AU}_$AI(t){at(this,t)}}const nt=M.litHtmlPolyfillSupport;nt?.(S,k),(M.litHtmlVersions??=[]).push("3.3.3");const lt=globalThis;class i extends A{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){const t=super.createRenderRoot();return this.renderOptions.renderBefore??=t.firstChild,t}update(t){const e=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Do=((t,e,r)=>{const s=r?.renderBefore??e;let o=s._$litPart$;if(void 0===o){const t=r?.renderBefore??null;s._$litPart$=o=new k(e.insertBefore(D(),t),t,void 0,r??{})}return o._$AI(t),o})(e,this.renderRoot,this.renderOptions)}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(!0)}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(!1)}render(){return tt}}i._$litElement$=!0,i.finalized=!0,lt.litElementHydrateSupport?.({LitElement:i});const dt=lt.litElementPolyfillSupport;dt?.({LitElement:i}),(lt.litElementVersions??=[]).push("4.2.2");const ct=t=>(e,r)=>{void 0!==r?r.addInitializer(()=>{customElements.define(t,e)}):customElements.define(t,e)},ht={attribute:!0,type:String,converter:$,reflect:!1,hasChanged:w},pt=(t=ht,e,r)=>{const{kind:s,metadata:o}=r;let a=globalThis.litPropertyMetadata.get(o);if(void 0===a&&globalThis.litPropertyMetadata.set(o,a=new Map),"setter"===s&&((t=Object.create(t)).wrapped=!0),a.set(r.name,t),"accessor"===s){const{name:s}=r;return{set(r){const o=e.get.call(this);e.set.call(this,r),this.requestUpdate(s,o,t,!0,r)},init(e){return void 0!==e&&this.C(s,void 0,t,e),e}}}if("setter"===s){const{name:s}=r;return function(r){const o=this[s];e.call(this,r),this.requestUpdate(s,o,t,!0,r)}}throw Error("Unsupported decorator location: "+s)};function ut(t){return(e,r)=>"object"==typeof r?pt(t,e,r):((t,e,r)=>{const s=e.hasOwnProperty(r);return e.constructor.createProperty(r,t),s?Object.getOwnPropertyDescriptor(e,r):void 0})(t,e,r)}function ft(t){return ut({...t,state:!0,attribute:!1})}const vt="#1d2026",mt="#23272f",gt="#ecedef",bt="rgba(236,237,239,0.55)",xt="rgba(255,255,255,0.07)",yt="rgba(255,255,255,0.16)",$t="rgba(255,255,255,0.05)",wt="#e08a4a",kt="#1b0f06",_t="rgba(255,255,255,0.12)",zt="rgba(255,255,255,0.04)",At="rgba(224,138,74,0.12)",St="14px",It=l`
   :host {
-    --hf-bg: ${a("#16181d")};
-    --hf-surface: ${a(ft)};
-    --hf-surface-alt: ${a(mt)};
-    --hf-text: ${a(gt)};
-    --hf-text-dim: ${a(vt)};
-    --hf-border: ${a(yt)};
-    --hf-border-active: ${a(bt)};
-    --hf-divider: ${a($t)};
-    --hf-accent: ${a(_t)};
-    --hf-accent-text: ${a(xt)};
-    --hf-slider-track: ${a(wt)};
-    --hf-input: ${a(kt)};
-    --hf-selected: ${a(At)};
-    --hf-radius: ${a(St)};
+    --hf-bg: ${n("#16181d")};
+    --hf-surface: ${n(vt)};
+    --hf-surface-alt: ${n(mt)};
+    --hf-text: ${n(gt)};
+    --hf-text-dim: ${n(bt)};
+    --hf-border: ${n(xt)};
+    --hf-border-active: ${n(yt)};
+    --hf-divider: ${n($t)};
+    --hf-accent: ${n(wt)};
+    --hf-accent-text: ${n(kt)};
+    --hf-slider-track: ${n(_t)};
+    --hf-input: ${n(zt)};
+    --hf-selected: ${n(At)};
+    --hf-radius: ${n(St)};
     --hf-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   }
-`;function Et(t,e={}){return(s={})=>{const r=s.size??20,o=s.stroke??"currentColor",n=s.sw??e.sw??1.7;return X`<svg width=${r} height=${r} viewBox="0 0 24 24" fill="none" stroke=${o} stroke-width=${n} stroke-linecap="round" stroke-linejoin="round"><path d=${t} /></svg>`}}function Ct(t){return(e={})=>{const s=e.size??20,r=e.fill??"currentColor";return X`<svg width=${s} height=${s} viewBox="0 0 24 24" fill=${r} stroke="none"><path d=${t} /></svg>`}}const Pt={play:Ct("M7 5.5v13a1 1 0 0 0 1.55.83l10-6.5a1 1 0 0 0 0-1.66l-10-6.5A1 1 0 0 0 7 5.5z"),pause:(t={})=>{const e=t.size??20,s=t.fill??"currentColor";return X`<svg width=${e} height=${e} viewBox="0 0 24 24" fill=${s} stroke="none">
+`;function Mt(t,e={}){return(r={})=>{const s=r.size??20,o=r.stroke??"currentColor",a=r.sw??e.sw??1.7;return J`<svg width=${s} height=${s} viewBox="0 0 24 24" fill="none" stroke=${o} stroke-width=${a} stroke-linecap="round" stroke-linejoin="round"><path d=${t} /></svg>`}}function Ct(t){return(e={})=>{const r=e.size??20,s=e.fill??"currentColor";return J`<svg width=${r} height=${r} viewBox="0 0 24 24" fill=${s} stroke="none"><path d=${t} /></svg>`}}const Pt={play:Ct("M7 5.5v13a1 1 0 0 0 1.55.83l10-6.5a1 1 0 0 0 0-1.66l-10-6.5A1 1 0 0 0 7 5.5z"),pause:(t={})=>{const e=t.size??20,r=t.fill??"currentColor";return J`<svg width=${e} height=${e} viewBox="0 0 24 24" fill=${r} stroke="none">
       <rect x="6" y="5" width="4.2" height="14" rx="1.2" />
       <rect x="13.8" y="5" width="4.2" height="14" rx="1.2" />
-    </svg>`},prev:Ct("M6 5h2v14H6V5zm14 .9v12.2a1 1 0 0 1-1.55.83L9 12.83a1 1 0 0 1 0-1.66l9.45-6.1A1 1 0 0 1 20 5.9z"),next:Ct("M18 5h-2v14h2V5zM4 5.9v12.2a1 1 0 0 0 1.55.83L15 12.83a1 1 0 0 0 0-1.66L5.55 5.07A1 1 0 0 0 4 5.9z"),shuffle:Et("M16 4h4v4 M20 4l-7 7 M4 4l16 16 M16 20h4v-4 M4 20l5-5"),rep:Et("M4 9V8a3 3 0 0 1 3-3h11l-3-3 M20 15v1a3 3 0 0 1-3 3H6l3 3"),rep1:(t={})=>{const e=t.size??20,s=t.stroke??"currentColor",r=t.sw??1.7;return X`<svg width=${e} height=${e} viewBox="0 0 24 24" fill="none" stroke=${s} stroke-width=${r} stroke-linecap="round" stroke-linejoin="round">
+    </svg>`},prev:Ct("M6 5h2v14H6V5zm14 .9v12.2a1 1 0 0 1-1.55.83L9 12.83a1 1 0 0 1 0-1.66l9.45-6.1A1 1 0 0 1 20 5.9z"),next:Ct("M18 5h-2v14h2V5zM4 5.9v12.2a1 1 0 0 0 1.55.83L15 12.83a1 1 0 0 0 0-1.66L5.55 5.07A1 1 0 0 0 4 5.9z"),shuffle:Mt("M16 4h4v4 M20 4l-7 7 M4 4l16 16 M16 20h4v-4 M4 20l5-5"),rep:Mt("M4 9V8a3 3 0 0 1 3-3h11l-3-3 M20 15v1a3 3 0 0 1-3 3H6l3 3"),rep1:(t={})=>{const e=t.size??20,r=t.stroke??"currentColor",s=t.sw??1.7;return J`<svg width=${e} height=${e} viewBox="0 0 24 24" fill="none" stroke=${r} stroke-width=${s} stroke-linecap="round" stroke-linejoin="round">
       <path d="M4 9V8a3 3 0 0 1 3-3h11l-3-3 M20 15v1a3 3 0 0 1-3 3H6l3 3" />
       <text x="12" y="14" text-anchor="middle" font-size="7" font-weight="700" fill="currentColor" stroke="none">1</text>
-    </svg>`},queue:Et("M4 7h11 M4 12h11 M4 17h7 M16 14v6 l3-2"),search:Et("M11 4a7 7 0 1 0 4.6 12.3L20 20 M11 4a7 7 0 0 1 7 7"),home:Et("M4 11l8-7 8 7v8a2 2 0 0 1-2 2h-3v-6h-6v6H6a2 2 0 0 1-2-2v-8z"),speaker:Et("M5 9h3l4-4v14l-4-4H5z M16 8a5 5 0 0 1 0 8 M19 5a9 9 0 0 1 0 14"),group:Et("M7 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M17 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M3 20c0-3 2.7-5 6-5s4 1 4 1 M14 21c0-2.5 1.5-4 4-4s4 1.5 4 4"),dot3:(t={})=>{const e=t.size??20,s=t.fill??"currentColor";return X`<svg width=${e} height=${e} viewBox="0 0 24 24" fill=${s} stroke="none">
+    </svg>`},queue:Mt("M4 7h11 M4 12h11 M4 17h7 M16 14v6 l3-2"),search:Mt("M11 4a7 7 0 1 0 4.6 12.3L20 20 M11 4a7 7 0 0 1 7 7"),home:Mt("M4 11l8-7 8 7v8a2 2 0 0 1-2 2h-3v-6h-6v6H6a2 2 0 0 1-2-2v-8z"),speaker:Mt("M5 9h3l4-4v14l-4-4H5z M16 8a5 5 0 0 1 0 8 M19 5a9 9 0 0 1 0 14"),group:Mt("M7 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M17 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M3 20c0-3 2.7-5 6-5s4 1 4 1 M14 21c0-2.5 1.5-4 4-4s4 1.5 4 4"),dot3:(t={})=>{const e=t.size??20,r=t.fill??"currentColor";return J`<svg width=${e} height=${e} viewBox="0 0 24 24" fill=${r} stroke="none">
       <circle cx="5" cy="12" r="1.6" />
       <circle cx="12" cy="12" r="1.6" />
       <circle cx="19" cy="12" r="1.6" />
-    </svg>`},x:Et("M6 6l12 12 M18 6L6 18"),chev:Et("M9 6l6 6-6 6"),chevL:Et("M15 6l-6 6 6 6"),chevD:Et("M6 9l6 6 6-6"),plus:Et("M12 5v14 M5 12h14"),check:Et("M5 12l4 4 10-10"),drag:(t={})=>{const e=t.size??20,s=t.fill??"currentColor";return X`<svg width=${e} height=${e} viewBox="0 0 24 24" fill=${s} stroke="none">
+    </svg>`},x:Mt("M6 6l12 12 M18 6L6 18"),chev:Mt("M9 6l6 6-6 6"),chevL:Mt("M15 6l-6 6 6 6"),chevD:Mt("M6 9l6 6 6-6"),plus:Mt("M12 5v14 M5 12h14"),check:Mt("M5 12l4 4 10-10"),drag:(t={})=>{const e=t.size??20,r=t.fill??"currentColor";return J`<svg width=${e} height=${e} viewBox="0 0 24 24" fill=${r} stroke="none">
       <circle cx="9" cy="6" r="1.5" /><circle cx="15" cy="6" r="1.5" />
       <circle cx="9" cy="12" r="1.5" /><circle cx="15" cy="12" r="1.5" />
       <circle cx="9" cy="18" r="1.5" /><circle cx="15" cy="18" r="1.5" />
-    </svg>`},trash:Et("M5 7h14 M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2 M7 7l1 13a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2l1-13"),top:Et("M12 19V7 M6 13l6-6 6 6 M5 4h14"),playNext:Et("M5 5l10 7-10 7V5z M19 6v12",{sw:2}),radio:Et("M4 12a8 8 0 0 1 14-5.5 M6 16a4 4 0 0 1 5-5 M3 20l14-14"),list:Et("M4 6h16 M4 12h16 M4 18h16"),album:(t={})=>{const e=t.size??20,s=t.stroke??"currentColor",r=t.sw??1.6;return X`<svg width=${e} height=${e} viewBox="0 0 24 24" fill="none" stroke=${s} stroke-width=${r} stroke-linecap="round" stroke-linejoin="round">
+    </svg>`},trash:Mt("M5 7h14 M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2 M7 7l1 13a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2l1-13"),top:Mt("M12 19V7 M6 13l6-6 6 6 M5 4h14"),playNext:Mt("M5 5l10 7-10 7V5z M19 6v12",{sw:2}),radio:Mt("M4 12a8 8 0 0 1 14-5.5 M6 16a4 4 0 0 1 5-5 M3 20l14-14"),list:Mt("M4 6h16 M4 12h16 M4 18h16"),album:(t={})=>{const e=t.size??20,r=t.stroke??"currentColor",s=t.sw??1.6;return J`<svg width=${e} height=${e} viewBox="0 0 24 24" fill="none" stroke=${r} stroke-width=${s} stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="9" />
       <circle cx="12" cy="12" r="2.5" />
-    </svg>`},artist:(t={})=>{const e=t.size??20,s=t.stroke??"currentColor",r=t.sw??1.7;return X`<svg width=${e} height=${e} viewBox="0 0 24 24" fill="none" stroke=${s} stroke-width=${r} stroke-linecap="round" stroke-linejoin="round">
+    </svg>`},artist:(t={})=>{const e=t.size??20,r=t.stroke??"currentColor",s=t.sw??1.7;return J`<svg width=${e} height=${e} viewBox="0 0 24 24" fill="none" stroke=${r} stroke-width=${s} stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="8" r="4" />
       <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" />
-    </svg>`},note:Et("M9 18V6l11-2v12 M9 18a3 3 0 1 1-3-3 3 3 0 0 1 3 3z M20 16a3 3 0 1 1-3-3 3 3 0 0 1 3 3z"),heart:Et("M12 21s-7-4.5-9-9.2C1.3 8 4 4 8 5c2 .5 3.2 2 4 3 .8-1 2-2.5 4-3 4-1 6.7 3 5 6.8C19 16.5 12 21 12 21z"),filter:Et("M4 5h16l-6 8v6l-4-2v-4L4 5z"),sun:(t={})=>{const e=t.size??14,s=t.stroke??"currentColor",r=t.sw??1.7;return X`<svg width=${e} height=${e} viewBox="0 0 24 24" fill="none" stroke=${s} stroke-width=${r} stroke-linecap="round">
+    </svg>`},note:Mt("M9 18V6l11-2v12 M9 18a3 3 0 1 1-3-3 3 3 0 0 1 3 3z M20 16a3 3 0 1 1-3-3 3 3 0 0 1 3 3z"),heart:Mt("M12 21s-7-4.5-9-9.2C1.3 8 4 4 8 5c2 .5 3.2 2 4 3 .8-1 2-2.5 4-3 4-1 6.7 3 5 6.8C19 16.5 12 21 12 21z"),filter:Mt("M4 5h16l-6 8v6l-4-2v-4L4 5z"),sun:(t={})=>{const e=t.size??14,r=t.stroke??"currentColor",s=t.sw??1.7;return J`<svg width=${e} height=${e} viewBox="0 0 24 24" fill="none" stroke=${r} stroke-width=${s} stroke-linecap="round">
       <circle cx="12" cy="12" r="4" />
       <path d="M12 3v2 M12 19v2 M3 12h2 M19 12h2 M5.6 5.6l1.4 1.4 M17 17l1.4 1.4 M5.6 18.4l1.4-1.4 M17 7l1.4-1.4" />
-    </svg>`},moon:Et("M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z")},It=[{id:"al1",name:"Mordechai",artist:"Khruangbin",h1:22,h2:350,year:2020},{id:"al2",name:"Salad Days",artist:"Mac DeMarco",h1:142,h2:80,year:2014},{id:"al3",name:"Awake",artist:"Tycho",h1:200,h2:280,year:2014},{id:"al4",name:"Migration",artist:"Bonobo",h1:32,h2:210,year:2017},{id:"al5",name:"Crush",artist:"Floating Points",h1:320,h2:18,year:2019},{id:"al6",name:"Pang",artist:"Caroline Polachek",h1:290,h2:340,year:2019},{id:"al7",name:"Mood Valiant",artist:"Hiatus Kaiyote",h1:12,h2:330,year:2021},{id:"al8",name:"In Colour",artist:"Jamie xx",h1:50,h2:200,year:2015},{id:"al9",name:"Spaces",artist:"Nils Frahm",h1:220,h2:240,year:2013},{id:"al10",name:"Untitled (Black Is)",artist:"SAULT",h1:0,h2:18,year:2020},{id:"al11",name:"French Kiwi Juice",artist:"FKJ",h1:175,h2:90,year:2017},{id:"al12",name:"Oncle Jazz",artist:"Men I Trust",h1:195,h2:250,year:2019},{id:"al13",name:"U.F.O.F.",artist:"Big Thief",h1:100,h2:175,year:2019},{id:"al14",name:"Bloom",artist:"Beach House",h1:280,h2:200,year:2012},{id:"al15",name:"Skiptracing",artist:"Mild High Club",h1:36,h2:5,year:2016},{id:"al16",name:"A Moment Apart",artist:"ODESZA",h1:245,h2:300,year:2017},{id:"al17",name:"Punisher",artist:"Phoebe Bridgers",h1:215,h2:245,year:2020},{id:"al18",name:"Vulture Prince",artist:"Arooj Aftab",h1:18,h2:28,year:2021}],zt=["Pelota","White Gloves","A Walk","Cirrus","Birth","Welcome To My Island","Red Room","Loud Places","Says","Wildfires","Skyline","Tides","Lemon Twigs","Last Light","Mountain at My Gates","Slow Burn","Vega","Daydream","Mirror Maru","Late Night","Soft Universe","Ondas","Reverie","Long Way Home","Eclipse","Powder Blue","Dreamcaster","After Hours","Ember"].map((t,e)=>{const s=It[e%It.length];return{id:`tr${e+1}`,name:t,artist:s.artist,album:s.name,albumId:s.id,durationSec:120+47*e%240}}),Tt=[{id:"spotify",name:"Spotify",glyph:"S",brandHue:140,accounts:[{id:"sp-main",name:"tom@home",tier:"Premium",email:"tom@home.local"},{id:"sp-shared",name:"Family · shared",tier:"Family",email:"fam@home.local"}]},{id:"apple",name:"Apple Music",glyph:"",brandHue:0,accounts:[{id:"ap-tom",name:"tom@icloud",tier:"Individual",email:"tom@icloud.com"}]},{id:"soundcloud",name:"SoundCloud",glyph:"~",brandHue:25,accounts:[{id:"sc-tom",name:"@tom_listens",tier:"Go+",email:"tom@sc.local"}]}];function Ht(t){const e=Math.max(0,Math.floor(t)),s=e%60;return`${Math.floor(e/60)}:${s<10?`0${s}`:s}`}function Ot(t,e={}){const{angle:s=135,lift:r=0}=e;if(!t)return"linear-gradient(135deg,#444,#222)";return`linear-gradient(${s}deg, oklch(${56+r}% 0.18 ${t.h1??200}), oklch(${30+r}% 0.16 ${t.h2??280}))`}const Lt={albums:It,tracks:zt,playlists:[{id:"pl1",name:"Deep Focus",owner:"Music Assistant",trackCount:86,h1:220,h2:280,mood:"instrumental·calm"},{id:"pl2",name:"Late-Night Drive",owner:"you",trackCount:42,h1:260,h2:340,mood:"atmospheric·downtempo"},{id:"pl3",name:"Sunday Cooking",owner:"you",trackCount:58,h1:30,h2:18,mood:"soul·jazz"},{id:"pl4",name:"Mellow Mornings",owner:"Editorial",trackCount:64,h1:50,h2:30,mood:"acoustic·warm"},{id:"pl5",name:"Workout",owner:"you",trackCount:38,h1:0,h2:340,mood:"high tempo·electronic"},{id:"pl6",name:"Liked Songs",owner:"you",trackCount:312,h1:130,h2:180,mood:"your favorites"},{id:"pl7",name:"Patio Sessions",owner:"you",trackCount:51,h1:180,h2:220,mood:"summer·chill"},{id:"pl8",name:"Discover Weekly",owner:"Editorial",trackCount:30,h1:290,h2:200,mood:"new finds"}],radioStations:[{id:"rd1",name:"KCRW · Eclectic 24",genre:"Eclectic",h1:12,h2:340},{id:"rd2",name:"NTS Radio 1",genre:"Underground",h1:30,h2:12},{id:"rd3",name:"BBC 6 Music",genre:"Alternative",h1:200,h2:250},{id:"rd4",name:"WWOZ New Orleans",genre:"Jazz · Blues",h1:38,h2:5},{id:"rd5",name:"Worldwide FM",genre:"Global",h1:165,h2:220}],providers:Tt,speakers:[{id:"sp1",name:"Living Room",room:"Living Room",model:"Sonos Era 300",volume:38},{id:"sp2",name:"Kitchen",room:"Kitchen",model:"Sonos One",volume:28},{id:"sp3",name:"Bedroom",room:"Bedroom",model:"HomePod mini",volume:18},{id:"sp4",name:"Office",room:"Office",model:"WiiM Pro + KEF",volume:45},{id:"sp5",name:"Patio",room:"Outside",model:"Sonos Move 2",volume:60},{id:"sp6",name:"Bathroom",room:"Bathroom",model:"HomePod mini",volume:22}],initialQueue:["tr1","tr5","tr12","tr18","tr9","tr3","tr22","tr7","tr15","tr27","tr2","tr11"],artistList:["Khruangbin","Mac DeMarco","Tycho","Bonobo","Floating Points","Caroline Polachek","Hiatus Kaiyote","Jamie xx","Nils Frahm","SAULT","FKJ","Men I Trust","Big Thief","Beach House","Mild High Club","ODESZA","Phoebe Bridgers","Vulfpeck","Yussef Dayes","Arooj Aftab"],fmtTime:Ht,albumById:function(t){return It.find(e=>e.id===t)},trackById:function(t){return zt.find(e=>e.id===t)},providerById:function(t){return Tt.find(e=>e.id===t)},artGradient:Ot};function Ut(t,e,s){return{queue:t.slice(),currentIdx:0,position:e,playing:!0,shuffle:!1,repeat:"off",groupVolume:s}}class Store extends EventTarget{constructor(){super(),this.tab="player",this.browser={crumbs:[{kind:"root",label:"Sources"}],providerId:null,accountId:null,sub:"playlists",detailId:null},this.search={query:"",filter:"all"},this.selectedTracks=new Set,this.multiMode=!1,this.groupingSheet={open:!1,leadId:null},this._tickInterval=null,this.speakers=Lt.speakers.map(t=>({...t,leadId:t.id}));const t=this.speakers.find(t=>"sp2"===t.id);t&&(t.leadId="sp1"),this.players={sp1:{...Ut(Lt.initialQueue,48,38),playing:!0},sp5:{...Ut(["tr3","tr18","tr7","tr12","tr22"],14,60),playing:!0,shuffle:!0}},this.activeLeadId="sp1",this._startTick()}get groups(){var t;const e={};for(const s of this.speakers)(e[t=s.leadId]??(e[t]=[])).push(s);return Object.keys(e).map(t=>{const s=e[t],r=s.find(e=>e.id===t)??s[0],o=this.players[t],n=1===s.length?r.name:s.map(t=>t.name).join(" + ");return{leadId:t,lead:r,members:s,name:n,player:o,playing:!!o?.playing,isActive:t===this.activeLeadId,isIdle:!o}}).sort((t,e)=>t.isActive!==e.isActive?t.isActive?-1:1:t.isIdle!==e.isIdle?t.isIdle?1:-1:t.lead.name.localeCompare(e.lead.name))}get activePlayer(){return this.players[this.activeLeadId]??Ut(Lt.initialQueue,0,30)}get activeGroup(){return this.groups.find(t=>t.leadId===this.activeLeadId)}get currentTrack(){const t=this.activePlayer,e=t.queue[t.currentIdx];return(e?Lt.trackById(e):void 0)??Lt.tracks[0]}get currentAlbum(){const t=Lt.albumById(this.currentTrack.albumId);if(!t)throw new Error(`Missing album for track ${this.currentTrack.id}`);return t}_emit(){this.dispatchEvent(new Event("change"))}setTab(t){this.tab!==t&&(this.tab=t,this._emit())}setActiveLead(t){this.players[t]||(this.players[t]=Ut(Lt.initialQueue,0,30)),this.activeLeadId=t,this._emit()}_patchActive(t){const e=this.players[this.activeLeadId]??Ut(Lt.initialQueue,0,30);this.players[this.activeLeadId]={...e,...t},this._emit()}setPlaying(t){this._patchActive({playing:t})}togglePlaying(){this._patchActive({playing:!this.activePlayer.playing})}setShuffle(t){this._patchActive({shuffle:t})}toggleShuffle(){this._patchActive({shuffle:!this.activePlayer.shuffle})}setRepeat(t){this._patchActive({repeat:t})}cycleRepeat(){const t=this.activePlayer.repeat,e="off"===t?"all":"all"===t?"one":"off";this._patchActive({repeat:e})}setPosition(t){this._patchActive({position:t})}next(){const t=this.activePlayer;this._patchActive({currentIdx:Math.min(t.queue.length-1,t.currentIdx+1),position:0})}prev(){const t=this.activePlayer;t.position>3?this._patchActive({position:0}):this._patchActive({currentIdx:Math.max(0,t.currentIdx-1),position:0})}setSpeakerVol(t,e){const s=this.speakers.find(e=>e.id===t);s&&(s.volume=e,this._emit())}setGroupVolumeFor(t,e){const s=this.players[t];s&&(this.players[t]={...s,groupVolume:e});for(const s of this.speakers)s.leadId===t&&(s.volume=e);this._emit()}setGroupVolume(t){this.setGroupVolumeFor(this.activeLeadId,t)}ungroupSpeaker(t){const e=this.speakers.find(e=>e.id===t);e&&(e.leadId=t,this._emit())}toggleGroupPlay(t){const e=this.players[t];e&&(this.players[t]={...e,playing:!e.playing},this._emit())}startSoloPlayback(t){this.players[t]=Ut(Lt.initialQueue,0,30),this.activeLeadId=t,this._emit()}openGroupingSheet(t){this.groupingSheet={open:!0,leadId:t},this._emit()}closeGroupingSheet(){this.groupingSheet={...this.groupingSheet,open:!1},this._emit()}commitGroupMembers(t,e){const s=new Set(e),r=s.has(t)?t:e[0]??null;if(this.speakers=this.speakers.map(e=>{const o=e.leadId===t;return s.has(e.id)?{...e,leadId:r??e.id}:o?{...e,leadId:e.id}:e}),r){if(r!==t){const e=this.players[t]??Ut(Lt.initialQueue,0,30);this.players[r]=e,delete this.players[t]}}else delete this.players[t];for(const t of e)t!==r&&delete this.players[t];if(this.activeLeadId===t)if(r)this.activeLeadId=r;else{const t=this.speakers.find(t=>t.leadId===t.id);t&&(this.activeLeadId=t.id)}this.groupingSheet={...this.groupingSheet,open:!1},this._emit()}setQueue(t){this._patchActive({queue:t})}removeFromQueue(t){const e=this.activePlayer,s=e.queue.slice();s.splice(t,1);const r=t<e.currentIdx?e.currentIdx-1:e.currentIdx;this._patchActive({queue:s,currentIdx:r})}moveQueue(t,e){if(t===e)return;const s=this.activePlayer,r=s.queue.slice(),[o]=r.splice(t,1);if(void 0===o)return;r.splice(e,0,o);let n=s.currentIdx;t===n?n=e:t<n&&e>=n?n-=1:t>n&&e<=n&&(n+=1),this._patchActive({queue:r,currentIdx:n})}playTrackAt(t){this._patchActive({currentIdx:t,position:0,playing:!0})}moveToTop(t){this.moveQueue(t,this.activePlayer.currentIdx+1)}clearQueue(){const t=this.activePlayer;this._patchActive({queue:t.queue.slice(0,t.currentIdx+1)})}removeBulk(t){const e=this.activePlayer,s=e.queue.filter((e,s)=>!t.has(s));this.players[this.activeLeadId]={...e,queue:s},this.selectedTracks=new Set,this.multiMode=!1,this._emit()}browserGo(t){this.browser={...this.browser,...t},this._emit()}pushCrumb(t,e={}){this.browser={...this.browser,...e,crumbs:[...this.browser.crumbs,t]},this._emit()}popToCrumb(t){const e=this.browser.crumbs.slice(0,t+1),s=e[e.length-1];let r={...this.browser,crumbs:e};"root"===s?.kind?r={...r,providerId:null,accountId:null,detailId:null}:"provider"===s?.kind?r={...r,accountId:null,detailId:null}:"account"===s?.kind&&(r={...r,detailId:null}),this.browser=r,this._emit()}setSearch(t){this.search={...this.search,...t},this._emit()}setSelectedTracks(t){this.selectedTracks=t,this._emit()}setMultiMode(t){this.multiMode=t,t||(this.selectedTracks=new Set),this._emit()}_startTick(){this._tickInterval=window.setInterval(()=>this._tick(),1e3)}_tick(){let t=!1;for(const e of Object.keys(this.players)){const s=this.players[e];if(!s.playing)continue;const r=s.queue[s.currentIdx];if(!r)continue;const o=Lt.trackById(r);o&&(s.position+1>=o.durationSec?this.players[e]={...s,position:0,currentIdx:Math.min(s.queue.length-1,s.currentIdx+1)}:this.players[e]={...s,position:s.position+1},t=!0)}t&&this._emit()}dispose(){null!==this._tickInterval&&(window.clearInterval(this._tickInterval),this._tickInterval=null)}}class StoreController{constructor(t,e){this.host=t,this.store=e,this._onChange=()=>{this.host.requestUpdate()},t.addController(this)}hostConnected(){this.store.addEventListener("change",this._onChange)}hostDisconnected(){this.store.removeEventListener("change",this._onChange)}}let Bt=class extends i{constructor(){super(...arguments),this.size=48,this.radius=8,this.boxShadow=""}render(){const t="number"==typeof this.size?`${this.size}px`:this.size,e="number"==typeof this.size?.34*this.size:16,s=Ot(this.obj),r=`width:${t};height:${t};border-radius:${this.radius}px;background:${s};${this.boxShadow?`box-shadow:${this.boxShadow}`:""}`;return X`
-      <div class="art" style=${r}>
-        ${this.glyph?X`<div class="glyph" style="font-size:${e}px">${this.glyph}</div>`:""}
+    </svg>`},moon:Mt("M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z")},Et=[{id:"al1",name:"Mordechai",artist:"Khruangbin",h1:22,h2:350,year:2020},{id:"al2",name:"Salad Days",artist:"Mac DeMarco",h1:142,h2:80,year:2014},{id:"al3",name:"Awake",artist:"Tycho",h1:200,h2:280,year:2014},{id:"al4",name:"Migration",artist:"Bonobo",h1:32,h2:210,year:2017},{id:"al5",name:"Crush",artist:"Floating Points",h1:320,h2:18,year:2019},{id:"al6",name:"Pang",artist:"Caroline Polachek",h1:290,h2:340,year:2019},{id:"al7",name:"Mood Valiant",artist:"Hiatus Kaiyote",h1:12,h2:330,year:2021},{id:"al8",name:"In Colour",artist:"Jamie xx",h1:50,h2:200,year:2015},{id:"al9",name:"Spaces",artist:"Nils Frahm",h1:220,h2:240,year:2013},{id:"al10",name:"Untitled (Black Is)",artist:"SAULT",h1:0,h2:18,year:2020},{id:"al11",name:"French Kiwi Juice",artist:"FKJ",h1:175,h2:90,year:2017},{id:"al12",name:"Oncle Jazz",artist:"Men I Trust",h1:195,h2:250,year:2019},{id:"al13",name:"U.F.O.F.",artist:"Big Thief",h1:100,h2:175,year:2019},{id:"al14",name:"Bloom",artist:"Beach House",h1:280,h2:200,year:2012},{id:"al15",name:"Skiptracing",artist:"Mild High Club",h1:36,h2:5,year:2016},{id:"al16",name:"A Moment Apart",artist:"ODESZA",h1:245,h2:300,year:2017},{id:"al17",name:"Punisher",artist:"Phoebe Bridgers",h1:215,h2:245,year:2020},{id:"al18",name:"Vulture Prince",artist:"Arooj Aftab",h1:18,h2:28,year:2021}],Tt=["Pelota","White Gloves","A Walk","Cirrus","Birth","Welcome To My Island","Red Room","Loud Places","Says","Wildfires","Skyline","Tides","Lemon Twigs","Last Light","Mountain at My Gates","Slow Burn","Vega","Daydream","Mirror Maru","Late Night","Soft Universe","Ondas","Reverie","Long Way Home","Eclipse","Powder Blue","Dreamcaster","After Hours","Ember"].map((t,e)=>{const r=Et[e%Et.length];return{id:`tr${e+1}`,name:t,artist:r.artist,album:r.name,albumId:r.id,durationSec:120+47*e%240}}),Ht=[{id:"spotify",name:"Spotify",glyph:"S",brandHue:140,accounts:[{id:"sp-main",name:"tom@home",tier:"Premium",email:"tom@home.local"},{id:"sp-shared",name:"Family · shared",tier:"Family",email:"fam@home.local"}]},{id:"apple",name:"Apple Music",glyph:"",brandHue:0,accounts:[{id:"ap-tom",name:"tom@icloud",tier:"Individual",email:"tom@icloud.com"}]},{id:"soundcloud",name:"SoundCloud",glyph:"~",brandHue:25,accounts:[{id:"sc-tom",name:"@tom_listens",tier:"Go+",email:"tom@sc.local"}]}];function Lt(t){const e=Math.max(0,Math.floor(t)),r=e%60;return`${Math.floor(e/60)}:${r<10?`0${r}`:r}`}function Ut(t,e={}){const{angle:r=135,lift:s=0}=e;if(!t)return"linear-gradient(135deg,#444,#222)";return`linear-gradient(${r}deg, oklch(${56+s}% 0.18 ${t.h1??200}), oklch(${30+s}% 0.16 ${t.h2??280}))`}const Bt={albums:Et,tracks:Tt,playlists:[{id:"pl1",name:"Deep Focus",owner:"Music Assistant",trackCount:86,h1:220,h2:280,mood:"instrumental·calm"},{id:"pl2",name:"Late-Night Drive",owner:"you",trackCount:42,h1:260,h2:340,mood:"atmospheric·downtempo"},{id:"pl3",name:"Sunday Cooking",owner:"you",trackCount:58,h1:30,h2:18,mood:"soul·jazz"},{id:"pl4",name:"Mellow Mornings",owner:"Editorial",trackCount:64,h1:50,h2:30,mood:"acoustic·warm"},{id:"pl5",name:"Workout",owner:"you",trackCount:38,h1:0,h2:340,mood:"high tempo·electronic"},{id:"pl6",name:"Liked Songs",owner:"you",trackCount:312,h1:130,h2:180,mood:"your favorites"},{id:"pl7",name:"Patio Sessions",owner:"you",trackCount:51,h1:180,h2:220,mood:"summer·chill"},{id:"pl8",name:"Discover Weekly",owner:"Editorial",trackCount:30,h1:290,h2:200,mood:"new finds"}],radioStations:[{id:"rd1",name:"KCRW · Eclectic 24",genre:"Eclectic",h1:12,h2:340},{id:"rd2",name:"NTS Radio 1",genre:"Underground",h1:30,h2:12},{id:"rd3",name:"BBC 6 Music",genre:"Alternative",h1:200,h2:250},{id:"rd4",name:"WWOZ New Orleans",genre:"Jazz · Blues",h1:38,h2:5},{id:"rd5",name:"Worldwide FM",genre:"Global",h1:165,h2:220}],providers:Ht,speakers:[{id:"sp1",name:"Living Room",room:"Living Room",model:"Sonos Era 300",volume:38},{id:"sp2",name:"Kitchen",room:"Kitchen",model:"Sonos One",volume:28},{id:"sp3",name:"Bedroom",room:"Bedroom",model:"HomePod mini",volume:18},{id:"sp4",name:"Office",room:"Office",model:"WiiM Pro + KEF",volume:45},{id:"sp5",name:"Patio",room:"Outside",model:"Sonos Move 2",volume:60},{id:"sp6",name:"Bathroom",room:"Bathroom",model:"HomePod mini",volume:22}],initialQueue:["tr1","tr5","tr12","tr18","tr9","tr3","tr22","tr7","tr15","tr27","tr2","tr11"],artistList:["Khruangbin","Mac DeMarco","Tycho","Bonobo","Floating Points","Caroline Polachek","Hiatus Kaiyote","Jamie xx","Nils Frahm","SAULT","FKJ","Men I Trust","Big Thief","Beach House","Mild High Club","ODESZA","Phoebe Bridgers","Vulfpeck","Yussef Dayes","Arooj Aftab"],fmtTime:Lt,albumById:function(t){return Et.find(e=>e.id===t)},trackById:function(t){return Tt.find(e=>e.id===t)},providerById:function(t){return Ht.find(e=>e.id===t)},artGradient:Ut};function Rt(t,e,r){return{queue:t.slice(),currentIdx:0,position:e,playing:!0,shuffle:!1,repeat:"off",groupVolume:r}}class Store extends EventTarget{constructor(){super(),this.tab="player",this.browser={crumbs:[{kind:"root",label:"Sources"}],providerId:null,accountId:null,sub:"playlists",detailId:null},this.search={query:"",filter:"all"},this.selectedTracks=new Set,this.multiMode=!1,this.groupingSheet={open:!1,leadId:null},this._tickInterval=null,this.speakers=Bt.speakers.map(t=>({...t,leadId:t.id}));const t=this.speakers.find(t=>"sp2"===t.id);t&&(t.leadId="sp1"),this.players={sp1:{...Rt(Bt.initialQueue,48,38),playing:!0},sp5:{...Rt(["tr3","tr18","tr7","tr12","tr22"],14,60),playing:!0,shuffle:!0}},this.activeLeadId="sp1",this._startTick()}get groups(){var t;const e={};for(const r of this.speakers)(e[t=r.leadId]??(e[t]=[])).push(r);return Object.keys(e).map(t=>{const r=e[t],s=r.find(e=>e.id===t)??r[0],o=this.players[t],a=1===r.length?s.name:r.map(t=>t.name).join(" + ");return{leadId:t,lead:s,members:r,name:a,player:o,playing:!!o?.playing,isActive:t===this.activeLeadId,isIdle:!o}}).sort((t,e)=>t.isActive!==e.isActive?t.isActive?-1:1:t.isIdle!==e.isIdle?t.isIdle?1:-1:t.lead.name.localeCompare(e.lead.name))}get activePlayer(){return this.players[this.activeLeadId]??Rt(Bt.initialQueue,0,30)}get activeGroup(){return this.groups.find(t=>t.leadId===this.activeLeadId)}get currentTrack(){const t=this.activePlayer,e=t.queue[t.currentIdx];return(e?Bt.trackById(e):void 0)??Bt.tracks[0]}get currentAlbum(){const t=Bt.albumById(this.currentTrack.albumId);if(!t)throw new Error(`Missing album for track ${this.currentTrack.id}`);return t}_emit(){this.dispatchEvent(new Event("change"))}setTab(t){this.tab!==t&&(this.tab=t,this._emit())}setActiveLead(t){this.players[t]||(this.players[t]=Rt(Bt.initialQueue,0,30)),this.activeLeadId=t,this._emit()}_patchActive(t){const e=this.players[this.activeLeadId]??Rt(Bt.initialQueue,0,30);this.players[this.activeLeadId]={...e,...t},this._emit()}setPlaying(t){this._patchActive({playing:t})}togglePlaying(){this._patchActive({playing:!this.activePlayer.playing})}setShuffle(t){this._patchActive({shuffle:t})}toggleShuffle(){this._patchActive({shuffle:!this.activePlayer.shuffle})}setRepeat(t){this._patchActive({repeat:t})}cycleRepeat(){const t=this.activePlayer.repeat,e="off"===t?"all":"all"===t?"one":"off";this._patchActive({repeat:e})}setPosition(t){this._patchActive({position:t})}next(){const t=this.activePlayer;this._patchActive({currentIdx:Math.min(t.queue.length-1,t.currentIdx+1),position:0})}prev(){const t=this.activePlayer;t.position>3?this._patchActive({position:0}):this._patchActive({currentIdx:Math.max(0,t.currentIdx-1),position:0})}setSpeakerVol(t,e){const r=this.speakers.find(e=>e.id===t);r&&(r.volume=e,this._emit())}setGroupVolumeFor(t,e){const r=this.players[t];r&&(this.players[t]={...r,groupVolume:e});for(const r of this.speakers)r.leadId===t&&(r.volume=e);this._emit()}setGroupVolume(t){this.setGroupVolumeFor(this.activeLeadId,t)}ungroupSpeaker(t){const e=this.speakers.find(e=>e.id===t);e&&(e.leadId=t,this._emit())}toggleGroupPlay(t){const e=this.players[t];e&&(this.players[t]={...e,playing:!e.playing},this._emit())}startSoloPlayback(t){this.players[t]=Rt(Bt.initialQueue,0,30),this.activeLeadId=t,this._emit()}openGroupingSheet(t){this.groupingSheet={open:!0,leadId:t},this._emit()}closeGroupingSheet(){this.groupingSheet={...this.groupingSheet,open:!1},this._emit()}commitGroupMembers(t,e){const r=new Set(e),s=r.has(t)?t:e[0]??null;if(this.speakers=this.speakers.map(e=>{const o=e.leadId===t;return r.has(e.id)?{...e,leadId:s??e.id}:o?{...e,leadId:e.id}:e}),s){if(s!==t){const e=this.players[t]??Rt(Bt.initialQueue,0,30);this.players[s]=e,delete this.players[t]}}else delete this.players[t];for(const t of e)t!==s&&delete this.players[t];if(this.activeLeadId===t)if(s)this.activeLeadId=s;else{const t=this.speakers.find(t=>t.leadId===t.id);t&&(this.activeLeadId=t.id)}this.groupingSheet={...this.groupingSheet,open:!1},this._emit()}setQueue(t){this._patchActive({queue:t})}removeFromQueue(t){const e=this.activePlayer,r=e.queue.slice();r.splice(t,1);const s=t<e.currentIdx?e.currentIdx-1:e.currentIdx;this._patchActive({queue:r,currentIdx:s})}moveQueue(t,e){if(t===e)return;const r=this.activePlayer,s=r.queue.slice(),[o]=s.splice(t,1);if(void 0===o)return;s.splice(e,0,o);let a=r.currentIdx;t===a?a=e:t<a&&e>=a?a-=1:t>a&&e<=a&&(a+=1),this._patchActive({queue:s,currentIdx:a})}playTrackAt(t){this._patchActive({currentIdx:t,position:0,playing:!0})}moveToTop(t){this.moveQueue(t,this.activePlayer.currentIdx+1)}clearQueue(){const t=this.activePlayer;this._patchActive({queue:t.queue.slice(0,t.currentIdx+1)})}removeBulk(t){const e=this.activePlayer,r=e.queue.filter((e,r)=>!t.has(r));this.players[this.activeLeadId]={...e,queue:r},this.selectedTracks=new Set,this.multiMode=!1,this._emit()}browserGo(t){this.browser={...this.browser,...t},this._emit()}pushCrumb(t,e={}){this.browser={...this.browser,...e,crumbs:[...this.browser.crumbs,t]},this._emit()}popToCrumb(t){const e=this.browser.crumbs.slice(0,t+1),r=e[e.length-1];let s={...this.browser,crumbs:e};"root"===r?.kind?s={...s,providerId:null,accountId:null,detailId:null}:"provider"===r?.kind?s={...s,accountId:null,detailId:null}:"account"===r?.kind&&(s={...s,detailId:null}),this.browser=s,this._emit()}setSearch(t){this.search={...this.search,...t},this._emit()}setSelectedTracks(t){this.selectedTracks=t,this._emit()}setMultiMode(t){this.multiMode=t,t||(this.selectedTracks=new Set),this._emit()}_startTick(){this._tickInterval=window.setInterval(()=>this._tick(),1e3)}_tick(){let t=!1;for(const e of Object.keys(this.players)){const r=this.players[e];if(!r.playing)continue;const s=r.queue[r.currentIdx];if(!s)continue;const o=Bt.trackById(s);o&&(r.position+1>=o.durationSec?this.players[e]={...r,position:0,currentIdx:Math.min(r.queue.length-1,r.currentIdx+1)}:this.players[e]={...r,position:r.position+1},t=!0)}t&&this._emit()}dispose(){null!==this._tickInterval&&(window.clearInterval(this._tickInterval),this._tickInterval=null)}}class StoreController{constructor(t,e){this.host=t,this.store=e,this._onChange=()=>{this.host.requestUpdate()},t.addController(this)}hostConnected(){this.store.addEventListener("change",this._onChange)}hostDisconnected(){this.store.removeEventListener("change",this._onChange)}}let Ot=class extends i{constructor(){super(...arguments),this.size=48,this.radius=8,this.boxShadow=""}render(){const t="number"==typeof this.size?`${this.size}px`:this.size,e="number"==typeof this.size?.34*this.size:16,r=Ut(this.obj),s=`width:${t};height:${t};border-radius:${this.radius}px;background:${r};${this.boxShadow?`box-shadow:${this.boxShadow}`:""}`;return J`
+      <div class="art" style=${s}>
+        ${this.glyph?J`<div class="glyph" style="font-size:${e}px">${this.glyph}</div>`:""}
         <div class="scan"></div>
       </div>
-    `}};Bt.styles=h`
+    `}};Ot.styles=l`
     :host {
       display: inline-block;
       flex: none;
@@ -74,14 +74,14 @@ function t(t,e,s,r){var o,n=arguments.length,a=n<3?e:null===r?r=Object.getOwnPro
       text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
       line-height: 1;
     }
-  `,t([ut({attribute:!1})],Bt.prototype,"obj",void 0),t([ut()],Bt.prototype,"size",void 0),t([ut({type:Number})],Bt.prototype,"radius",void 0),t([ut({attribute:!1})],Bt.prototype,"glyph",void 0),t([ut()],Bt.prototype,"boxShadow",void 0),Bt=t([ct("hf-album-art")],Bt);let Nt=class extends i{constructor(){super(...arguments),this.value=0,this.min=0,this.max=100,this.color="#fff",this.track="rgba(255,255,255,0.18)",this.trackHeight=4,this.thumb=14,this.ariaLabel="",this._onInput=t=>{const e=Number(t.target.value);this.value=e,this.dispatchEvent(new CustomEvent("hf-input",{detail:e,bubbles:!0,composed:!0}))}}render(){const t=(this.value-this.min)/(this.max-this.min)*100;return this.style.setProperty("--hf-pct",`${t}%`),this.style.setProperty("--hf-color",this.color),this.style.setProperty("--hf-track",this.track),this.style.setProperty("--hf-track-h",`${this.trackHeight}px`),this.style.setProperty("--hf-thumb",`${this.thumb}px`),X`<input
+  `,t([ut({attribute:!1})],Ot.prototype,"obj",void 0),t([ut()],Ot.prototype,"size",void 0),t([ut({type:Number})],Ot.prototype,"radius",void 0),t([ut({attribute:!1})],Ot.prototype,"glyph",void 0),t([ut()],Ot.prototype,"boxShadow",void 0),Ot=t([ct("hf-album-art")],Ot);let qt=class extends i{constructor(){super(...arguments),this.value=0,this.min=0,this.max=100,this.color="#fff",this.track="rgba(255,255,255,0.18)",this.trackHeight=4,this.thumb=14,this.ariaLabel="",this._onInput=t=>{const e=Number(t.target.value);this.value=e,this.dispatchEvent(new CustomEvent("hf-input",{detail:e,bubbles:!0,composed:!0}))}}render(){const t=(this.value-this.min)/(this.max-this.min)*100;return this.style.setProperty("--hf-pct",`${t}%`),this.style.setProperty("--hf-color",this.color),this.style.setProperty("--hf-track",this.track),this.style.setProperty("--hf-track-h",`${this.trackHeight}px`),this.style.setProperty("--hf-thumb",`${this.thumb}px`),J`<input
       type="range"
       min=${this.min}
       max=${this.max}
       .value=${String(this.value)}
       aria-label=${this.ariaLabel||"Slider"}
       @input=${this._onInput}
-    />`}};Nt.styles=h`
+    />`}};qt.styles=l`
     :host {
       --hf-pct: 0%;
       --hf-color: #fff;
@@ -142,10 +142,10 @@ function t(t,e,s,r){var o,n=arguments.length,a=n<3?e:null===r?r=Object.getOwnPro
       border: 0;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
     }
-  `,t([ut({type:Number})],Nt.prototype,"value",void 0),t([ut({type:Number})],Nt.prototype,"min",void 0),t([ut({type:Number})],Nt.prototype,"max",void 0),t([ut()],Nt.prototype,"color",void 0),t([ut()],Nt.prototype,"track",void 0),t([ut({type:Number,attribute:"track-height"})],Nt.prototype,"trackHeight",void 0),t([ut({type:Number})],Nt.prototype,"thumb",void 0),t([ut({attribute:"aria-label"})],Nt.prototype,"ariaLabel",void 0),Nt=t([ct("hf-slider")],Nt);let Rt=class extends i{willUpdate(t){t.has("store")&&this.store&&!this._ctrl&&(this._ctrl=new StoreController(this,this.store))}render(){if(!this.store)return X``;const t=this.store,e=t.currentTrack,s=t.currentAlbum,r=t.activePlayer,o=t.activeGroup,n=t.groups.filter(t=>!t.isActive&&t.playing).length;return X`
+  `,t([ut({type:Number})],qt.prototype,"value",void 0),t([ut({type:Number})],qt.prototype,"min",void 0),t([ut({type:Number})],qt.prototype,"max",void 0),t([ut()],qt.prototype,"color",void 0),t([ut()],qt.prototype,"track",void 0),t([ut({type:Number,attribute:"track-height"})],qt.prototype,"trackHeight",void 0),t([ut({type:Number})],qt.prototype,"thumb",void 0),t([ut({attribute:"aria-label"})],qt.prototype,"ariaLabel",void 0),qt=t([ct("hf-slider")],qt);let Dt=class extends i{willUpdate(t){t.has("store")&&this.store&&!this._ctrl&&(this._ctrl=new StoreController(this,this.store))}render(){if(!this.store)return J``;const t=this.store,e=t.currentTrack,r=t.currentAlbum,s=t.activePlayer,o=t.activeGroup,a=t.groups.filter(t=>!t.isActive&&t.playing).length;return J`
       <div class="art-wrap">
         <hf-album-art
-          .obj=${s}
+          .obj=${r}
           size="100%"
           radius="18"
           boxShadow="0 18px 40px rgba(0,0,0,0.35)"
@@ -153,29 +153,29 @@ function t(t,e,s,r){var o,n=arguments.length,a=n<3?e:null===r?r=Object.getOwnPro
       </div>
       <div class="meta">
         <div class="eyebrow">
-          ${r.shuffle?"Shuffle":"Now Playing"} · ${s.name}
+          ${s.shuffle?"Shuffle":"Now Playing"} · ${r.name}
         </div>
         <div class="title">${e.name}</div>
         <div class="artist">${e.artist}</div>
       </div>
       <div class="scrubber">
         <hf-slider
-          .value=${r.position}
+          .value=${s.position}
           .min=${0}
           .max=${e.durationSec}
-          .color=${_t}
-          .track=${wt}
+          .color=${wt}
+          .track=${_t}
           @hf-input=${e=>t.setPosition(e.detail)}
         ></hf-slider>
         <div class="times">
-          <span>${Ht(r.position)}</span>
-          <span>-${Ht(e.durationSec-r.position)}</span>
+          <span>${Lt(s.position)}</span>
+          <span>-${Lt(e.durationSec-s.position)}</span>
         </div>
       </div>
       <div class="transport">
         <button
           class="icon-btn"
-          aria-pressed=${r.shuffle}
+          aria-pressed=${s.shuffle}
           aria-label="Shuffle"
           @click=${()=>t.toggleShuffle()}
         >
@@ -186,32 +186,32 @@ function t(t,e,s,r){var o,n=arguments.length,a=n<3?e:null===r?r=Object.getOwnPro
         </button>
         <button
           class="play-btn"
-          aria-label=${r.playing?"Pause":"Play"}
+          aria-label=${s.playing?"Pause":"Play"}
           @click=${()=>t.togglePlaying()}
         >
-          ${r.playing?Pt.pause({size:22}):Pt.play({size:22})}
+          ${s.playing?Pt.pause({size:22}):Pt.play({size:22})}
         </button>
         <button class="icon-btn" aria-label="Next" @click=${()=>t.next()}>
           ${Pt.next({size:22})}
         </button>
         <button
           class="icon-btn"
-          aria-pressed=${"off"!==r.repeat}
+          aria-pressed=${"off"!==s.repeat}
           aria-label="Repeat"
           @click=${()=>t.cycleRepeat()}
         >
-          ${"one"===r.repeat?Pt.rep1({size:18}):Pt.rep({size:18})}
+          ${"one"===s.repeat?Pt.rep1({size:18}):Pt.rep({size:18})}
         </button>
       </div>
       <div class="output">
         <button class="output-main" type="button" @click=${()=>t.setTab("group")}>
-          ${Pt.speaker({size:16,stroke:_t})}
+          ${Pt.speaker({size:16,stroke:wt})}
           <div style="flex:1; min-width:0">
             <div class="output-name">${o?.name??"No output"}</div>
             <div class="output-sub">
-              ${(o?.members.length??0)>1?X`Grouped · ${o?.members.length} speakers · `:""}
-              Volume ${r.groupVolume}
-              ${n>0?X` · ${n} other group${n>1?"s":""}
+              ${(o?.members.length??0)>1?J`Grouped · ${o?.members.length} speakers · `:""}
+              Volume ${s.groupVolume}
+              ${a>0?J` · ${a} other group${a>1?"s":""}
                   playing`:""}
             </div>
           </div>
@@ -224,7 +224,7 @@ function t(t,e,s,r){var o,n=arguments.length,a=n<3?e:null===r?r=Object.getOwnPro
           ${Pt.group({size:13})} Group
         </button>
       </div>
-    `}};Rt.styles=h`
+    `}};Dt.styles=l`
     :host {
       display: block;
       height: 100%;
@@ -362,26 +362,2061 @@ function t(t,e,s,r){var o,n=arguments.length,a=n<3?e:null===r?r=Object.getOwnPro
       font-size: 11.5px;
       font-weight: 600;
     }
-  `,t([ut({attribute:!1})],Rt.prototype,"store",void 0),Rt=t([ct("hf-player-tab")],Rt),window.customCards=window.customCards||[],window.customCards.push({type:"homefront-music-card",name:"Homefront Music Card",description:"Music Assistant + WiiM multi-room controller",preview:!1});const jt=[{id:"player",label:"Player",icon:"play"},{id:"browser",label:"Browse",icon:"home"},{id:"search",label:"Search",icon:"search"},{id:"queue",label:"Queue",icon:"queue"},{id:"group",label:"Output",icon:"speaker"}];let Dt=class extends i{constructor(){super(),this._store=new Store,new StoreController(this,this._store)}setConfig(t){if(!t)throw new Error("Invalid configuration");this._config=t}getCardSize(){return 12}disconnectedCallback(){super.disconnectedCallback(),this._store.dispose()}render(){return X`
+  `,t([ut({attribute:!1})],Dt.prototype,"store",void 0),Dt=t([ct("hf-player-tab")],Dt);const jt=[{id:"playlists",label:"Playlists"},{id:"albums",label:"Albums"},{id:"artists",label:"Artists"},{id:"tracks",label:"Tracks"},{id:"radio",label:"Radio"}];let Nt=class extends i{willUpdate(t){t.has("store")&&this.store&&!this._ctrl&&(this._ctrl=new StoreController(this,this.store))}render(){return this.store?J`${this._renderCrumbs()} ${this._renderBody()}`:J``}_renderCrumbs(){const t=this.store.browser.crumbs;return J`
+      <div class="crumbs">
+        ${t.map((e,r)=>{const s=r===t.length-1;return J`
+            <button
+              class="crumb-btn"
+              data-current=${s}
+              @click=${()=>this.store.popToCrumb(r)}
+            >
+              ${e.label}
+            </button>
+            ${r<t.length-1?J`<span aria-hidden="true">${Pt.chev({size:11})}</span>`:""}
+          `})}
+      </div>
+    `}_renderBody(){const{providerId:t,accountId:e,sub:r,detailId:s}=this.store.browser;if(!t)return this._renderProviders();const o=Bt.providerById(t);return o?e?s?this._renderDetail(s):this._renderTypeView(r):this._renderAccounts(o):J``}_renderProviders(){return J`
+      <div class="body">
+        <div class="section-label">Connected sources</div>
+        <div class="stack">
+          ${Bt.providers.map(t=>this._renderProviderTile(t))}
+        </div>
+      </div>
+    `}_renderProviderTile(t){const e=`linear-gradient(135deg, oklch(72% 0.18 ${t.brandHue}), oklch(48% 0.16 ${(t.brandHue+30)%360}))`;return J`
+      <button
+        class="provider-tile"
+        @click=${()=>this.store.pushCrumb({kind:"provider",label:t.name},{providerId:t.id})}
+      >
+        <div class="provider-glyph" style=${`background:${e}`}>
+          ${t.glyph||t.name[0]}
+        </div>
+        <div class="provider-info">
+          <div class="provider-name">${t.name}</div>
+          <div class="provider-sub">
+            ${t.accounts.length} account${t.accounts.length>1?"s":""} · connected
+          </div>
+        </div>
+        ${Pt.chev({size:16})}
+      </button>
+    `}_renderAccounts(t){return J`
+      <div class="body">
+        <div class="section-label">${t.name} · choose an account</div>
+        <div class="stack">
+          ${t.accounts.map(t=>this._renderAccountTile(t))}
+        </div>
+      </div>
+    `}_renderAccountTile(t){const e=t.name.replace(/[^a-zA-Z]/g,"").slice(0,2).toUpperCase();return J`
+      <button
+        class="account-tile"
+        @click=${()=>this.store.pushCrumb({kind:"account",label:t.name},{accountId:t.id,sub:"playlists",detailId:null})}
+      >
+        <div class="account-avatar" style=${"background:conic-gradient(from 220deg, var(--hf-accent), oklch(70% 0.14 220))"}>${e}</div>
+        <div style="flex:1; min-width:0">
+          <div class="account-name">${t.name}</div>
+          <div class="account-sub">${t.tier}</div>
+        </div>
+        ${Pt.chev({size:16})}
+      </button>
+    `}_renderTypeView(t){return J`
+      <div class="subtabs">
+        ${jt.map(e=>J`
+            <button
+              class="subtab"
+              data-active=${t===e.id}
+              @click=${()=>this.store.browserGo({sub:e.id})}
+            >
+              ${e.label}
+            </button>
+          `)}
+      </div>
+      <div class="body">${this._renderTypeBody(t)}</div>
+    `}_renderTypeBody(t){return"playlists"===t?J`
+        <div class="grid2">
+          ${Bt.playlists.map(t=>J`
+              <button
+                class="art-tile"
+                @click=${()=>this.store.pushCrumb({kind:"detail",label:t.name},{detailId:t.id})}
+              >
+                <hf-album-art
+                  .obj=${t}
+                  size="100%"
+                  radius="8"
+                  style="aspect-ratio:1/1; width:100%"
+                ></hf-album-art>
+                <div>
+                  <div class="art-tile-name">${t.name}</div>
+                  <div class="art-tile-sub">${t.trackCount} tracks</div>
+                </div>
+              </button>
+            `)}
+        </div>
+      `:"albums"===t?J`
+        <div class="grid2">
+          ${Bt.albums.map(t=>J`
+              <button
+                class="art-tile"
+                @click=${()=>this.store.pushCrumb({kind:"detail",label:t.name},{detailId:t.id})}
+              >
+                <hf-album-art
+                  .obj=${t}
+                  size="100%"
+                  radius="8"
+                  style="aspect-ratio:1/1; width:100%"
+                ></hf-album-art>
+                <div>
+                  <div class="art-tile-name">${t.name}</div>
+                  <div class="art-tile-sub">${t.artist}</div>
+                </div>
+              </button>
+            `)}
+        </div>
+      `:"artists"===t?J`
+        <div>
+          ${Bt.artistList.slice(0,12).map((t,e)=>J`
+              <button class="artist-row">
+                <div
+                  class="artist-avatar"
+                  style=${`background: conic-gradient(from ${40*e}deg, oklch(70% 0.18 ${30*e}), oklch(46% 0.16 ${(30*e+60)%360}))`}
+                ></div>
+                <div class="artist-name">${t}</div>
+                <div class="artist-tag">Artist</div>
+              </button>
+            `)}
+        </div>
+      `:"tracks"===t?J`
+        <div>
+          ${Bt.tracks.slice(0,12).map((t,e)=>this._renderTrackRow(t,e+1))}
+        </div>
+      `:J`
+      <div class="stack">
+        ${Bt.radioStations.map(t=>J`
+            <button class="radio-row">
+              <hf-album-art
+                .obj=${t}
+                size="44"
+                radius="10"
+                .glyph=${Pt.radio({size:18,stroke:"#fff"})}
+              ></hf-album-art>
+              <div style="flex:1; min-width:0">
+                <div class="track-name">${t.name}</div>
+                <div class="track-sub">${t.genre}</div>
+              </div>
+              ${Pt.play({size:16})}
+            </button>
+          `)}
+      </div>
+    `}_renderTrackRow(t,e){const r=Bt.albumById(t.albumId);return J`
+      <button class="track-row">
+        ${null!=e?J`<div class="track-index">${e}</div>`:""}
+        <hf-album-art .obj=${r} size="36" radius="6"></hf-album-art>
+        <div class="track-meta">
+          <div class="track-name">${t.name}</div>
+          <div class="track-sub">${t.artist} · ${t.album}</div>
+        </div>
+        <div class="track-time">${Lt(t.durationSec)}</div>
+      </button>
+    `}_renderDetail(t){const e=Bt.playlists.find(e=>e.id===t),r=Bt.albums.find(e=>e.id===t),s=e??r;if(!s)return J``;const o=!!e;return J`
+      <div>
+        <div class="detail-header">
+          <hf-album-art
+            .obj=${s}
+            size="112"
+            radius="14"
+            boxShadow="0 12px 24px rgba(0,0,0,0.28)"
+          ></hf-album-art>
+          <div class="detail-meta">
+            <div class="detail-kind">${o?"Playlist":"Album"}</div>
+            <div class="detail-title">${s.name}</div>
+            <div class="detail-sub">
+              ${o?`${s.owner} · ${s.trackCount} tracks`:`${s.artist} · ${s.year}`}
+            </div>
+            <div class="detail-actions">
+              <button class="pill-btn primary">${Pt.play({size:13})} Play</button>
+              <button class="pill-btn">${Pt.plus({size:13})} Queue</button>
+            </div>
+          </div>
+        </div>
+        <div class="body">
+          ${Bt.tracks.slice(0,10).map((t,e)=>this._renderTrackRow(t,e+1))}
+        </div>
+      </div>
+    `}};Nt.styles=l`
+    :host {
+      display: block;
+      height: 100%;
+      overflow-y: auto;
+      padding-bottom: 12px;
+      color: var(--hf-text);
+      font-family: var(--hf-font);
+      box-sizing: border-box;
+    }
+    .crumbs {
+      padding: 10px 14px 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      color: var(--hf-text-dim);
+      font-size: 12px;
+    }
+    .crumb-btn {
+      background: transparent;
+      border: 0;
+      padding: 3px 6px;
+      border-radius: 6px;
+      color: var(--hf-text-dim);
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 12px;
+      font: inherit;
+    }
+    .crumb-btn[data-current='true'] {
+      color: var(--hf-text);
+      font-weight: 600;
+    }
+    .section-label {
+      padding: 4px 4px 6px;
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--hf-text-dim);
+    }
+    .body {
+      padding: 0 14px 16px;
+    }
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .provider-tile {
+      background: var(--hf-surface);
+      border: 1px solid var(--hf-border);
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: var(--hf-text);
+      cursor: pointer;
+      text-align: left;
+      font: inherit;
+      width: 100%;
+    }
+    .provider-glyph {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 26px;
+      flex: none;
+      box-shadow: inset 0 -8px 18px rgba(0, 0, 0, 0.18);
+    }
+    .provider-info {
+      min-width: 0;
+      flex: 1;
+    }
+    .provider-name {
+      font-weight: 600;
+      font-size: 15px;
+    }
+    .provider-sub {
+      font-size: 11.5px;
+      color: var(--hf-text-dim);
+      margin-top: 2px;
+    }
+    .account-tile {
+      background: var(--hf-surface);
+      border: 1px solid var(--hf-border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--hf-text);
+      cursor: pointer;
+      text-align: left;
+      font: inherit;
+      width: 100%;
+    }
+    .account-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .account-name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .account-sub {
+      font-size: 11.5px;
+      color: var(--hf-text-dim);
+      margin-top: 2px;
+    }
+    .subtabs {
+      display: flex;
+      gap: 4px;
+      padding: 4px 14px 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .subtabs::-webkit-scrollbar {
+      display: none;
+    }
+    .subtab {
+      background: transparent;
+      color: var(--hf-text-dim);
+      border: 1px solid var(--hf-border);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font: inherit;
+      white-space: nowrap;
+    }
+    .subtab[data-active='true'] {
+      background: var(--hf-accent);
+      color: var(--hf-accent-text);
+      border-color: var(--hf-accent);
+    }
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .art-tile {
+      background: var(--hf-surface);
+      border: 1px solid var(--hf-border);
+      border-radius: 12px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      color: var(--hf-text);
+      cursor: pointer;
+      text-align: left;
+      font: inherit;
+    }
+    .art-tile-name {
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .art-tile-sub {
+      font-size: 11px;
+      color: var(--hf-text-dim);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .artist-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 4px;
+      background: transparent;
+      border: 0;
+      border-bottom: 1px solid var(--hf-divider);
+      width: 100%;
+      cursor: pointer;
+      font: inherit;
+    }
+    .artist-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+    }
+    .artist-name {
+      font-size: 14px;
+      color: var(--hf-text);
+      font-weight: 500;
+    }
+    .artist-tag {
+      margin-left: auto;
+      color: var(--hf-text-dim);
+      font-size: 11px;
+    }
+    .track-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 4px;
+      background: transparent;
+      border: 0;
+      border-bottom: 1px solid var(--hf-divider);
+      width: 100%;
+      cursor: pointer;
+      color: var(--hf-text);
+      text-align: left;
+      font: inherit;
+    }
+    .track-index {
+      width: 18px;
+      text-align: right;
+      color: var(--hf-text-dim);
+      font-size: 11px;
+      font-variant-numeric: tabular-nums;
+    }
+    .track-meta {
+      flex: 1;
+      min-width: 0;
+    }
+    .track-name {
+      font-size: 13.5px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .track-sub {
+      font-size: 11.5px;
+      color: var(--hf-text-dim);
+      margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .track-time {
+      color: var(--hf-text-dim);
+      font-size: 11px;
+      font-variant-numeric: tabular-nums;
+    }
+    .radio-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      background: var(--hf-surface);
+      border: 1px solid var(--hf-border);
+      border-radius: 12px;
+      width: 100%;
+      cursor: pointer;
+      font: inherit;
+      color: var(--hf-text);
+    }
+    .detail-header {
+      padding: 8px 14px 16px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-end;
+    }
+    .detail-meta {
+      min-width: 0;
+      flex: 1;
+    }
+    .detail-kind {
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--hf-text-dim);
+    }
+    .detail-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-top: 4px;
+      line-height: 1.1;
+    }
+    .detail-sub {
+      font-size: 12px;
+      color: var(--hf-text-dim);
+      margin-top: 6px;
+    }
+    .detail-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .pill-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      color: var(--hf-text);
+      border: 1px solid var(--hf-border);
+      border-radius: 999px;
+      padding: 7px 14px;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      font: inherit;
+    }
+    .pill-btn.primary {
+      background: var(--hf-accent);
+      color: var(--hf-accent-text);
+      border: 0;
+    }
+  `,t([ut({attribute:!1})],Nt.prototype,"store",void 0),Nt=t([ct("hf-browse-tab")],Nt);const Gt=[{id:"all",label:"All"},{id:"tracks",label:"Tracks"},{id:"albums",label:"Albums"},{id:"artists",label:"Artists"},{id:"playlists",label:"Playlists"}],Vt=["khruangbin","jazz","deep focus","ambient","tycho","discover weekly"];let Ft=class extends i{willUpdate(t){t.has("store")&&this.store&&!this._ctrl&&(this._ctrl=new StoreController(this,this.store))}render(){if(!this.store)return J``;const t=this.store,e=t.search.query.trim().toLowerCase(),r=t.search.filter,s=e?this._matchesFor(e):null;return J`
+      <div class="top">
+        <div class="input-wrap">
+          ${Pt.search({size:16})}
+          <input
+            .value=${t.search.query}
+            placeholder="Search Spotify, Apple Music, SoundCloud…"
+            @input=${e=>t.setSearch({query:e.target.value})}
+          />
+          ${t.search.query?J`
+                <button
+                  class="clear-btn"
+                  aria-label="Clear search"
+                  @click=${()=>t.setSearch({query:""})}
+                >
+                  ${Pt.x({size:14})}
+                </button>
+              `:""}
+        </div>
+        <div class="filters">
+          ${Gt.map(e=>J`
+              <button
+                class="filter"
+                data-active=${r===e.id}
+                @click=${()=>t.setSearch({filter:e.id})}
+              >
+                ${e.label}
+              </button>
+            `)}
+        </div>
+      </div>
+
+      <div class="scroll">
+        ${s?this._renderResults(s,r):this._renderSuggestions()}
+      </div>
+    `}_matchesFor(t){const e=e=>e.toLowerCase().includes(t);return{tracks:Bt.tracks.filter(t=>e(t.name)||e(t.artist)),albums:Bt.albums.filter(t=>e(t.name)||e(t.artist)),artists:Bt.artistList.filter(e),playlists:Bt.playlists.filter(t=>e(t.name))}}_renderResults(t,e){return J`
+      <div class="body">
+        ${Bt.providers.map(r=>this._renderProviderSection(r,t,e))}
+      </div>
+    `}_renderProviderSection(t,e,r){let s=e.tracks.slice(0,4),o=e.albums.slice(0,2),a=e.artists.slice(0,2),n=e.playlists.slice(0,2);"apple"===t.id?(s=e.tracks.slice(1,4),o=e.albums.slice(2,4)):"soundcloud"===t.id&&(s=e.tracks.slice(2,5),o=[]),"tracks"===r?(o=[],a=[],n=[]):"albums"===r?(s=[],a=[],n=[]):"artists"===r?(s=[],o=[],n=[]):"playlists"===r&&(s=[],o=[],a=[]);const l=s.length+o.length+a.length+n.length;if(0===l)return J``;const d=`linear-gradient(135deg, oklch(70% 0.18 ${t.brandHue}), oklch(46% 0.16 ${(t.brandHue+30)%360}))`;return J`
+      <div class="section">
+        <div class="section-head">
+          <div class="provider-glyph-sm" style=${`background:${d}`}>
+            ${t.glyph||t.name[0]}
+          </div>
+          <div class="provider-name">${t.name}</div>
+          <div class="result-count">
+            ${l} result${l>1?"s":""}
+          </div>
+        </div>
+
+        ${s.length>0?J`
+              <div style="margin-bottom:6px">
+                <div class="small-label">Tracks</div>
+                ${s.map(t=>{const e=Bt.albumById(t.albumId);return J`
+                    <div class="track-row">
+                      <hf-album-art .obj=${e} size="36" radius="6"></hf-album-art>
+                      <div class="row-meta">
+                        <div class="row-name">${t.name}</div>
+                        <div class="row-sub">${t.artist} · ${t.album}</div>
+                      </div>
+                      <div class="row-time">${Lt(t.durationSec)}</div>
+                    </div>
+                  `})}
+              </div>
+            `:""}
+
+        ${o.length>0?J`
+              <div style="margin-bottom:6px">
+                <div class="small-label">Albums</div>
+                <div class="album-row">
+                  ${o.map(t=>J`
+                      <div class="album-card">
+                        <hf-album-art .obj=${t} size="96" radius="8"></hf-album-art>
+                        <div class="album-name">${t.name}</div>
+                        <div class="album-artist">${t.artist}</div>
+                      </div>
+                    `)}
+                </div>
+              </div>
+            `:""}
+
+        ${a.length>0?J`
+              <div style="margin-bottom:6px">
+                <div class="small-label">Artists</div>
+                ${a.map((t,e)=>J`
+                    <div class="artist-row">
+                      <div
+                        class="artist-avatar"
+                        style=${`background: conic-gradient(from ${60*e}deg, oklch(70% 0.18 ${40*e}), oklch(46% 0.16 ${(40*e+60)%360}))`}
+                      ></div>
+                      <div class="row-name">${t}</div>
+                      <div class="row-time">Artist</div>
+                    </div>
+                  `)}
+              </div>
+            `:""}
+
+        ${n.length>0?J`
+              <div>
+                <div class="small-label">Playlists</div>
+                ${n.map(t=>J`
+                    <div class="playlist-row">
+                      <hf-album-art .obj=${t} size="36" radius="6"></hf-album-art>
+                      <div class="row-meta">
+                        <div class="row-name">${t.name}</div>
+                        <div class="row-sub">${t.trackCount} tracks</div>
+                      </div>
+                    </div>
+                  `)}
+              </div>
+            `:""}
+      </div>
+    `}_renderSuggestions(){return J`
+      <div class="suggestions">
+        <div class="small-label">Try searching</div>
+        <div class="suggest-row">
+          ${Vt.map(t=>J`
+              <button
+                class="suggest-pill"
+                @click=${()=>this.store.setSearch({query:t})}
+              >
+                ${t}
+              </button>
+            `)}
+        </div>
+        <div class="small-label">Recent</div>
+        ${Bt.tracks.slice(0,4).map(t=>{const e=Bt.albumById(t.albumId);return J`
+            <div class="track-row">
+              <hf-album-art .obj=${e} size="36" radius="6"></hf-album-art>
+              <div class="row-meta">
+                <div class="row-name">${t.name}</div>
+                <div class="row-sub">${t.artist} · ${t.album}</div>
+              </div>
+              <div class="row-time">${Lt(t.durationSec)}</div>
+            </div>
+          `})}
+      </div>
+    `}};Ft.styles=l`
+    :host {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      color: var(--hf-text);
+      font-family: var(--hf-font);
+      box-sizing: border-box;
+    }
+    .top {
+      padding: 14px 14px 8px;
+      border-bottom: 1px solid var(--hf-divider);
+    }
+    .input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--hf-input);
+      border-radius: 999px;
+      padding: 8px 12px;
+      border: 1px solid var(--hf-border);
+    }
+    input {
+      flex: 1;
+      background: transparent;
+      border: 0;
+      outline: 0;
+      color: var(--hf-text);
+      font-size: 13.5px;
+      font: inherit;
+    }
+    .clear-btn {
+      background: transparent;
+      border: 0;
+      padding: 2px;
+      cursor: pointer;
+      color: var(--hf-text-dim);
+    }
+    .filters {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .filters::-webkit-scrollbar {
+      display: none;
+    }
+    .filter {
+      background: transparent;
+      color: var(--hf-text-dim);
+      border: 1px solid var(--hf-border);
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      font: inherit;
+      white-space: nowrap;
+    }
+    .filter[data-active='true'] {
+      background: var(--hf-accent);
+      color: var(--hf-accent-text);
+      border-color: var(--hf-accent);
+    }
+    .scroll {
+      flex: 1;
+      overflow-y: auto;
+    }
+    .body {
+      padding: 10px 14px 16px;
+    }
+    .small-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--hf-text-dim);
+      margin-bottom: 4px;
+    }
+    .section {
+      margin-bottom: 16px;
+    }
+    .section-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 0 8px;
+    }
+    .provider-glyph-sm {
+      width: 18px;
+      height: 18px;
+      border-radius: 5px;
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 10px;
+    }
+    .provider-name {
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .result-count {
+      font-size: 11px;
+      color: var(--hf-text-dim);
+      margin-left: auto;
+    }
+    .album-row {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 4px 0;
+      scrollbar-width: none;
+    }
+    .album-row::-webkit-scrollbar {
+      display: none;
+    }
+    .album-card {
+      width: 96px;
+      flex: none;
+    }
+    .album-name {
+      margin-top: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .album-artist {
+      font-size: 10.5px;
+      color: var(--hf-text-dim);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .artist-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 4px;
+      border-bottom: 1px solid var(--hf-divider);
+    }
+    .artist-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+    }
+    .playlist-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 4px;
+      border-bottom: 1px solid var(--hf-divider);
+    }
+    .track-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 4px;
+      border-bottom: 1px solid var(--hf-divider);
+    }
+    .row-name {
+      font-size: 13.5px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .row-sub {
+      font-size: 11.5px;
+      color: var(--hf-text-dim);
+      margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .row-time {
+      color: var(--hf-text-dim);
+      font-size: 11px;
+      font-variant-numeric: tabular-nums;
+    }
+    .row-meta {
+      flex: 1;
+      min-width: 0;
+    }
+    .suggestions {
+      padding: 14px 14px;
+    }
+    .suggest-pill {
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: var(--hf-surface);
+      border: 1px solid var(--hf-border);
+      color: var(--hf-text);
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .suggest-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+  `,t([ut({attribute:!1})],Ft.prototype,"store",void 0),Ft=t([ct("hf-search-tab")],Ft);let Qt=class extends i{constructor(){super(...arguments),this.rowHeight=56,this.actionBg="#e0413a",this._dx=0,this._dragging=!1,this._startX=null,this._startDx=0,this._onDown=t=>{const e="touches"in t?t.touches[0].clientX:t.clientX;this._startX=e,this._startDx=this._dx,this._dragging=!0},this._onMove=t=>{if(null===this._startX)return;const e="touches"in t?t.touches[0].clientX:t.clientX;let r=this._startDx+(e-this._startX);r>0&&(r=0),r<-110&&(r=-110),this._dx=r},this._onUp=()=>{this._startX=null,this._dragging=!1,this._dx=this._dx<-64?-92:0},this._fireDelete=()=>{this.dispatchEvent(new CustomEvent("hf-delete",{bubbles:!0,composed:!0})),this._dx=0}}render(){return J`
+      <div
+        class="action"
+        style=${`background:${this.actionBg}`}
+        @click=${this._fireDelete}
+      >
+        ${this.icon??J`<span>×</span>`}
+      </div>
+      <div
+        class=${"row "+(this._dragging?"dragging":"")}
+        style=${`height:${this.rowHeight}px;transform:translateX(${this._dx}px);transition:${this._dragging?"none":"transform 0.18s"}`}
+        @mousedown=${this._onDown}
+        @mousemove=${this._onMove}
+        @mouseup=${this._onUp}
+        @mouseleave=${this._onUp}
+        @touchstart=${this._onDown}
+        @touchmove=${this._onMove}
+        @touchend=${this._onUp}
+      >
+        <slot></slot>
+      </div>
+    `}};Qt.styles=l`
+    :host {
+      display: block;
+      position: relative;
+      overflow: hidden;
+    }
+    .action {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 92px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      cursor: pointer;
+    }
+    .row {
+      height: 100%;
+      cursor: grab;
+      background: var(--hf-bg);
+    }
+    .row.dragging {
+      cursor: grabbing;
+    }
+  `,t([ut({type:Number})],Qt.prototype,"rowHeight",void 0),t([ut()],Qt.prototype,"actionBg",void 0),t([ut({attribute:!1})],Qt.prototype,"icon",void 0),t([ft()],Qt.prototype,"_dx",void 0),t([ft()],Qt.prototype,"_dragging",void 0),Qt=t([ct("hf-swipe-row")],Qt);let Wt=class extends i{constructor(){super(...arguments),this.items=[],this.rowHeight=56,this.renderRow=()=>J``,this._dragIdx=null,this._hoverIdx=null,this._startY=0,this._onMove=t=>{if(null===this._dragIdx)return;const e=("touches"in t?t.touches[0].clientY:t.clientY)-this._startY,r=Math.round(this._dragIdx+e/this.rowHeight);this._hoverIdx=Math.max(0,Math.min(this.items.length-1,r))},this._onUp=()=>{null!==this._dragIdx&&null!==this._hoverIdx&&this._hoverIdx!==this._dragIdx&&this.dispatchEvent(new CustomEvent("hf-reorder",{detail:{from:this._dragIdx,to:this._hoverIdx},bubbles:!0,composed:!0})),this._dragIdx=null,this._hoverIdx=null,window.removeEventListener("mousemove",this._onMove),window.removeEventListener("mouseup",this._onUp),window.removeEventListener("touchmove",this._onMove),window.removeEventListener("touchend",this._onUp)}}render(){const t=this._positions();return J`
+      <div class="stack" style=${`height:${this.items.length*this.rowHeight}px`}>
+        ${this.items.map((e,r)=>{const s=r===this._dragIdx,o=t[r]??0;return J`
+            <div
+              class=${"item "+(s?"dragging":"")}
+              style=${`transform:translateY(${o}px)`}
+              .key=${e.key}
+            >
+              ${this.renderRow(e,r,{onGripDown:this._gripDownFor(r),isDragging:s})}
+            </div>
+          `})}
+      </div>
+    `}_positions(){const t=this.items.map((t,e)=>e);if(null!==this._dragIdx&&null!==this._hoverIdx){const[e]=t.splice(this._dragIdx,1);void 0!==e&&t.splice(this._hoverIdx,0,e)}const e=new Array(this.items.length).fill(0);return t.forEach((t,r)=>{e[t]=r*this.rowHeight}),e}_gripDownFor(t){return e=>{e.preventDefault(),this._dragIdx=t,this._hoverIdx=t,this._startY="touches"in e?e.touches[0].clientY:e.clientY,window.addEventListener("mousemove",this._onMove),window.addEventListener("mouseup",this._onUp),window.addEventListener("touchmove",this._onMove,{passive:!1}),window.addEventListener("touchend",this._onUp)}}disconnectedCallback(){super.disconnectedCallback(),window.removeEventListener("mousemove",this._onMove),window.removeEventListener("mouseup",this._onUp),window.removeEventListener("touchmove",this._onMove),window.removeEventListener("touchend",this._onUp)}};Wt.styles=l`
+    :host {
+      display: block;
+    }
+    .stack {
+      position: relative;
+    }
+    .item {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      transition: transform 0.18s cubic-bezier(0.2, 0.7, 0.3, 1);
+    }
+    .item.dragging {
+      transition: none;
+      z-index: 10;
+      opacity: 0.92;
+      filter: drop-shadow(0 8px 22px rgba(0, 0, 0, 0.4));
+    }
+  `,t([ut({attribute:!1})],Wt.prototype,"items",void 0),t([ut({type:Number})],Wt.prototype,"rowHeight",void 0),t([ut({attribute:!1})],Wt.prototype,"renderRow",void 0),t([ft()],Wt.prototype,"_dragIdx",void 0),t([ft()],Wt.prototype,"_hoverIdx",void 0),Wt=t([ct("hf-draggable-queue")],Wt);let Yt=class extends i{willUpdate(t){t.has("store")&&this.store&&!this._ctrl&&(this._ctrl=new StoreController(this,this.store))}render(){if(!this.store)return J``;const t=this.store,e=t.activePlayer,r=e.queue.slice(e.currentIdx+1),s=Bt.trackById(e.queue[e.currentIdx]??""),o=r.map((t,r)=>{const s=e.currentIdx+1+r;return{key:`${t}@${s}`,id:t,idxInQueue:s}}),a=t.selectedTracks.size;return J`
+      ${t.multiMode?J`
+            <div class="toolbar multi">
+              <button
+                class="icon-btn-sq"
+                @click=${()=>t.setMultiMode(!1)}
+                aria-label="Cancel selection"
+              >
+                ${Pt.x({size:16})}
+              </button>
+              <div class="multi-count">${a} selected</div>
+              <div class="multi-actions">
+                <button
+                  class="pill-primary"
+                  @click=${()=>t.removeBulk(t.selectedTracks)}
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          `:J`
+            <div class="toolbar">
+              <div>
+                <div class="title">Queue</div>
+                <div class="sub">${r.length} upcoming · drag to reorder</div>
+              </div>
+              <div style="display:flex;gap:6px">
+                <button
+                  class="icon-btn-sq"
+                  aria-label="Multi-select"
+                  @click=${()=>t.setMultiMode(!0)}
+                >
+                  ${Pt.check({size:16})}
+                </button>
+                <button
+                  class="icon-btn-sq"
+                  aria-label="Clear queue"
+                  @click=${()=>t.clearQueue()}
+                >
+                  ${Pt.trash({size:16})}
+                </button>
+              </div>
+            </div>
+          `}
+
+      ${s?J`
+            <div class="now-playing">
+              <div class="small-label">Now playing</div>
+              <div class="now-playing-card">
+                <hf-album-art
+                  .obj=${Bt.albumById(s.albumId)}
+                  size="44"
+                  radius="8"
+                ></hf-album-art>
+                <div class="np-meta">
+                  <div class="np-line">
+                    <div class="np-pulse"></div>
+                    <div class="np-name">${s.name}</div>
+                  </div>
+                  <div class="np-artist">${s.artist}</div>
+                </div>
+              </div>
+            </div>
+          `:""}
+
+      <div class="scroll">
+        <div class="small-label">Up next · ${r.length}</div>
+        ${0===o.length?J`<div class="empty">Queue is empty</div>`:J`
+              <hf-draggable-queue
+                .items=${o}
+                .rowHeight=${56}
+                .renderRow=${(t,e,r)=>this._renderRow(t,r)}
+                @hf-reorder=${e=>{const r=t.activePlayer.currentIdx;t.moveQueue(r+1+e.detail.from,r+1+e.detail.to)}}
+              ></hf-draggable-queue>
+            `}
+      </div>
+    `}_renderRow(t,e){const r=this.store,s=Bt.trackById(t.id);if(!s)return J``;const o=Bt.albumById(s.albumId),a=r.selectedTracks.has(t.idxInQueue);return J`
+      <hf-swipe-row
+        .rowHeight=${56}
+        @hf-delete=${()=>r.removeFromQueue(t.idxInQueue)}
+      >
+        <div class="row-inner" data-selected=${a}>
+          ${r.multiMode?J`
+                <button
+                  class="checkbox"
+                  data-checked=${a}
+                  @click=${e=>{e.stopPropagation();const s=new Set(r.selectedTracks);s.has(t.idxInQueue)?s.delete(t.idxInQueue):s.add(t.idxInQueue),r.setSelectedTracks(s)}}
+                >
+                  ${a?Pt.check({size:12,sw:3}):""}
+                </button>
+              `:J`
+                <div
+                  class="grip"
+                  aria-label="Drag handle"
+                  @mousedown=${e.onGripDown}
+                  @touchstart=${e.onGripDown}
+                >
+                  ${Pt.drag({size:14})}
+                </div>
+              `}
+          <hf-album-art .obj=${o} size="40" radius="6"></hf-album-art>
+          <div
+            class="row-track"
+            @click=${()=>r.multiMode?null:r.playTrackAt(t.idxInQueue)}
+          >
+            <div class="row-name">${s.name}</div>
+            <div class="row-artist">${s.artist}</div>
+          </div>
+          <div class="row-time">${Lt(s.durationSec)}</div>
+          ${r.multiMode?"":J`
+                <button
+                  class="row-next"
+                  aria-label="Play next"
+                  @click=${e=>{e.stopPropagation(),r.moveToTop(t.idxInQueue)}}
+                >
+                  ${Pt.playNext({size:14})}
+                </button>
+              `}
+        </div>
+      </hf-swipe-row>
+    `}};Yt.styles=l`
+    :host {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      color: var(--hf-text);
+      font-family: var(--hf-font);
+      box-sizing: border-box;
+    }
+    .toolbar {
+      padding: 14px 14px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .toolbar.multi {
+      justify-content: flex-start;
+    }
+    .title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.05;
+    }
+    .sub {
+      font-size: 11.5px;
+      color: var(--hf-text-dim);
+      margin-top: 4px;
+    }
+    .icon-btn-sq {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      padding: 0;
+      background: var(--hf-surface);
+      border: 1px solid var(--hf-border);
+      color: var(--hf-text);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      font: inherit;
+    }
+    .multi-count {
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .multi-actions {
+      margin-left: auto;
+      display: flex;
+      gap: 6px;
+    }
+    .pill-primary {
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: var(--hf-accent);
+      color: var(--hf-accent-text);
+      border: 0;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 600;
+      font-size: 12px;
+    }
+    .now-playing {
+      padding: 0 14px 12px;
+    }
+    .now-playing-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 10px;
+      background: var(--hf-surface-alt);
+      border: 1px solid var(--hf-border);
+      border-radius: 12px;
+    }
+    .np-meta {
+      flex: 1;
+      min-width: 0;
+    }
+    .np-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .np-pulse {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--hf-accent);
+      animation: hf-q-pulse 1.4s ease-in-out infinite;
+    }
+    @keyframes hf-q-pulse {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.3); }
+    }
+    .np-name {
+      font-size: 13.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .np-artist {
+      font-size: 11.5px;
+      color: var(--hf-text-dim);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .small-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--hf-text-dim);
+      margin-bottom: 4px;
+    }
+    .scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 14px 16px;
+    }
+    .empty {
+      padding: 30px 0;
+      text-align: center;
+      color: var(--hf-text-dim);
+      font-size: 12px;
+    }
+    .row-inner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 6px;
+      height: 56px;
+      box-sizing: border-box;
+      border-radius: 8px;
+    }
+    .row-inner[data-selected='true'] {
+      background: var(--hf-selected);
+    }
+    .grip {
+      cursor: grab;
+      padding: 4px;
+      color: var(--hf-text-dim);
+      flex: none;
+      touch-action: none;
+    }
+    .row-track {
+      flex: 1;
+      min-width: 0;
+    }
+    .row-name {
+      font-size: 13.5px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .row-artist {
+      font-size: 11.5px;
+      color: var(--hf-text-dim);
+      margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .row-time {
+      color: var(--hf-text-dim);
+      font-size: 11px;
+      font-variant-numeric: tabular-nums;
+    }
+    .row-next {
+      background: transparent;
+      border: 0;
+      padding: 4px;
+      color: var(--hf-text-dim);
+      cursor: pointer;
+    }
+    .checkbox {
+      width: 20px;
+      height: 20px;
+      border-radius: 5px;
+      background: transparent;
+      border: 1.5px solid var(--hf-border);
+      display: grid;
+      place-items: center;
+      padding: 0;
+      cursor: pointer;
+      flex: none;
+    }
+    .checkbox[data-checked='true'] {
+      background: var(--hf-accent);
+      color: var(--hf-accent-text);
+      border-color: var(--hf-accent);
+    }
+  `,t([ut({attribute:!1})],Yt.prototype,"store",void 0),Yt=t([ct("hf-queue-tab")],Yt);let Kt=class extends i{willUpdate(t){t.has("store")&&this.store&&!this._ctrl&&(this._ctrl=new StoreController(this,this.store))}render(){if(!this.store)return J``;const t=this.store.groups,e=t.filter(t=>!t.isIdle),r=t.filter(t=>t.isIdle);return J`
+      <div class="header">
+        <div class="header-title">Speakers & groups</div>
+        <div class="header-sub">
+          ${e.length} group${1===e.length?"":"s"} ·
+          ${this.store.speakers.length} speakers total
+        </div>
+      </div>
+
+      <div class="groups">
+        ${e.map(t=>this._renderGroupCard(t))}
+      </div>
+
+      ${r.length>0?J`
+            <div class="idle-section">
+              Idle
+              <div class="rule"></div>
+              ${r.length}
+            </div>
+            <div class="idle-rows">
+              ${r.map(t=>this._renderIdleRow(t))}
+            </div>
+          `:""}
+
+      <div class="footer-help">
+        Tap a group's name to control it from the Player tab. Use Group on
+        any row to add/remove rooms; ▶ on an idle row starts solo playback.
+      </div>
+    `}_renderGroupCard(t){const e=t.player?Bt.trackById(t.player.queue[t.player.currentIdx]??""):void 0,r=e?Bt.albumById(e.albumId):void 0,s=t.player?.groupVolume??t.lead.volume;return J`
+      <div class="group-card" data-active=${t.isActive}>
+        <div class="group-head">
+          ${r?J`<hf-album-art .obj=${r} size="46" radius="9"></hf-album-art>`:J`<div class="group-art">${Pt.speaker({size:18})}</div>`}
+          <div class="group-meta">
+            <button class="group-name-btn" @click=${()=>this.store.setActiveLead(t.leadId)}>
+              <span class="group-name">${t.name}</span>
+              ${t.isActive?J`<span class="active-badge">Active</span>`:""}
+            </button>
+            <div class="group-track">
+              ${e?J`<strong>${e.name}</strong> · ${e.artist}`:"Idle"}
+            </div>
+          </div>
+          <div class="group-actions">
+            <button
+              class="pill-btn"
+              title="Group rooms"
+              @click=${()=>this.store.openGroupingSheet(t.leadId)}
+            >
+              ${Pt.group({size:13})} Group
+            </button>
+            <button
+              class="play-btn"
+              data-playing=${t.playing}
+              aria-label=${t.playing?"Pause group":"Play group"}
+              @click=${()=>this.store.toggleGroupPlay(t.leadId)}
+            >
+              ${t.playing?Pt.pause({size:14}):Pt.play({size:14})}
+            </button>
+          </div>
+        </div>
+
+        <div class="group-volume">
+          <div class="group-volume-head">
+            ${Pt.group({size:13,stroke:bt})}
+            <div class="group-volume-label">
+              Group · ${t.members.length} speaker${1===t.members.length?"":"s"}
+            </div>
+            <div class="group-volume-value">${s}</div>
+          </div>
+          <hf-slider
+            .value=${s}
+            .color=${wt}
+            .track=${_t}
+            @hf-input=${e=>this.store.setGroupVolumeFor(t.leadId,e.detail)}
+          ></hf-slider>
+        </div>
+
+        <div class="members">
+          ${t.members.map(e=>this._renderMemberRow(e,t))}
+        </div>
+      </div>
+    `}_renderMemberRow(t,e){const r=t.id===e.leadId,s=e.members.length>1;return J`
+      <div class="member-row">
+        <div class="member-info">
+          <div class="member-name-row">
+            <div class="member-name">${t.name}</div>
+            ${r&&e.members.length>1?J`<span class="lead-tag">Lead</span>`:""}
+          </div>
+          <hf-slider
+            .value=${t.volume}
+            .color=${bt}
+            .track=${_t}
+            .trackHeight=${3}
+            .thumb=${10}
+            @hf-input=${e=>this.store.setSpeakerVol(t.id,e.detail)}
+          ></hf-slider>
+        </div>
+        <div class="member-vol-value">${t.volume}</div>
+        ${s?J`
+              <button
+                class="member-leave"
+                title="Leave group"
+                @click=${()=>this.store.ungroupSpeaker(t.id)}
+              >
+                ${Pt.x({size:13})}
+              </button>
+            `:""}
+      </div>
+    `}_renderIdleRow(t){const e=t.lead;return J`
+      <div class="idle-row">
+        <div class="idle-icon">${Pt.speaker({size:14})}</div>
+        <div class="idle-info">
+          <div class="idle-name">${e.name}</div>
+          <div class="idle-sub">${e.model} · idle</div>
+        </div>
+        <button
+          class="idle-group-btn"
+          title="Group with other rooms"
+          @click=${()=>this.store.openGroupingSheet(e.id)}
+        >
+          ${Pt.group({size:11})} Group
+        </button>
+        <button
+          class="idle-play-btn"
+          title="Play solo here"
+          aria-label="Play solo"
+          @click=${()=>this.store.startSoloPlayback(e.id)}
+        >
+          ${Pt.play({size:11})}
+        </button>
+      </div>
+    `}};Kt.styles=l`
+    :host {
+      display: block;
+      height: 100%;
+      overflow-y: auto;
+      padding: 8px 14px 16px;
+      color: var(--hf-text);
+      font-family: var(--hf-font);
+      box-sizing: border-box;
+    }
+    .header {
+      padding: 8px 4px 4px;
+    }
+    .header-title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.05;
+    }
+    .header-sub {
+      font-size: 11.5px;
+      color: var(--hf-text-dim);
+      margin-top: 4px;
+    }
+    .groups {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 4px;
+    }
+    .group-card {
+      background: var(--hf-surface);
+      border: 1px solid var(--hf-border);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .group-card[data-active='true'] {
+      border-color: var(--hf-accent);
+      box-shadow: 0 0 0 2px rgba(224, 138, 74, 0.15);
+    }
+    .group-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 12px 10px;
+    }
+    .group-art {
+      width: 46px;
+      height: 46px;
+      border-radius: 9px;
+      background: var(--hf-input);
+      display: grid;
+      place-items: center;
+      color: var(--hf-text-dim);
+      flex: none;
+    }
+    .group-meta {
+      flex: 1;
+      min-width: 0;
+    }
+    .group-name-btn {
+      background: transparent;
+      border: 0;
+      padding: 0;
+      font: inherit;
+      color: var(--hf-text);
+      text-align: left;
+      cursor: pointer;
+      min-width: 0;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .group-name {
+      font-size: 14px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+    .active-badge {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--hf-accent);
+      padding: 1px 6px;
+      border: 1px solid var(--hf-accent);
+      border-radius: 4px;
+      text-transform: uppercase;
+      flex: none;
+    }
+    .group-track {
+      font-size: 11px;
+      color: var(--hf-text-dim);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .group-track strong {
+      color: var(--hf-text);
+      font-weight: 500;
+    }
+    .group-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .pill-btn {
+      height: 32px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: transparent;
+      border: 1px solid var(--hf-border);
+      color: var(--hf-text);
+      cursor: pointer;
+      font: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11.5px;
+      font-weight: 600;
+      flex: none;
+    }
+    .play-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--hf-text);
+      border: 1px solid var(--hf-border);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      flex: none;
+    }
+    .play-btn[data-playing='true'] {
+      background: var(--hf-accent);
+      color: var(--hf-accent-text);
+      border-color: var(--hf-accent);
+    }
+    .group-volume {
+      padding: 0 12px 4px;
+    }
+    .group-volume-head {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: -2px;
+      color: var(--hf-text-dim);
+    }
+    .group-volume-label {
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .group-volume-value {
+      margin-left: auto;
+      font-size: 11px;
+      font-variant-numeric: tabular-nums;
+    }
+    .members {
+      border-top: 1px solid var(--hf-divider);
+      padding: 6px 12px 10px;
+    }
+    .member-row {
+      padding: 6px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .member-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .member-name-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .member-name {
+      font-size: 12.5px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .lead-tag {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--hf-text-dim);
+      text-transform: uppercase;
+    }
+    .member-vol-value {
+      font-size: 10.5px;
+      color: var(--hf-text-dim);
+      width: 22px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .member-leave {
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--hf-text-dim);
+      cursor: pointer;
+    }
+    .idle-section {
+      margin: 20px 4px 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--hf-text-dim);
+    }
+    .idle-section .rule {
+      flex: 1;
+      height: 1px;
+      background: var(--hf-divider);
+    }
+    .idle-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .idle-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: var(--hf-surface);
+      border: 1px solid var(--hf-border);
+      border-radius: 10px;
+    }
+    .idle-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      background: var(--hf-input);
+      display: grid;
+      place-items: center;
+      color: var(--hf-text-dim);
+      flex: none;
+    }
+    .idle-name {
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .idle-sub {
+      font-size: 10.5px;
+      color: var(--hf-text-dim);
+      margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .idle-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .idle-group-btn {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--hf-text);
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: transparent;
+      border: 1px solid var(--hf-border);
+      cursor: pointer;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .idle-play-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      background: var(--hf-accent);
+      color: var(--hf-accent-text);
+      border: 0;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      flex: none;
+    }
+    .footer-help {
+      margin-top: 16px;
+      padding: 0 4px;
+      font-size: 11px;
+      color: var(--hf-text-dim);
+      line-height: 1.5;
+    }
+  `,t([ut({attribute:!1})],Kt.prototype,"store",void 0),Kt=t([ct("hf-output-tab")],Kt);const Xt=l`
+  .hf-pip {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 1.5px;
+    height: 10px;
+  }
+  .hf-pip > span {
+    width: 2px;
+    border-radius: 1px;
+    transform-origin: bottom;
+  }
+  .hf-pip > span:nth-child(1) {
+    height: 6px;
+    animation: hf-eq-a 0.9s ease-in-out infinite;
+  }
+  .hf-pip > span:nth-child(2) {
+    height: 9px;
+    animation: hf-eq-b 0.9s ease-in-out infinite 0.15s;
+  }
+  .hf-pip > span:nth-child(3) {
+    height: 5px;
+    animation: hf-eq-c 0.9s ease-in-out infinite 0.3s;
+  }
+  @keyframes hf-eq-a {
+    0%, 100% { transform: scaleY(0.55); }
+    50% { transform: scaleY(1.35); }
+  }
+  @keyframes hf-eq-b {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(0.45); }
+  }
+  @keyframes hf-eq-c {
+    0%, 100% { transform: scaleY(0.75); }
+    50% { transform: scaleY(1.15); }
+  }
+`;let Jt=class extends i{willUpdate(t){t.has("store")&&this.store&&!this._ctrl&&(this._ctrl=new StoreController(this,this.store))}render(){if(!this.store)return J``;const t=this.store.groups;return J`
+      <div class="rail">
+        ${t.map(t=>{const e=t.isActive?kt:wt;return J`
+            <button
+              class="chip"
+              data-active=${t.isActive}
+              data-idle=${t.isIdle}
+              @click=${()=>this.store.setActiveLead(t.leadId)}
+            >
+              ${t.playing?function(t){const e=`background:${t}`;return J`
+    <span class="hf-pip" aria-hidden="true">
+      <span style=${e}></span>
+      <span style=${e}></span>
+      <span style=${e}></span>
+    </span>
+  `}(e):Pt.speaker({size:11,stroke:"currentColor"})}
+              <span class="chip-name">${t.name}</span>
+              ${t.members.length>1?J`<span class="badge">${t.members.length}</span>`:""}
+            </button>
+          `})}
+        <button
+          class="manage-btn"
+          aria-label="Manage groups"
+          title="Manage groups"
+          @click=${()=>this.store.setTab("group")}
+        >
+          ${Pt.group({size:13})}
+        </button>
+      </div>
+    `}};Jt.styles=[Xt,l`
+      :host {
+        display: block;
+        border-bottom: 1px solid var(--hf-divider);
+      }
+      .rail {
+        display: flex;
+        gap: 6px;
+        padding: 2px 14px 10px;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+      .rail::-webkit-scrollbar {
+        display: none;
+      }
+      .chip {
+        flex: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 10px 5px 8px;
+        border-radius: 999px;
+        cursor: pointer;
+        font: inherit;
+        background: transparent;
+        color: var(--hf-text);
+        border: 1px solid var(--hf-border);
+        white-space: nowrap;
+        max-width: 220px;
+        overflow: hidden;
+      }
+      .chip[data-active='true'] {
+        background: var(--hf-accent);
+        color: var(--hf-accent-text);
+        border-color: var(--hf-accent);
+      }
+      .chip[data-idle='true'] {
+        color: var(--hf-text-dim);
+        opacity: 0.7;
+      }
+      .chip-name {
+        font-size: 11.5px;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 180px;
+      }
+      .badge {
+        font-size: 9.5px;
+        font-weight: 700;
+        padding: 1px 5px;
+        border-radius: 999px;
+        background: var(--hf-input);
+        color: var(--hf-text-dim);
+      }
+      .chip[data-active='true'] .badge {
+        background: rgba(0, 0, 0, 0.18);
+        color: var(--hf-accent-text);
+      }
+      .manage-btn {
+        flex: none;
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        background: transparent;
+        border: 1px dashed var(--hf-border);
+        display: grid;
+        place-items: center;
+        color: var(--hf-text-dim);
+        cursor: pointer;
+        padding: 0;
+      }
+    `],t([ut({attribute:!1})],Jt.prototype,"store",void 0),Jt=t([ct("hf-group-chip-rail")],Jt);let Zt=class extends i{constructor(){super(...arguments),this._draft=new Set,this._initialDraft=new Set,this._wasOpen=!1,this._apply=()=>{const t=this.store.groupingSheet;t.leadId&&this.store.commitGroupMembers(t.leadId,Array.from(this._draft))}}willUpdate(t){if(t.has("store")&&this.store&&!this._ctrl&&(this._ctrl=new StoreController(this,this.store)),this.store){const t=this.store.groupingSheet.open;t&&!this._wasOpen&&this._seedDraft(),this._wasOpen=t}}_seedDraft(){const t=this.store.groupingSheet.leadId;if(!t)return;const e=this.store.speakers.filter(e=>e.leadId===t).map(t=>t.id);e.push(t);const r=new Set(e);this._draft=r,this._initialDraft=new Set(r)}render(){const t=this.store?.groupingSheet;if(!t?.open)return this.toggleAttribute("data-open",!1),J``;this.toggleAttribute("data-open",!0);const e=t.leadId,r=this.store.speakers.find(t=>t.id===e);if(!r)return J``;const s=this._draft.size,o=this._diffChanged(),a=0===s?"Group will be dissolved":1===s?"Will play solo":`${s} rooms grouped`;return J`
+      <div class="scrim" @click=${()=>this.store.closeGroupingSheet()}></div>
+      <div class="sheet" @click=${t=>t.stopPropagation()}>
+        <div class="grip"><div></div></div>
+        <div class="header">
+          <div class="header-title">Group rooms</div>
+          <div class="header-sub">
+            Choose rooms to play in sync with
+            <strong>${r.name}</strong>.
+          </div>
+        </div>
+        <div class="list">
+          ${this.store.speakers.map(t=>{const r=this._draft.has(t.id),s=t.id===e;return J`
+              <button
+                class="row"
+                data-checked=${r}
+                @click=${()=>this._toggle(t.id)}
+              >
+                <div class="check">
+                  ${r?Pt.check({size:15,sw:2.6}):""}
+                </div>
+                <div class="row-info">
+                  <div class="row-name-line">
+                    <div class="row-name">${t.name}</div>
+                    ${s?J`<span class="anchor-tag">Anchor</span>`:""}
+                  </div>
+                  <div class="row-sub">
+                    ${t.model}${this._contextFor(t.id,e)?` · ${this._contextFor(t.id,e)}`:""}
+                  </div>
+                </div>
+                <div class="row-vol">vol ${t.volume}</div>
+              </button>
+            `})}
+        </div>
+        <div class="footer">
+          <div class="footer-status">${a}</div>
+          <button class="btn btn-cancel" @click=${()=>this.store.closeGroupingSheet()}>
+            Cancel
+          </button>
+          <button
+            class="btn btn-done"
+            ?disabled=${!o}
+            @click=${this._apply}
+          >
+            Done
+          </button>
+        </div>
+      </div>
+    `}_toggle(t){const e=this.store.groupingSheet,r=new Set(this._draft);if(r.has(t)){if(t===e.leadId&&r.size>1)return;r.delete(t)}else r.add(t);this._draft=r}_diffChanged(){if(this._initialDraft.size!==this._draft.size)return!0;for(const t of this._initialDraft)if(!this._draft.has(t))return!0;return!1}_contextFor(t,e){const r=this.store.speakers.find(e=>e.id===t);if(!r)return null;if(r.leadId===e)return null;const s=this.store.groups.find(t=>t.leadId===r.leadId);return s?1===s.members.length?s.player?"Playing solo":"Idle":`In ${s.name}`:null}};Zt.styles=l`
+    :host {
+      position: absolute;
+      inset: 0;
+      z-index: 50;
+      pointer-events: none;
+    }
+    :host([data-open='true']) {
+      pointer-events: auto;
+    }
+    .scrim {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      animation: hf-sheet-fade 0.18s ease-out;
+    }
+    .sheet {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--hf-bg);
+      color: var(--hf-text);
+      border-top-left-radius: 18px;
+      border-top-right-radius: 18px;
+      box-shadow: 0 -20px 40px rgba(0, 0, 0, 0.45);
+      max-height: 92%;
+      display: flex;
+      flex-direction: column;
+      animation: hf-sheet-slide 0.24s cubic-bezier(0.2, 0.7, 0.3, 1);
+    }
+    @keyframes hf-sheet-fade {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes hf-sheet-slide {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .grip {
+      display: flex;
+      justify-content: center;
+      padding: 8px 0 4px;
+    }
+    .grip > div {
+      width: 36px;
+      height: 4px;
+      border-radius: 4px;
+      background: var(--hf-border);
+    }
+    .header {
+      padding: 6px 18px 12px;
+      border-bottom: 1px solid var(--hf-divider);
+    }
+    .header-title {
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    .header-sub {
+      font-size: 12px;
+      color: var(--hf-text-dim);
+      margin-top: 4px;
+    }
+    .header-sub strong {
+      color: var(--hf-text);
+      font-weight: 600;
+    }
+    .list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 0;
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      padding: 12px 18px;
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      font: inherit;
+      color: var(--hf-text);
+      text-align: left;
+      border-bottom: 1px solid var(--hf-divider);
+    }
+    .check {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: transparent;
+      border: 1.5px solid var(--hf-border);
+      display: grid;
+      place-items: center;
+      flex: none;
+      transition: background 0.12s, border-color 0.12s;
+    }
+    .row[data-checked='true'] .check {
+      background: var(--hf-accent);
+      border-color: var(--hf-accent);
+      color: var(--hf-accent-text);
+    }
+    .row-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .row-name-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .row-name {
+      font-size: 14.5px;
+      font-weight: 600;
+    }
+    .anchor-tag {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--hf-accent);
+      padding: 1px 5px;
+      text-transform: uppercase;
+      border: 1px solid var(--hf-accent);
+      border-radius: 4px;
+    }
+    .row-sub {
+      font-size: 11.5px;
+      color: var(--hf-text-dim);
+      margin-top: 2px;
+    }
+    .row-vol {
+      font-size: 11px;
+      color: var(--hf-text-dim);
+      font-variant-numeric: tabular-nums;
+    }
+    .footer {
+      padding: 12px 18px 18px;
+      border-top: 1px solid var(--hf-divider);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--hf-surface);
+    }
+    .footer-status {
+      font-size: 12px;
+      color: var(--hf-text-dim);
+      flex: 1;
+    }
+    .btn {
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font: inherit;
+    }
+    .btn-cancel {
+      background: transparent;
+      border: 1px solid var(--hf-border);
+      color: var(--hf-text);
+    }
+    .btn-done {
+      padding: 8px 18px;
+      background: var(--hf-accent);
+      color: var(--hf-accent-text);
+      border: 0;
+    }
+    .btn-done[disabled] {
+      background: var(--hf-input);
+      color: var(--hf-text-dim);
+      cursor: default;
+      opacity: 0.7;
+    }
+  `,t([ut({attribute:!1})],Zt.prototype,"store",void 0),t([ft()],Zt.prototype,"_draft",void 0),Zt=t([ct("hf-group-sheet")],Zt),window.customCards=window.customCards||[],window.customCards.push({type:"homefront-music-card",name:"Homefront Music Card",description:"Music Assistant + WiiM multi-room controller",preview:!1});const te=[{id:"player",label:"Player",icon:"play"},{id:"browser",label:"Browse",icon:"home"},{id:"search",label:"Search",icon:"search"},{id:"queue",label:"Queue",icon:"queue"},{id:"group",label:"Output",icon:"speaker"}];let ee=class extends i{constructor(){super(),this._store=new Store,new StoreController(this,this._store)}setConfig(t){if(!t)throw new Error("Invalid configuration");this._config=t}getCardSize(){return 12}disconnectedCallback(){super.disconnectedCallback(),this._store.dispose()}render(){return J`
       <div class="frame">
         ${this._renderTitle()}
+        <hf-group-chip-rail .store=${this._store}></hf-group-chip-rail>
         <div class="body">${this._renderActiveTab()}</div>
         ${this._renderTabBar()}
       </div>
-    `}_renderTitle(){const t=this._config?.zones?.length??0,e=this._store.groups.filter(t=>t.playing).length,s=t>0?`· ${e} group${1===e?"":"s"} playing · ${t} zone${1===t?"":"s"}`:`· ${e} group${1===e?"":"s"} playing · mock`;return X`
+      <hf-group-sheet .store=${this._store}></hf-group-sheet>
+    `}_renderTitle(){const t=this._config?.zones?.length??0,e=this._store.groups.filter(t=>t.playing).length,r=t>0?` · ${t} zone${1===t?"":"s"}`:" · mock";return J`
       <div class="title-row">
         <span class="title-icon">${Pt.note({size:14})}</span>
         <span class="title-label">Music Assistant</span>
-        <span class="title-sub">${s}</span>
+        <span class="title-sub">
+          ${e} group${1===e?"":"s"} playing${r}
+        </span>
       </div>
-    `}_renderActiveTab(){const t=this._store.tab;return"player"===t?X`<hf-player-tab .store=${this._store}></hf-player-tab>`:X`
-      <div class="stub">
-        ${jt.find(e=>e.id===t)?.label} tab<br />
-        coming next in Phase 1.
-      </div>
-    `}_renderTabBar(){return X`
+    `}_renderActiveTab(){switch(this._store.tab){case"player":return J`<hf-player-tab .store=${this._store}></hf-player-tab>`;case"browser":return J`<hf-browse-tab .store=${this._store}></hf-browse-tab>`;case"search":return J`<hf-search-tab .store=${this._store}></hf-search-tab>`;case"queue":return J`<hf-queue-tab .store=${this._store}></hf-queue-tab>`;case"group":return J`<hf-output-tab .store=${this._store}></hf-output-tab>`}}_renderTabBar(){return J`
       <div class="tab-bar" role="tablist">
-        ${jt.map(t=>{const e=this._store.tab===t.id;return X`
+        ${te.map(t=>{const e=this._store.tab===t.id;return J`
             <button
               class="tab"
               role="tab"
@@ -393,16 +2428,17 @@ function t(t,e,s,r){var o,n=arguments.length,a=n<3?e:null===r?r=Object.getOwnPro
             </button>
           `})}
       </div>
-    `}};Dt.styles=[Mt,h`
+    `}};ee.styles=[It,l`
       :host {
         display: block;
+        position: relative;
         background: var(--hf-bg);
         color: var(--hf-text);
         border-radius: 16px;
         overflow: hidden;
         font-family: var(--hf-font);
         border: 1px solid var(--hf-border);
-        min-height: 620px;
+        min-height: 700px;
       }
       .frame {
         display: flex;
@@ -415,7 +2451,6 @@ function t(t,e,s,r){var o,n=arguments.length,a=n<3?e:null===r?r=Object.getOwnPro
         align-items: center;
         gap: 8px;
         padding: 10px 14px 8px;
-        border-bottom: 1px solid var(--hf-divider);
       }
       .title-icon {
         color: var(--hf-text);
@@ -435,16 +2470,6 @@ function t(t,e,s,r){var o,n=arguments.length,a=n<3?e:null===r?r=Object.getOwnPro
         flex: 1;
         min-height: 0;
         position: relative;
-      }
-      .stub {
-        height: 100%;
-        display: grid;
-        place-items: center;
-        padding: 24px;
-        color: var(--hf-text-dim);
-        font-size: 13px;
-        text-align: center;
-        line-height: 1.5;
       }
       .tab-bar {
         display: grid;
@@ -484,4 +2509,4 @@ function t(t,e,s,r){var o,n=arguments.length,a=n<3?e:null===r?r=Object.getOwnPro
         font-weight: 600;
         letter-spacing: 0.01em;
       }
-    `],t([ut({attribute:!1})],Dt.prototype,"hass",void 0),t([function(t){return ut({...t,state:!0,attribute:!1})}()],Dt.prototype,"_config",void 0),Dt=t([ct("homefront-music-card")],Dt);export{Dt as HomefrontMusicCard};
+    `],t([ut({attribute:!1})],ee.prototype,"hass",void 0),t([ft()],ee.prototype,"_config",void 0),ee=t([ct("homefront-music-card")],ee);export{ee as HomefrontMusicCard};
