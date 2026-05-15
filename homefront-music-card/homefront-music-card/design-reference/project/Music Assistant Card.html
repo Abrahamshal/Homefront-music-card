@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Music Assistant Card — Variations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" />
+  <style>
+    html, body, #root { margin: 0; padding: 0; height: 100%; }
+    body { background: #f0eee9; font-family: "Inter", system-ui, sans-serif; }
+    *, *::before, *::after { box-sizing: border-box; }
+    @keyframes ma-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.35; transform: scale(0.7); }
+    }
+    @keyframes ma-eq1 { 0%,100%{height:6px} 50%{height:3px} }
+    @keyframes ma-eq2 { 0%,100%{height:9px} 35%{height:2px} 70%{height:7px} }
+    @keyframes ma-eq3 { 0%,100%{height:5px} 50%{height:8px} }
+    @keyframes ma-fade { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes ma-slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    /* Hide scrollbars inside cards */
+    .ma-card *::-webkit-scrollbar { display: none; }
+    .ma-card * { scrollbar-width: none; }
+  </style>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script src="data.js"></script>
+  <script type="text/babel" src="design-canvas.jsx"></script>
+  <script type="text/babel" src="tweaks-panel.jsx"></script>
+  <script type="text/babel" src="card-core.jsx"></script>
+  <script type="text/babel" src="card-screens.jsx"></script>
+  <script type="text/babel" src="cards-variations.jsx"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+      "density": "comfy"
+    }/*EDITMODE-END*/;
+
+    function App() {
+      const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+      // Single card centered on the canvas, sized like a mobile HA dashboard
+      // card (roomy on desktop, fits a phone too).
+      const CARD_W = 420;
+      const CARD_H = 820;
+
+      return (
+        <>
+          <DesignCanvas>
+            <DCSection id="card" title="Music Assistant — Refined"
+                       subtitle="Multi-group, Sonos-style room grouping. Tap any “Group” button to add or remove rooms from a sync group.">
+              <DCArtboard id="refined" label="Music Assistant" width={CARD_W} height={CARD_H}>
+                <div className="ma-card" style={{ width: CARD_W, height: CARD_H, background: "#16181d", borderRadius: 16 }}>
+                  <RefinedCard density={t.density} />
+                </div>
+              </DCArtboard>
+            </DCSection>
+
+            <DCPostIt top={140} left={CARD_W + 280} rotate={-1}>
+              <b>How grouping works</b><br/>
+              Tap the <b>Group</b> chip on any group card (or beside the output indicator)
+              to open the room sheet. Check rooms to add them in sync, uncheck to remove.
+              Apply with Done.
+            </DCPostIt>
+            <DCPostIt top={380} left={CARD_W + 280} rotate={1.5}>
+              <b>Multiple groups at once</b><br/>
+              The chip rail under the title row lets you switch which group the
+              card is controlling. Idle rooms appear ghosted — tap to wake.
+            </DCPostIt>
+            <DCPostIt top={600} left={CARD_W + 280} rotate={-0.5}>
+              <b>What's on each tab</b><br/>
+              Player · Browse (Source → Account → Type → Detail) · Search (per-provider) · Queue (drag · swipe · multi-select) · Output (groups, members, volumes).
+            </DCPostIt>
+          </DesignCanvas>
+
+          <TweaksPanel>
+            <TweakSection label="Layout" />
+            <TweakRadio label="Density" value={t.density}
+                        options={["compact", "regular", "comfy"]}
+                        onChange={(v) => setTweak("density", v)} />
+          </TweaksPanel>
+        </>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
