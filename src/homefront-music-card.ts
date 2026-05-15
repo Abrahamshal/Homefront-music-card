@@ -6,6 +6,7 @@ import { themeVars } from './styles/theme.js';
 import { Icons } from './components/Icons.js';
 import { Store, type Tab } from './state/store.js';
 import { StoreController } from './state/storeController.js';
+import { checkIntegrations, type IntegrationStatus } from './state/integrationDetect.js';
 import './components/PlayerTab.js';
 import './components/BrowseTab.js';
 import './components/SearchTab.js';
@@ -13,6 +14,7 @@ import './components/QueueTab.js';
 import './components/OutputTab.js';
 import './components/GroupChipRail.js';
 import './components/GroupSheet.js';
+import './components/SetupHelp.js';
 
 declare global {
   interface Window {
@@ -46,6 +48,7 @@ export class HomefrontMusicCard extends LitElement {
   @property({ attribute: false }) public hass?: HomeAssistant;
 
   @state() private _config?: HomefrontCardConfig;
+  @state() private _integrationStatus?: IntegrationStatus;
 
   // The store is created once per card instance and lives until the card is
   // disconnected from the DOM. The 1-second tick is owned by the store and
@@ -64,6 +67,12 @@ export class HomefrontMusicCard extends LitElement {
       throw new Error('Invalid configuration');
     }
     this._config = config;
+  }
+
+  protected willUpdate(changed: Map<string, unknown>): void {
+    if (changed.has('hass') && this.hass) {
+      this._integrationStatus = checkIntegrations(this.hass);
+    }
   }
 
   public getCardSize(): number {
@@ -165,6 +174,13 @@ export class HomefrontMusicCard extends LitElement {
   ];
 
   protected render() {
+    // Show the setup-help panel when we have a real hass and any of the
+    // three required integrations is missing. Without hass (development
+    // or a fresh Lovelace edit), fall through to the main UI with mock
+    // data — that's also how the visual editor previews the card.
+    if (this._integrationStatus && !this._integrationStatus.allPresent) {
+      return html`<hf-setup-help .status=${this._integrationStatus}></hf-setup-help>`;
+    }
     return html`
       <div class="frame">
         ${this._renderTitle()}
