@@ -4,6 +4,8 @@ import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant, HomefrontCardConfig } from './types.js';
 import { themeVars } from './styles/theme.js';
 import { Icons } from './components/Icons.js';
+import { Store, type Tab } from './state/store.js';
+import { StoreController } from './state/storeController.js';
 import './components/PlayerTab.js';
 
 declare global {
@@ -25,8 +27,6 @@ window.customCards.push({
   preview: false,
 });
 
-type Tab = 'player' | 'browser' | 'search' | 'queue' | 'group';
-
 const TABS: Array<{ id: Tab; label: string; icon: keyof typeof Icons }> = [
   { id: 'player', label: 'Player', icon: 'play' },
   { id: 'browser', label: 'Browse', icon: 'home' },
@@ -40,7 +40,18 @@ export class HomefrontMusicCard extends LitElement {
   @property({ attribute: false }) public hass?: HomeAssistant;
 
   @state() private _config?: HomefrontCardConfig;
-  @state() private _tab: Tab = 'player';
+
+  // The store is created once per card instance and lives until the card is
+  // disconnected from the DOM. The 1-second tick is owned by the store and
+  // must be disposed below to avoid leaking timers across re-renders.
+  private _store = new Store();
+
+  constructor() {
+    super();
+    // Side-effect-only: the controller registers itself with this host on
+    // construction, so we don't keep a reference to it.
+    new StoreController(this, this._store);
+  }
 
   public setConfig(config: HomefrontCardConfig): void {
     if (!config) {
@@ -51,6 +62,11 @@ export class HomefrontMusicCard extends LitElement {
 
   public getCardSize(): number {
     return 12;
+  }
+
+  public override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._store.dispose();
   }
 
   static styles = [
@@ -161,9 +177,11 @@ export class HomefrontMusicCard extends LitElement {
 
   private _renderTitle() {
     const zoneCount = this._config?.zones?.length ?? 0;
-    const sub = zoneCount > 0
-      ? `· ${zoneCount} zone${zoneCount === 1 ? '' : 's'} configured`
-      : '· Phase 1 preview · mock data';
+    const playingGroups = this._store.groups.filter((g) => g.playing).length;
+    const sub =
+      zoneCount > 0
+        ? `· ${playingGroups} group${playingGroups === 1 ? '' : 's'} playing · ${zoneCount} zone${zoneCount === 1 ? '' : 's'}`
+        : `· ${playingGroups} group${playingGroups === 1 ? '' : 's'} playing · mock`;
     return html`
       <div class="title-row">
         <span class="title-icon">${Icons.note({ size: 14 })}</span>
@@ -174,12 +192,13 @@ export class HomefrontMusicCard extends LitElement {
   }
 
   private _renderActiveTab() {
-    if (this._tab === 'player') {
-      return html`<hf-player-tab></hf-player-tab>`;
+    const tab = this._store.tab;
+    if (tab === 'player') {
+      return html`<hf-player-tab .store=${this._store}></hf-player-tab>`;
     }
     return html`
       <div class="stub">
-        ${TABS.find((t) => t.id === this._tab)?.label} tab<br />
+        ${TABS.find((t) => t.id === tab)?.label} tab<br />
         coming next in Phase 1.
       </div>
     `;
@@ -189,13 +208,13 @@ export class HomefrontMusicCard extends LitElement {
     return html`
       <div class="tab-bar" role="tablist">
         ${TABS.map((t) => {
-          const selected = this._tab === t.id;
+          const selected = this._store.tab === t.id;
           return html`
             <button
               class="tab"
               role="tab"
               aria-selected=${selected}
-              @click=${() => (this._tab = t.id)}
+              @click=${() => this._store.setTab(t.id)}
             >
               ${Icons[t.icon]({ size: 18 })}
               <span class="tab-label">${t.label}</span>
@@ -206,3 +225,4 @@ export class HomefrontMusicCard extends LitElement {
     `;
   }
 }
+
