@@ -1,4 +1,4 @@
-import { LitElement, html, css, type TemplateResult } from 'lit';
+import { LitElement, html, type TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
 export interface DraggableItem {
@@ -36,41 +36,32 @@ export class DraggableQueue<T extends DraggableItem = DraggableItem> extends Lit
   @state() private _hoverIdx: number | null = null;
   private _startY = 0;
 
-  static styles = css`
-    :host {
-      display: block;
-    }
-    .stack {
-      position: relative;
-    }
-    .item {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 0;
-      transition: transform 0.18s cubic-bezier(0.2, 0.7, 0.3, 1);
-    }
-    .item.dragging {
-      transition: none;
-      z-index: 10;
-      opacity: 0.92;
-      filter: drop-shadow(0 8px 22px rgba(0, 0, 0, 0.4));
-    }
-  `;
+  /**
+   * Render in light DOM so the parent's stylesheet can style the row
+   * content returned from `renderRow`. Without this, the rendered
+   * `.row-inner` etc. would land in this component's shadow root, where
+   * the parent's CSS doesn't reach.
+   */
+  protected override createRenderRoot(): HTMLElement {
+    return this;
+  }
 
   protected render() {
     const positions = this._positions();
     return html`
-      <div class="stack" style=${`height:${this.items.length * this.rowHeight}px`}>
+      <div
+        style=${`position:relative;height:${this.items.length * this.rowHeight}px`}
+      >
         ${this.items.map((item, i) => {
           const dragging = i === this._dragIdx;
           const y = positions[i] ?? 0;
+          const itemStyle = `position:absolute;left:0;right:0;top:0;transform:translateY(${y}px);${
+            dragging
+              ? 'transition:none;z-index:10;opacity:0.92;filter:drop-shadow(0 8px 22px rgba(0,0,0,0.4))'
+              : 'transition:transform 0.18s cubic-bezier(0.2,0.7,0.3,1)'
+          }`;
           return html`
-            <div
-              class=${`item ${dragging ? 'dragging' : ''}`}
-              style=${`transform:translateY(${y}px)`}
-              .key=${item.key}
-            >
+            <div style=${itemStyle} .key=${item.key}>
               ${this.renderRow(item, i, {
                 onGripDown: this._gripDownFor(i),
                 isDragging: dragging,

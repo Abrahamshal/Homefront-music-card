@@ -1252,39 +1252,17 @@ function t(t,e,r,s){var o,a=arguments.length,n=a<3?e:null===s?s=Object.getOwnPro
     .row.dragging {
       cursor: grabbing;
     }
-  `,t([ut({type:Number})],Qt.prototype,"rowHeight",void 0),t([ut()],Qt.prototype,"actionBg",void 0),t([ut({attribute:!1})],Qt.prototype,"icon",void 0),t([ft()],Qt.prototype,"_dx",void 0),t([ft()],Qt.prototype,"_dragging",void 0),Qt=t([ct("hf-swipe-row")],Qt);let Wt=class extends i{constructor(){super(...arguments),this.items=[],this.rowHeight=56,this.renderRow=()=>J``,this._dragIdx=null,this._hoverIdx=null,this._startY=0,this._onMove=t=>{if(null===this._dragIdx)return;const e=("touches"in t?t.touches[0].clientY:t.clientY)-this._startY,r=Math.round(this._dragIdx+e/this.rowHeight);this._hoverIdx=Math.max(0,Math.min(this.items.length-1,r))},this._onUp=()=>{null!==this._dragIdx&&null!==this._hoverIdx&&this._hoverIdx!==this._dragIdx&&this.dispatchEvent(new CustomEvent("hf-reorder",{detail:{from:this._dragIdx,to:this._hoverIdx},bubbles:!0,composed:!0})),this._dragIdx=null,this._hoverIdx=null,window.removeEventListener("mousemove",this._onMove),window.removeEventListener("mouseup",this._onUp),window.removeEventListener("touchmove",this._onMove),window.removeEventListener("touchend",this._onUp)}}render(){const t=this._positions();return J`
-      <div class="stack" style=${`height:${this.items.length*this.rowHeight}px`}>
+  `,t([ut({type:Number})],Qt.prototype,"rowHeight",void 0),t([ut()],Qt.prototype,"actionBg",void 0),t([ut({attribute:!1})],Qt.prototype,"icon",void 0),t([ft()],Qt.prototype,"_dx",void 0),t([ft()],Qt.prototype,"_dragging",void 0),Qt=t([ct("hf-swipe-row")],Qt);let Wt=class extends i{constructor(){super(...arguments),this.items=[],this.rowHeight=56,this.renderRow=()=>J``,this._dragIdx=null,this._hoverIdx=null,this._startY=0,this._onMove=t=>{if(null===this._dragIdx)return;const e=("touches"in t?t.touches[0].clientY:t.clientY)-this._startY,r=Math.round(this._dragIdx+e/this.rowHeight);this._hoverIdx=Math.max(0,Math.min(this.items.length-1,r))},this._onUp=()=>{null!==this._dragIdx&&null!==this._hoverIdx&&this._hoverIdx!==this._dragIdx&&this.dispatchEvent(new CustomEvent("hf-reorder",{detail:{from:this._dragIdx,to:this._hoverIdx},bubbles:!0,composed:!0})),this._dragIdx=null,this._hoverIdx=null,window.removeEventListener("mousemove",this._onMove),window.removeEventListener("mouseup",this._onUp),window.removeEventListener("touchmove",this._onMove),window.removeEventListener("touchend",this._onUp)}}createRenderRoot(){return this}render(){const t=this._positions();return J`
+      <div
+        style=${`position:relative;height:${this.items.length*this.rowHeight}px`}
+      >
         ${this.items.map((e,r)=>{const s=r===this._dragIdx,o=t[r]??0;return J`
-            <div
-              class=${"item "+(s?"dragging":"")}
-              style=${`transform:translateY(${o}px)`}
-              .key=${e.key}
-            >
+            <div style=${`position:absolute;left:0;right:0;top:0;transform:translateY(${o}px);${s?"transition:none;z-index:10;opacity:0.92;filter:drop-shadow(0 8px 22px rgba(0,0,0,0.4))":"transition:transform 0.18s cubic-bezier(0.2,0.7,0.3,1)"}`} .key=${e.key}>
               ${this.renderRow(e,r,{onGripDown:this._gripDownFor(r),isDragging:s})}
             </div>
           `})}
       </div>
-    `}_positions(){const t=this.items.map((t,e)=>e);if(null!==this._dragIdx&&null!==this._hoverIdx){const[e]=t.splice(this._dragIdx,1);void 0!==e&&t.splice(this._hoverIdx,0,e)}const e=new Array(this.items.length).fill(0);return t.forEach((t,r)=>{e[t]=r*this.rowHeight}),e}_gripDownFor(t){return e=>{e.preventDefault(),this._dragIdx=t,this._hoverIdx=t,this._startY="touches"in e?e.touches[0].clientY:e.clientY,window.addEventListener("mousemove",this._onMove),window.addEventListener("mouseup",this._onUp),window.addEventListener("touchmove",this._onMove,{passive:!1}),window.addEventListener("touchend",this._onUp)}}disconnectedCallback(){super.disconnectedCallback(),window.removeEventListener("mousemove",this._onMove),window.removeEventListener("mouseup",this._onUp),window.removeEventListener("touchmove",this._onMove),window.removeEventListener("touchend",this._onUp)}};Wt.styles=l`
-    :host {
-      display: block;
-    }
-    .stack {
-      position: relative;
-    }
-    .item {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 0;
-      transition: transform 0.18s cubic-bezier(0.2, 0.7, 0.3, 1);
-    }
-    .item.dragging {
-      transition: none;
-      z-index: 10;
-      opacity: 0.92;
-      filter: drop-shadow(0 8px 22px rgba(0, 0, 0, 0.4));
-    }
-  `,t([ut({attribute:!1})],Wt.prototype,"items",void 0),t([ut({type:Number})],Wt.prototype,"rowHeight",void 0),t([ut({attribute:!1})],Wt.prototype,"renderRow",void 0),t([ft()],Wt.prototype,"_dragIdx",void 0),t([ft()],Wt.prototype,"_hoverIdx",void 0),Wt=t([ct("hf-draggable-queue")],Wt);let Yt=class extends i{willUpdate(t){t.has("store")&&this.store&&!this._ctrl&&(this._ctrl=new StoreController(this,this.store))}render(){if(!this.store)return J``;const t=this.store,e=t.activePlayer,r=e.queue.slice(e.currentIdx+1),s=Bt.trackById(e.queue[e.currentIdx]??""),o=r.map((t,r)=>{const s=e.currentIdx+1+r;return{key:`${t}@${s}`,id:t,idxInQueue:s}}),a=t.selectedTracks.size;return J`
+    `}_positions(){const t=this.items.map((t,e)=>e);if(null!==this._dragIdx&&null!==this._hoverIdx){const[e]=t.splice(this._dragIdx,1);void 0!==e&&t.splice(this._hoverIdx,0,e)}const e=new Array(this.items.length).fill(0);return t.forEach((t,r)=>{e[t]=r*this.rowHeight}),e}_gripDownFor(t){return e=>{e.preventDefault(),this._dragIdx=t,this._hoverIdx=t,this._startY="touches"in e?e.touches[0].clientY:e.clientY,window.addEventListener("mousemove",this._onMove),window.addEventListener("mouseup",this._onUp),window.addEventListener("touchmove",this._onMove,{passive:!1}),window.addEventListener("touchend",this._onUp)}}disconnectedCallback(){super.disconnectedCallback(),window.removeEventListener("mousemove",this._onMove),window.removeEventListener("mouseup",this._onUp),window.removeEventListener("touchmove",this._onMove),window.removeEventListener("touchend",this._onUp)}};t([ut({attribute:!1})],Wt.prototype,"items",void 0),t([ut({type:Number})],Wt.prototype,"rowHeight",void 0),t([ut({attribute:!1})],Wt.prototype,"renderRow",void 0),t([ft()],Wt.prototype,"_dragIdx",void 0),t([ft()],Wt.prototype,"_hoverIdx",void 0),Wt=t([ct("hf-draggable-queue")],Wt);let Yt=class extends i{willUpdate(t){t.has("store")&&this.store&&!this._ctrl&&(this._ctrl=new StoreController(this,this.store))}render(){if(!this.store)return J``;const t=this.store,e=t.activePlayer,r=e.queue.slice(e.currentIdx+1),s=Bt.trackById(e.queue[e.currentIdx]??""),o=r.map((t,r)=>{const s=e.currentIdx+1+r;return{key:`${t}@${s}`,id:t,idxInQueue:s}}),a=t.selectedTracks.size;return J`
       ${t.multiMode?J`
             <div class="toolbar multi">
               <button
