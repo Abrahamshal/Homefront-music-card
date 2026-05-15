@@ -1,0 +1,37 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-attach:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Attach built card to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ github.event.release.tag_name }}" \
+            dist/homefront-music-card.js \
+            --clobber
