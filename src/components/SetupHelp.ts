@@ -23,16 +23,16 @@ const REQUIREMENTS: Requirement[] = [
   },
   {
     key: 'hasQueueActions',
-    name: 'Music Assistant Queue Actions',
-    why: 'Adds queue manipulation services (reorder, remove, clear) that the card uses on the Queue tab.',
-    hint: 'Install via HACS as a custom integration repository.',
-    link: 'https://github.com/marvinwankersteen/music_assistant_queue_actions',
+    name: 'Music Assistant Queue Actions (mass_queue)',
+    why: 'Adds queue manipulation services (reorder, remove, clear) the card uses on the Queue tab. Registers services under the mass_queue domain.',
+    hint: 'Install via HACS — "Music Assistant Queue Actions" by droans — then add it under Settings → Devices & Services.',
+    link: 'https://github.com/droans/mass_queue',
   },
   {
     key: 'hasWiim',
-    name: 'WiiM (mjcumming/wiim)',
-    why: 'Provides WiiM-native Linkplay grouping. The card uses this for all multi-room sync, not MA grouping.',
-    hint: 'Install via HACS as a custom integration repository, then add devices in Settings → Devices & Services.',
+    name: 'WiiM Audio (LinkPlay)',
+    why: 'Provides WiiM-native Linkplay grouping. The card uses this for all multi-room sync, never MA grouping.',
+    hint: 'Install via HACS — "WiiM Audio Integration for Home Assistant" by mjcumming — then add each device under Settings → Devices & Services.',
     link: 'https://github.com/mjcumming/wiim',
   },
 ];
