@@ -82,10 +82,14 @@ export function derivePlayers(
           );
 
     const repeat = ((attrs.repeat as string | undefined) ?? 'off') as Repeat;
-    const isPlayable = ma.state === 'playing' || ma.state === 'paused';
 
+    // Always emit a player entry in hass-mode, even when MA is idle. The
+    // queue carries the sentinel so currentTrack/Album fall through to
+    // `deriveCurrentTrack` (which returns null when there's no
+    // media_title — the store then synthesizes a "Nothing playing"
+    // placeholder instead of mock data).
     out[leadId] = {
-      queue: isPlayable ? [HASS_QUEUE_SENTINEL] : [],
+      queue: [HASS_QUEUE_SENTINEL],
       currentIdx: 0,
       position: typeof attrs.media_position === 'number' ? attrs.media_position : 0,
       playing: ma.state === 'playing',
@@ -96,6 +100,33 @@ export function derivePlayers(
   }
 
   return out;
+}
+
+/**
+ * Build a placeholder track for "nothing playing" — used by the store
+ * when we're in hass-mode but MA has no media_title yet (idle, off, just
+ * connected, etc.). Keeps the UI consistent and avoids mock-data leak.
+ */
+export function idlePlaceholderTrack(): Track {
+  return {
+    id: HASS_QUEUE_SENTINEL,
+    name: 'Nothing playing',
+    artist: '',
+    album: '',
+    albumId: HASS_QUEUE_SENTINEL,
+    durationSec: 0,
+  };
+}
+
+export function idlePlaceholderAlbum(): Album {
+  return {
+    id: HASS_QUEUE_SENTINEL,
+    name: '',
+    artist: '',
+    h1: 220,
+    h2: 280,
+    year: 0,
+  };
 }
 
 /**

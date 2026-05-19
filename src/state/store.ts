@@ -11,6 +11,8 @@ import {
   derivePlayers,
   deriveCurrentTrack,
   deriveCurrentAlbum,
+  idlePlaceholderTrack,
+  idlePlaceholderAlbum,
   HASS_QUEUE_SENTINEL,
 } from './hassDerive.js';
 
@@ -178,9 +180,14 @@ export class Store extends EventTarget {
   }
 
   get activePlayer(): PlayerState {
-    return (
-      this.players[this.activeLeadId] ?? defaultPlayer(mockData.initialQueue, 0, 30)
-    );
+    const existing = this.players[this.activeLeadId];
+    if (existing) return existing;
+    // In hass-mode we synthesize an idle player rather than leaking mock
+    // data through the queue fallback.
+    if (this._isHassMode) {
+      return defaultPlayer([HASS_QUEUE_SENTINEL], 0, 0);
+    }
+    return defaultPlayer(mockData.initialQueue, 0, 30);
   }
 
   get activeGroup(): Group | undefined {
@@ -188,27 +195,27 @@ export class Store extends EventTarget {
   }
 
   get currentTrack(): Track {
-    const p = this.activePlayer;
-    const id = p.queue[p.currentIdx];
-    if (id === HASS_QUEUE_SENTINEL && this._hass) {
+    if (this._isHassMode && this._hass) {
       const zone = this._zones.find((z) => z.wiim === this.activeLeadId);
       if (zone) {
         const derived = deriveCurrentTrack(this._hass, zone.ma);
         if (derived) return derived;
       }
+      return idlePlaceholderTrack();
     }
+    const p = this.activePlayer;
+    const id = p.queue[p.currentIdx];
     return (id ? mockData.trackById(id) : undefined) ?? mockData.tracks[0]!;
   }
 
   get currentAlbum(): Album {
-    const p = this.activePlayer;
-    const id = p.queue[p.currentIdx];
-    if (id === HASS_QUEUE_SENTINEL && this._hass) {
+    if (this._isHassMode && this._hass) {
       const zone = this._zones.find((z) => z.wiim === this.activeLeadId);
       if (zone) {
         const derived = deriveCurrentAlbum(this._hass, zone.ma);
         if (derived) return derived;
       }
+      return idlePlaceholderAlbum();
     }
     const album = mockData.albumById(this.currentTrack.albumId);
     if (!album) throw new Error(`Missing album for track ${this.currentTrack.id}`);
@@ -291,6 +298,23 @@ export class Store extends EventTarget {
         speakers.find((s) => s.id === s.leadId) ?? speakers[0];
       if (firstLead) this.activeLeadId = firstLead.id;
     }
+
+    // Per-zone diagnostics: surface the MA entity's reported state +
+    // key attributes so we can see when MA reports `idle` / lacks
+    // metadata even though it's playing in the MA web UI.
+    const extra: string[] = [];
+    for (const z of zones) {
+      const ma = this._hass.states?.[z.ma];
+      if (!ma) {
+        extra.push(`${z.name}: MA entity ${z.ma} not found in hass.states`);
+        continue;
+      }
+      const a = ma.attributes as Record<string, unknown>;
+      extra.push(
+        `${z.name}: MA=${z.ma} state=${ma.state} title=${JSON.stringify(a.media_title ?? null)} artist=${JSON.stringify(a.media_artist ?? null)} pos=${a.media_position ?? '-'} shuffle=${a.shuffle ?? '-'}`,
+      );
+    }
+    this.diagnosticNotes = [...this.diagnosticNotes, '— per-zone MA state —', ...extra];
   }
 
   /** Is the store currently driven from hass (vs. mock data)? */
