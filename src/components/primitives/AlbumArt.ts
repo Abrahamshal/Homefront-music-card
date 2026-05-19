@@ -18,6 +18,12 @@ export class AlbumArt extends LitElement {
   @property({ type: Number }) radius = 8;
   @property({ attribute: false }) glyph?: TemplateResult | string;
   @property() boxShadow = '';
+  /**
+   * Optional image URL (e.g. MA's `entity_picture`). When set, the image
+   * renders over the gradient — gradient remains as a fallback for slow
+   * loads and as a tinted backdrop if the image has transparency.
+   */
+  @property({ attribute: 'image-url' }) imageUrl?: string;
 
   static styles = css`
     :host {
@@ -36,6 +42,14 @@ export class AlbumArt extends LitElement {
       inset: 0;
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), transparent 40%);
       pointer-events: none;
+    }
+    img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
     .glyph {
       position: absolute;
@@ -66,6 +80,9 @@ export class AlbumArt extends LitElement {
     const wrapStyle = `width:${sizeCss};height:${sizeCss};border-radius:${this.radius}px;background:${bg};${this.boxShadow ? `box-shadow:${this.boxShadow}` : ''}`;
     return html`
       <div class="art" style=${wrapStyle}>
+        ${this.imageUrl
+          ? html`<img src=${this.imageUrl} alt="" loading="lazy" />`
+          : ''}
         ${this.glyph ? html`<div class="glyph" style="font-size:${glyphSize}px">${this.glyph}</div>` : ''}
         <div class="scan"></div>
       </div>

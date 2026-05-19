@@ -67,11 +67,18 @@ export class HomefrontMusicCard extends LitElement {
       throw new Error('Invalid configuration');
     }
     this._config = config;
+    this._store.setConfig(config);
   }
 
   protected willUpdate(changed: Map<string, unknown>): void {
     if (changed.has('hass') && this.hass) {
       this._integrationStatus = checkIntegrations(this.hass);
+      // Only flow hass into the store once all required integrations are
+      // present. Otherwise the store would derive an empty zone map and
+      // the user would see "no zones" UI on top of the setup-help panel.
+      if (this._integrationStatus.allPresent) {
+        this._store.setHass(this.hass);
+      }
     }
   }
 

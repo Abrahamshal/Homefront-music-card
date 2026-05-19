@@ -4,6 +4,15 @@ import {
   type MockSpeaker,
   type Track,
 } from './mockData.js';
+import type { HomeAssistant, HomefrontCardConfig, ZoneConfig } from '../types.js';
+import { discoverZones } from './zoneDiscovery.js';
+import {
+  deriveSpeakers,
+  derivePlayers,
+  deriveCurrentTrack,
+  deriveCurrentAlbum,
+  HASS_QUEUE_SENTINEL,
+} from './hassDerive.js';
 
 export type Tab = 'player' | 'browser' | 'search' | 'queue' | 'group';
 export type Repeat = 'off' | 'one' | 'all';
@@ -106,6 +115,13 @@ export class Store extends EventTarget {
 
   private _tickInterval: number | null = null;
 
+  /** Latest hass snapshot. Null until the card receives one (dev/no-HA). */
+  private _hass: HomeAssistant | undefined;
+  /** Effective zone map — either explicit config.zones or auto-discovered. */
+  private _zones: ZoneConfig[] = [];
+  /** True once we've ever seen a hass; locks us into hass-derived mode. */
+  private _isHassMode = false;
+
   constructor() {
     super();
     // Every speaker starts solo, then Kitchen joins Living Room (seeded
@@ -172,13 +188,88 @@ export class Store extends EventTarget {
   get currentTrack(): Track {
     const p = this.activePlayer;
     const id = p.queue[p.currentIdx];
+    if (id === HASS_QUEUE_SENTINEL && this._hass) {
+      const zone = this._zones.find((z) => z.wiim === this.activeLeadId);
+      if (zone) {
+        const derived = deriveCurrentTrack(this._hass, zone.ma);
+        if (derived) return derived;
+      }
+    }
     return (id ? mockData.trackById(id) : undefined) ?? mockData.tracks[0]!;
   }
 
   get currentAlbum(): Album {
+    const p = this.activePlayer;
+    const id = p.queue[p.currentIdx];
+    if (id === HASS_QUEUE_SENTINEL && this._hass) {
+      const zone = this._zones.find((z) => z.wiim === this.activeLeadId);
+      if (zone) {
+        const derived = deriveCurrentAlbum(this._hass, zone.ma);
+        if (derived) return derived;
+      }
+    }
     const album = mockData.albumById(this.currentTrack.albumId);
     if (!album) throw new Error(`Missing album for track ${this.currentTrack.id}`);
     return album;
+  }
+
+  // ── hass / config integration ────────────────────────────────────────────
+
+  /**
+   * Bind the card's `hass` to the store. Re-derives speakers + players on
+   * every call. The first call switches the store into hass-mode (stops
+   * the mock 1-second tick, since HA pushes state updates).
+   */
+  setHass(hass: HomeAssistant): void {
+    this._hass = hass;
+    if (!this._isHassMode) {
+      this._isHassMode = true;
+      this._stopTick();
+    }
+    this._deriveFromHass();
+    this._emit();
+  }
+
+  /**
+   * Bind the card config. If zones are explicit, use them; otherwise
+   * discovery runs on each hass update.
+   */
+  setConfig(config: HomefrontCardConfig): void {
+    if (config.zones && config.zones.length > 0) {
+      this._zones = config.zones;
+    } else {
+      this._zones = [];
+    }
+    if (this._hass) {
+      this._deriveFromHass();
+      this._emit();
+    }
+  }
+
+  private _deriveFromHass(): void {
+    if (!this._hass) return;
+    const zones =
+      this._zones.length > 0 ? this._zones : discoverZones(this._hass);
+    this._zones = zones;
+
+    const speakers = deriveSpeakers(this._hass, zones);
+    this.speakers = speakers;
+    this.players = derivePlayers(this._hass, zones, speakers);
+
+    // Reset activeLeadId if it no longer exists in the derived speakers
+    // (e.g., first hass after mock seed, or zone added/removed).
+    if (!speakers.find((s) => s.id === this.activeLeadId)) {
+      const firstLead =
+        speakers.find((s) => s.id === s.leadId) ?? speakers[0];
+      if (firstLead) this.activeLeadId = firstLead.id;
+    }
+  }
+
+  private _stopTick(): void {
+    if (this._tickInterval !== null) {
+      window.clearInterval(this._tickInterval);
+      this._tickInterval = null;
+    }
   }
 
   // ── notification ─────────────────────────────────────────────────────────
@@ -490,9 +581,6 @@ export class Store extends EventTarget {
 
   /** Stop the 1-second tick. Call when the host card disconnects. */
   dispose(): void {
-    if (this._tickInterval !== null) {
-      window.clearInterval(this._tickInterval);
-      this._tickInterval = null;
-    }
+    this._stopTick();
   }
 }

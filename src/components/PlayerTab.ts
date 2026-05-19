@@ -173,6 +173,7 @@ export class PlayerTab extends LitElement {
     const group = s.activeGroup;
     const otherPlaying = s.groups.filter((g) => !g.isActive && g.playing).length;
 
+    const albumImageUrl = (al as { imageUrl?: string }).imageUrl;
     return html`
       <div class="art-wrap">
         <hf-album-art
@@ -180,6 +181,7 @@ export class PlayerTab extends LitElement {
           size="100%"
           radius="18"
           boxShadow="0 18px 40px rgba(0,0,0,0.35)"
+          .imageUrl=${albumImageUrl}
         ></hf-album-art>
       </div>
       <div class="meta">
