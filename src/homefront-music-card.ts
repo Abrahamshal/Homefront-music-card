@@ -177,6 +177,36 @@ export class HomefrontMusicCard extends LitElement {
         font-weight: 600;
         letter-spacing: 0.01em;
       }
+      .debug-overlay {
+        position: absolute;
+        bottom: 4px;
+        left: 4px;
+        right: 4px;
+        background: rgba(0, 0, 0, 0.85);
+        color: #ecedef;
+        font-family: ui-monospace, SFMono-Regular, monospace;
+        font-size: 10.5px;
+        line-height: 1.5;
+        border-radius: 6px;
+        padding: 8px 10px;
+        z-index: 60;
+        max-height: 40%;
+        overflow-y: auto;
+        pointer-events: auto;
+      }
+      .debug-overlay-title {
+        font-family: var(--hf-font);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--hf-accent);
+        margin-bottom: 4px;
+      }
+      .debug-overlay-line {
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
     `,
   ];
 
@@ -196,6 +226,21 @@ export class HomefrontMusicCard extends LitElement {
         ${this._renderTabBar()}
       </div>
       <hf-group-sheet .store=${this._store}></hf-group-sheet>
+      ${this._config?.debug ? this._renderDebugOverlay() : ''}
+    `;
+  }
+
+  private _renderDebugOverlay() {
+    const notes = this._store.diagnosticNotes;
+    return html`
+      <div class="debug-overlay">
+        <div class="debug-overlay-title">
+          ${this._store.isHassMode ? 'HASS MODE' : 'MOCK MODE'} · zone discovery
+        </div>
+        ${notes.length > 0
+          ? notes.map((n) => html`<div class="debug-overlay-line">${n}</div>`)
+          : html`<div class="debug-overlay-line">(no diagnostics yet)</div>`}
+      </div>
     `;
   }
 

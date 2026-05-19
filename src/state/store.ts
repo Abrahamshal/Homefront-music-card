@@ -5,7 +5,7 @@ import {
   type Track,
 } from './mockData.js';
 import type { HomeAssistant, HomefrontCardConfig, ZoneConfig } from '../types.js';
-import { discoverZones } from './zoneDiscovery.js';
+import { discoverZonesWithDiagnostics } from './zoneDiscovery.js';
 import {
   deriveSpeakers,
   derivePlayers,
@@ -119,8 +119,10 @@ export class Store extends EventTarget {
   private _hass: HomeAssistant | undefined;
   /** Effective zone map — either explicit config.zones or auto-discovered. */
   private _zones: ZoneConfig[] = [];
-  /** True once we've ever seen a hass; locks us into hass-derived mode. */
+  /** True once we've ever seen a hass AND found at least one zone. */
   private _isHassMode = false;
+  /** Last discovery diagnostic for the debug overlay. */
+  diagnosticNotes: string[] = [];
 
   constructor() {
     super();
@@ -222,10 +224,6 @@ export class Store extends EventTarget {
    */
   setHass(hass: HomeAssistant): void {
     this._hass = hass;
-    if (!this._isHassMode) {
-      this._isHassMode = true;
-      this._stopTick();
-    }
     this._deriveFromHass();
     this._emit();
   }
@@ -248,21 +246,56 @@ export class Store extends EventTarget {
 
   private _deriveFromHass(): void {
     if (!this._hass) return;
-    const zones =
-      this._zones.length > 0 ? this._zones : discoverZones(this._hass);
-    this._zones = zones;
 
+    // Resolve zones: explicit config wins; otherwise discover.
+    let zones: ZoneConfig[];
+    if (this._zones.length > 0 && this._isHassMode) {
+      zones = this._zones;
+      this.diagnosticNotes = ['using explicit config.zones from card YAML'];
+    } else {
+      const result = discoverZonesWithDiagnostics(this._hass);
+      zones = result.zones;
+      this.diagnosticNotes = result.notes;
+      // eslint-disable-next-line no-console
+      console.debug(
+        '[homefront-music-card] zone discovery:\n' + result.notes.join('\n'),
+      );
+    }
+
+    // If discovery found nothing, stay in mock mode so the user sees the
+    // prototype rather than an empty card. They'll switch automatically
+    // once a WiiM-MA pair becomes available.
+    if (zones.length === 0) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        '[homefront-music-card] No zones discovered — staying in mock mode. See store.diagnosticNotes for details.',
+      );
+      return;
+    }
+
+    // First successful derivation flips us into hass-mode.
+    if (!this._isHassMode) {
+      this._isHassMode = true;
+      this._stopTick();
+    }
+
+    this._zones = zones;
     const speakers = deriveSpeakers(this._hass, zones);
     this.speakers = speakers;
     this.players = derivePlayers(this._hass, zones, speakers);
 
     // Reset activeLeadId if it no longer exists in the derived speakers
-    // (e.g., first hass after mock seed, or zone added/removed).
+    // (first hass after mock seed, or zone added/removed).
     if (!speakers.find((s) => s.id === this.activeLeadId)) {
       const firstLead =
         speakers.find((s) => s.id === s.leadId) ?? speakers[0];
       if (firstLead) this.activeLeadId = firstLead.id;
     }
+  }
+
+  /** Is the store currently driven from hass (vs. mock data)? */
+  get isHassMode(): boolean {
+    return this._isHassMode;
   }
 
   private _stopTick(): void {

@@ -82,6 +82,8 @@ export interface HomefrontCardConfig {
   default_lead?: string;
   /** Override the default accent color. */
   accent_color?: string;
+  /** Render a diagnostic overlay showing zone discovery output. */
+  debug?: boolean;
 }
 
 // Browse media node shape (returned by media_player/browse_media WS command).
