@@ -88,6 +88,10 @@ function defaultPlayer(queue: readonly string[], position: number, gv: number): 
   };
 }
 
+function clamp01(v: number): number {
+  return Math.max(0, Math.min(1, v));
+}
+
 /**
  * Card-wide state and mutators, ported from the prototype's `useMusicCard`
  * hook. Plain class extending EventTarget; consumers subscribe via the
@@ -335,6 +339,36 @@ export class Store extends EventTarget {
     this.dispatchEvent(new Event('change'));
   }
 
+  // ── service dispatch ─────────────────────────────────────────────────────
+
+  /**
+   * Fire-and-forget service call. No-op when not in hass-mode (i.e.,
+   * dev/mock). Failures are logged to the console; we don't surface them
+   * in the UI yet (toast notifications are a Phase 4 polish item).
+   */
+  private _callService(
+    domain: string,
+    service: string,
+    data: Record<string, unknown> = {},
+    target: { entity_id?: string | string[]; area_id?: string; device_id?: string } = {},
+  ): void {
+    if (!this._isHassMode || !this._hass) return;
+    this._hass
+      .callService(domain, service, data, target)
+      .catch((err: unknown) => {
+        // eslint-disable-next-line no-console
+        console.warn(
+          `[homefront-music-card] ${domain}.${service} failed:`,
+          err,
+        );
+      });
+  }
+
+  /** Resolve the MA entity ID for a given group leader, or undefined. */
+  private _maFor(leadId: string): string | undefined {
+    return this._zones.find((z) => z.wiim === leadId)?.ma;
+  }
+
   // ── tab ──────────────────────────────────────────────────────────────────
 
   setTab(t: Tab): void {
@@ -364,26 +398,47 @@ export class Store extends EventTarget {
 
   setPlaying(v: boolean): void {
     this._patchActive({ playing: v });
+    const ma = this._maFor(this.activeLeadId);
+    if (ma) {
+      this._callService(
+        'media_player',
+        v ? 'media_play' : 'media_pause',
+        {},
+        { entity_id: ma },
+      );
+    }
   }
   togglePlaying(): void {
-    this._patchActive({ playing: !this.activePlayer.playing });
+    this.setPlaying(!this.activePlayer.playing);
   }
   setShuffle(v: boolean): void {
     this._patchActive({ shuffle: v });
+    const ma = this._maFor(this.activeLeadId);
+    if (ma) {
+      this._callService('media_player', 'shuffle_set', { shuffle: v }, { entity_id: ma });
+    }
   }
   toggleShuffle(): void {
-    this._patchActive({ shuffle: !this.activePlayer.shuffle });
+    this.setShuffle(!this.activePlayer.shuffle);
   }
   setRepeat(r: Repeat): void {
     this._patchActive({ repeat: r });
+    const ma = this._maFor(this.activeLeadId);
+    if (ma) {
+      this._callService('media_player', 'repeat_set', { repeat: r }, { entity_id: ma });
+    }
   }
   cycleRepeat(): void {
     const cur = this.activePlayer.repeat;
     const nextR: Repeat = cur === 'off' ? 'all' : cur === 'all' ? 'one' : 'off';
-    this._patchActive({ repeat: nextR });
+    this.setRepeat(nextR);
   }
   setPosition(v: number): void {
     this._patchActive({ position: v });
+    const ma = this._maFor(this.activeLeadId);
+    if (ma) {
+      this._callService('media_player', 'media_seek', { seek_position: v }, { entity_id: ma });
+    }
   }
 
   next(): void {
@@ -392,35 +447,74 @@ export class Store extends EventTarget {
       currentIdx: Math.min(p.queue.length - 1, p.currentIdx + 1),
       position: 0,
     });
+    const ma = this._maFor(this.activeLeadId);
+    if (ma) {
+      this._callService('media_player', 'media_next_track', {}, { entity_id: ma });
+    }
   }
   prev(): void {
     const p = this.activePlayer;
     if (p.position > 3) {
       this._patchActive({ position: 0 });
+      const ma = this._maFor(this.activeLeadId);
+      if (ma) {
+        this._callService('media_player', 'media_seek', { seek_position: 0 }, { entity_id: ma });
+      }
     } else {
       this._patchActive({
         currentIdx: Math.max(0, p.currentIdx - 1),
         position: 0,
       });
+      const ma = this._maFor(this.activeLeadId);
+      if (ma) {
+        this._callService('media_player', 'media_previous_track', {}, { entity_id: ma });
+      }
     }
   }
 
   // ── speakers / volume ────────────────────────────────────────────────────
+  // Volume calls always target the WiiM entity, never the MA entity —
+  // per the architecture, MA group volume on a Linkplay group would
+  // collide with WiiM's native sync.
 
   setSpeakerVol(id: string, v: number): void {
     const sp = this.speakers.find((s) => s.id === id);
     if (!sp) return;
     sp.volume = v;
     this._emit();
+    if (this._isHassMode) {
+      this._callService(
+        'media_player',
+        'volume_set',
+        { volume_level: clamp01(v / 100) },
+        { entity_id: id },
+      );
+    }
   }
 
   setGroupVolumeFor(leadId: string, v: number): void {
     const cur = this.players[leadId];
     if (cur) this.players[leadId] = { ...cur, groupVolume: v };
+    const memberIds: string[] = [];
     for (const s of this.speakers) {
-      if (s.leadId === leadId) s.volume = v;
+      if (s.leadId === leadId) {
+        s.volume = v;
+        memberIds.push(s.id);
+      }
     }
     this._emit();
+    if (this._isHassMode && memberIds.length > 0) {
+      // Per-member calls (parallel is fine; HA serializes WS frames anyway).
+      const level = clamp01(v / 100);
+      for (const id of memberIds) {
+        this._callService(
+          'media_player',
+          'volume_set',
+          { volume_level: level },
+          { entity_id: id },
+        );
+      }
+    }
   }
 
   setGroupVolume(v: number): void {
@@ -428,22 +522,55 @@ export class Store extends EventTarget {
   }
 
   // ── grouping ─────────────────────────────────────────────────────────────
+  // All grouping mutations target the WiiM entities. Per architecture,
+  // never join/unjoin against MA entities for Linkplay-grouped speakers.
 
   ungroupSpeaker(id: string): void {
     const sp = this.speakers.find((s) => s.id === id);
     if (!sp) return;
     sp.leadId = id;
     this._emit();
+    if (this._isHassMode) {
+      this._callService('media_player', 'unjoin', {}, { entity_id: id });
+    }
   }
 
   toggleGroupPlay(leadId: string): void {
     const cur = this.players[leadId];
     if (!cur) return;
-    this.players[leadId] = { ...cur, playing: !cur.playing };
+    const wantPlay = !cur.playing;
+    this.players[leadId] = { ...cur, playing: wantPlay };
     this._emit();
+    const ma = this._maFor(leadId);
+    if (ma) {
+      this._callService(
+        'media_player',
+        wantPlay ? 'media_play' : 'media_pause',
+        {},
+        { entity_id: ma },
+      );
+    }
   }
 
+  /**
+   * Resume playback on an idle solo speaker. In hass-mode we just send
+   * `media_play` to the speaker's MA entity — if MA has a queue it
+   * resumes, otherwise it's a no-op until the user picks content from
+   * the Browse tab (Phase 2 Chunk C wires that).
+   *
+   * In mock mode we seed a synthetic queue so the prototype keeps the
+   * "tap ▶ to come alive" behavior.
+   */
   startSoloPlayback(speakerId: string): void {
+    if (this._isHassMode) {
+      this.activeLeadId = speakerId;
+      const ma = this._maFor(speakerId);
+      if (ma) {
+        this._callService('media_player', 'media_play', {}, { entity_id: ma });
+      }
+      this._emit();
+      return;
+    }
     this.players[speakerId] = defaultPlayer(mockData.initialQueue, 0, 30);
     this.activeLeadId = speakerId;
     this._emit();
@@ -472,6 +599,17 @@ export class Store extends EventTarget {
     const memberSet = new Set(newMemberIds);
     const newLead = memberSet.has(leadId) ? leadId : newMemberIds[0] ?? null;
 
+    // Diff against current group membership BEFORE mutating speakers, so
+    // we know who to send unjoin/join to.
+    const currentMemberIds = this.speakers
+      .filter((s) => s.leadId === leadId)
+      .map((s) => s.id);
+    const toUnjoin = currentMemberIds.filter((id) => !memberSet.has(id));
+    const toJoin = newMemberIds.filter(
+      (id) => !currentMemberIds.includes(id) && id !== newLead,
+    );
+
+    // Optimistic local update.
     this.speakers = this.speakers.map((sp) => {
       const wasMember = sp.leadId === leadId;
       const willBeMember = memberSet.has(sp.id);
@@ -503,6 +641,21 @@ export class Store extends EventTarget {
 
     this.groupingSheet = { ...this.groupingSheet, open: false };
     this._emit();
+
+    // Service calls — all on WiiM entities, never on MA entities.
+    if (this._isHassMode) {
+      for (const id of toUnjoin) {
+        this._callService('media_player', 'unjoin', {}, { entity_id: id });
+      }
+      if (newLead && toJoin.length > 0) {
+        this._callService(
+          'media_player',
+          'join',
+          { group_members: toJoin },
+          { entity_id: newLead },
+        );
+      }
+    }
   }
 
   // ── queue actions ────────────────────────────────────────────────────────
