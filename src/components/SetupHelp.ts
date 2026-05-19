@@ -165,6 +165,46 @@ export class SetupHelp extends LitElement {
         color: var(--hf-text-dim);
         line-height: 1.5;
       }
+      .diagnostics {
+        margin-top: 14px;
+        padding: 10px 12px;
+        background: var(--hf-input);
+        border: 1px solid var(--hf-border);
+        border-radius: 8px;
+        font-family: ui-monospace, SFMono-Regular, monospace;
+        font-size: 10.5px;
+        color: var(--hf-text-dim);
+        line-height: 1.6;
+      }
+      .diagnostics-title {
+        font-family: var(--hf-font);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--hf-text);
+        margin-bottom: 6px;
+      }
+      .diag-line {
+        display: flex;
+        gap: 6px;
+        align-items: flex-start;
+      }
+      .diag-mark {
+        flex: none;
+        width: 14px;
+        text-align: center;
+      }
+      .diag-mark.ok {
+        color: rgb(120, 200, 120);
+      }
+      .diag-mark.miss {
+        color: var(--hf-accent);
+      }
+      .diag-text {
+        flex: 1;
+        word-break: break-word;
+      }
     `,
   ];
 
@@ -199,6 +239,20 @@ export class SetupHelp extends LitElement {
         After installing the missing piece${missingCount === 1 ? '' : 's'},
         reload Home Assistant (or restart). This card will pick up the
         changes automatically.
+      </div>
+
+      <div class="diagnostics">
+        <div class="diagnostics-title">Detection diagnostics</div>
+        ${this.status.diagnostics.map(
+          (d) => html`
+            <div class="diag-line">
+              <span class=${`diag-mark ${d.matched ? 'ok' : 'miss'}`}>
+                ${d.matched ? '✓' : '✗'}
+              </span>
+              <span class="diag-text">[${d.target}] ${d.label}</span>
+            </div>
+          `,
+        )}
       </div>
     `;
   }

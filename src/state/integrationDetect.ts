@@ -5,6 +5,17 @@ export interface IntegrationStatus {
   hasQueueActions: boolean;
   hasWiim: boolean;
   allPresent: boolean;
+  /** Diagnostic: every signal we evaluated, with what we found. */
+  diagnostics: IntegrationDiagnostic[];
+}
+
+export interface IntegrationDiagnostic {
+  /** Which integration this signal belongs to. */
+  target: 'MA' | 'QueueActions' | 'WiiM';
+  /** Human-readable description (e.g. "service mass_queue.get_queue_items"). */
+  label: string;
+  /** Whether the signal matched. */
+  matched: boolean;
 }
 
 /**
@@ -28,32 +39,73 @@ export interface IntegrationStatus {
  */
 export function checkIntegrations(hass: HomeAssistant): IntegrationStatus {
   const services = hass.services ?? {};
+  const states = hass.states ?? {};
+  const diagnostics: IntegrationDiagnostic[] = [];
+
   const ma = (services.music_assistant ?? {}) as Record<string, unknown>;
   const massQueue = (services.mass_queue ?? {}) as Record<string, unknown>;
   const wiimServices = (services.wiim ?? {}) as Record<string, unknown>;
-  const states = hass.states ?? {};
 
+  // MA
   const hasMA = !!ma.play_media;
+  diagnostics.push({
+    target: 'MA',
+    label: 'service music_assistant.play_media',
+    matched: hasMA,
+  });
 
-  const hasQueueActions = !!(
-    massQueue.get_queue_items ||
-    massQueue.remove_queue_item ||
-    massQueue.move_queue_item_up ||
-    massQueue.play_queue_item ||
-    massQueue.clear_queue_from_here
-  );
+  // Queue Actions (droans/mass_queue)
+  const queueServiceCandidates = [
+    'get_queue_items',
+    'remove_queue_item',
+    'move_queue_item_up',
+    'play_queue_item',
+    'clear_queue_from_here',
+  ];
+  const matchedQueueSvc = queueServiceCandidates.find((s) => !!massQueue[s]);
+  const hasQueueActions = !!matchedQueueSvc;
+  diagnostics.push({
+    target: 'QueueActions',
+    label: `mass_queue domain has any of ${queueServiceCandidates.join(', ')}`,
+    matched: hasQueueActions,
+  });
+  // Also surface what mass_queue.* keys we DID see, if any.
+  const massQueueKeys = Object.keys(massQueue);
+  if (massQueueKeys.length > 0) {
+    diagnostics.push({
+      target: 'QueueActions',
+      label: `mass_queue domain services found: ${massQueueKeys.slice(0, 6).join(', ')}${massQueueKeys.length > 6 ? '…' : ''}`,
+      matched: true,
+    });
+  }
 
-  const hasWiimServices = !!(
-    wiimServices.play_preset ||
-    wiimServices.play_url ||
-    wiimServices.set_eq ||
-    wiimServices.get_queue
-  );
+  // WiiM (two parallel signals)
+  const wiimServiceCandidates = ['play_preset', 'play_url', 'set_eq', 'get_queue'];
+  const matchedWiimSvc = wiimServiceCandidates.find((s) => !!wiimServices[s]);
+  const hasWiimServices = !!matchedWiimSvc;
+  diagnostics.push({
+    target: 'WiiM',
+    label: `wiim domain has any of ${wiimServiceCandidates.join(', ')}`,
+    matched: hasWiimServices,
+  });
+  const wiimServiceKeys = Object.keys(wiimServices);
+  if (wiimServiceKeys.length > 0) {
+    diagnostics.push({
+      target: 'WiiM',
+      label: `wiim domain services found: ${wiimServiceKeys.slice(0, 6).join(', ')}${wiimServiceKeys.length > 6 ? '…' : ''}`,
+      matched: true,
+    });
+  }
 
   const hasWiimDeviceEntity = Object.values(states).some((s) => {
     if (!s.entity_id.startsWith('media_player.')) return false;
     const role = (s.attributes as { group_role?: unknown }).group_role;
     return role === 'master' || role === 'slave' || role === 'solo';
+  });
+  diagnostics.push({
+    target: 'WiiM',
+    label: 'any media_player.* attribute group_role is master/slave/solo',
+    matched: hasWiimDeviceEntity,
   });
 
   const hasWiim = hasWiimServices || hasWiimDeviceEntity;
@@ -63,5 +115,6 @@ export function checkIntegrations(hass: HomeAssistant): IntegrationStatus {
     hasQueueActions,
     hasWiim,
     allPresent: hasMA && hasQueueActions && hasWiim,
+    diagnostics,
   };
 }
