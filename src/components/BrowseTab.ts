@@ -54,6 +54,11 @@ export class BrowseTab extends LitElement {
   @state() private _sortMode: SortMode = 'default';
   @state() private _sortMenuOpen = false;
 
+  // Client-side search within the current browse level. Reset whenever
+  // we drill in or pop back so each level starts fresh.
+  @state() private _filterQuery = '';
+  private _lastStackDepth = 0;
+
   protected willUpdate(changed: PropertyValues): void {
     if (changed.has('store') && this.store && !this._ctrl) {
       this._ctrl = new StoreController(this, this.store);
@@ -70,6 +75,12 @@ export class BrowseTab extends LitElement {
     ) {
       this._kickedOffRoot = true;
       void this.store.browseRoot();
+    }
+    // Reset the search filter whenever the user drills in or pops out.
+    const depth = this.store?.hassBrowseStack?.length ?? 0;
+    if (depth !== this._lastStackDepth) {
+      this._lastStackDepth = depth;
+      if (this._filterQuery !== '') this._filterQuery = '';
     }
   }
 
@@ -404,6 +415,42 @@ export class BrowseTab extends LitElement {
     .hass-error {
       color: #e0413a;
     }
+    .controls-bar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 14px 4px;
+    }
+    .filter-input-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--hf-input);
+      border: 1px solid var(--hf-border);
+      border-radius: 999px;
+      padding: 4px 10px;
+      color: var(--hf-text-dim);
+    }
+    .filter-input {
+      flex: 1;
+      background: transparent;
+      border: 0;
+      outline: 0;
+      color: var(--hf-text);
+      font: inherit;
+      font-size: 12.5px;
+      min-width: 0;
+    }
+    .filter-clear {
+      background: transparent;
+      border: 0;
+      padding: 2px;
+      cursor: pointer;
+      color: var(--hf-text-dim);
+      display: inline-flex;
+    }
     .sort-bar {
       position: relative;
       display: flex;
@@ -479,11 +526,10 @@ export class BrowseTab extends LitElement {
   private _renderHass(): TemplateResult {
     const stack = this.store.hassBrowseStack;
     const current = stack[stack.length - 1];
+    const showControls = !!current && (current.children?.length ?? 0) > 5;
     return html`
       ${this._renderHassCrumbs(stack)}
-      ${current && (current.children?.length ?? 0) > 0
-        ? this._renderSortBar()
-        : ''}
+      ${showControls ? this._renderControlsBar() : ''}
       ${this.store.hassBrowseError
         ? html`<div class="hass-error">${this.store.hassBrowseError}</div>`
         : this.store.hassBrowseLoading && !current
@@ -494,9 +540,31 @@ export class BrowseTab extends LitElement {
     `;
   }
 
-  private _renderSortBar(): TemplateResult {
+  private _renderControlsBar(): TemplateResult {
     return html`
-      <div class="sort-bar">
+      <div class="controls-bar">
+        <div class="filter-input-wrap">
+          ${Icons.search({ size: 13, stroke: 'currentColor' })}
+          <input
+            class="filter-input"
+            type="search"
+            placeholder="Filter this list…"
+            .value=${this._filterQuery}
+            @input=${(e: Event) =>
+              (this._filterQuery = (e.target as HTMLInputElement).value)}
+          />
+          ${this._filterQuery
+            ? html`
+                <button
+                  class="filter-clear"
+                  aria-label="Clear filter"
+                  @click=${() => (this._filterQuery = '')}
+                >
+                  ${Icons.x({ size: 12 })}
+                </button>
+              `
+            : ''}
+        </div>
         <button
           class="sort-btn"
           @click=${(e: Event) => {
@@ -504,7 +572,7 @@ export class BrowseTab extends LitElement {
             this._sortMenuOpen = !this._sortMenuOpen;
           }}
         >
-          ${Icons.filter({ size: 12 })} Sort: ${labelFor(this._sortMode)}
+          ${Icons.filter({ size: 12 })} ${labelFor(this._sortMode)}
         </button>
         ${this._sortMenuOpen
           ? html`
@@ -587,8 +655,22 @@ export class BrowseTab extends LitElement {
     if (children.length === 0) {
       return html`<div class="hass-empty">No items</div>`;
     }
-    const sorted = this._applySort(children);
+    const filtered = this._applyFilter(children);
+    const sorted = this._applySort(filtered);
+    if (sorted.length === 0) {
+      return html`
+        <div class="hass-empty">
+          No matches for "${this._filterQuery}"
+        </div>
+      `;
+    }
     return html`<div class="body">${this._renderHassList(sorted)}</div>`;
+  }
+
+  private _applyFilter(children: BrowseMediaNode[]): BrowseMediaNode[] {
+    const q = this._filterQuery.trim().toLowerCase();
+    if (!q) return children;
+    return children.filter((c) => c.title.toLowerCase().includes(q));
   }
 
   private _renderHassList(children: BrowseMediaNode[]): TemplateResult {
