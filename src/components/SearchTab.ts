@@ -21,6 +21,9 @@ const FILTERS: Array<{ id: SearchFilter; label: string }> = [
 
 const SUGGESTIONS = ['khruangbin', 'jazz', 'deep focus', 'ambient', 'tycho', 'discover weekly'];
 
+/** First few row-extract diagnostics get logged; track which we've done. */
+const _loggedRowKeys = new Set<string>();
+
 /**
  * Cross-provider search. Sticky input + filter chips at top; results grouped
  * by provider. Empty state shows canned suggestions.
@@ -643,7 +646,8 @@ export class SearchTab extends LitElement {
     if (artistStr) subtitleParts.push(artistStr);
     const albumStr = extractName(rec.album);
     if (albumStr && albumStr !== title) subtitleParts.push(albumStr);
-    const providerStr = extractName(rec.provider) ?? extractName(rec.provider_mappings);
+    const providerStr =
+      extractName(rec.provider) ?? extractName(rec.provider_mappings);
     if (providerStr) subtitleParts.push(providerStr);
     const subtitle = subtitleParts.join(' · ');
     const image = extractImage(rec);
@@ -653,6 +657,25 @@ export class SearchTab extends LitElement {
         : typeof rec.duration_seconds === 'number'
           ? (rec.duration_seconds as number)
           : undefined;
+    // Log once per session-ish so we can verify the extractor is doing
+    // its job. If you see "[object Object]" in the UI but this log
+    // looks correct, you're on a stale bundle (hard-refresh needed).
+    if (!_loggedRowKeys.has(rec.uri as string | undefined ?? title)) {
+      _loggedRowKeys.add(rec.uri as string | undefined ?? title);
+      if (_loggedRowKeys.size < 6) {
+        // eslint-disable-next-line no-console
+        console.debug('[homefront-music-card] search row extract:', {
+          title,
+          artistStr,
+          albumStr,
+          image,
+          rawArtist: rec.artist,
+          rawArtists: rec.artists,
+          rawAlbum: rec.album,
+          rawMetadata: rec.metadata,
+        });
+      }
+    }
     return html`
       <div class="track-row" @click=${() => this.store.playSearchResult(item)}>
         ${image
@@ -720,9 +743,18 @@ function filterToMediaTypes(filter: SearchFilter): string[] {
  * string, an object with `.name`/`.title`, or an array of either.
  * MA's search response wraps artist/album/provider in nested objects
  * rather than flat strings.
+ *
+ * Belt-and-suspenders: explicitly rejects the literal `"[object Object]"`
+ * string in case an upstream layer toString'd an object before we got
+ * it (which is the visual symptom we're chasing).
  */
 function extractName(v: unknown): string | undefined {
-  if (typeof v === 'string') return v.length > 0 ? v : undefined;
+  if (typeof v === 'string') {
+    const trimmed = v.trim();
+    if (!trimmed) return undefined;
+    if (trimmed === '[object Object]') return undefined;
+    return trimmed;
+  }
   if (Array.isArray(v) && v.length > 0) return extractName(v[0]);
   if (v && typeof v === 'object') {
     const obj = v as Record<string, unknown>;
