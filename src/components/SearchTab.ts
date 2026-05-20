@@ -1,7 +1,12 @@
 import { LitElement, html, css, type PropertyValues, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { mockData, fmtTime, type Provider } from '../state/mockData.js';
-import { Store, type SearchFilter } from '../state/store.js';
+import {
+  Store,
+  type HassSearchResults,
+  type SearchFilter,
+  type SearchResultItem,
+} from '../state/store.js';
 import { StoreController } from '../state/storeController.js';
 import { Icons } from './Icons.js';
 import './primitives/AlbumArt.js';
@@ -29,11 +34,35 @@ export class SearchTab extends LitElement {
   @property({ attribute: false }) store!: Store;
 
   private _ctrl?: StoreController;
+  /** Debounce timer for hass-mode search. */
+  private _searchTimer: number | null = null;
+  /** Last query we fired in hass-mode, to avoid duplicate requests. */
+  private _lastFiredQuery = '';
 
   protected willUpdate(changed: PropertyValues): void {
     if (changed.has('store') && this.store && !this._ctrl) {
       this._ctrl = new StoreController(this, this.store);
     }
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    if (this._searchTimer !== null) {
+      window.clearTimeout(this._searchTimer);
+      this._searchTimer = null;
+    }
+  }
+
+  private _scheduleHassSearch(query: string, filter: SearchFilter): void {
+    if (this._searchTimer !== null) window.clearTimeout(this._searchTimer);
+    // 350ms after the user stops typing — feels responsive but doesn't
+    // hammer the MA server with one search per keystroke.
+    this._searchTimer = window.setTimeout(() => {
+      if (query === this._lastFiredQuery) return;
+      this._lastFiredQuery = query;
+      const mediaTypes = filterToMediaTypes(filter);
+      void this.store.searchMa(query, mediaTypes, 25);
+    }, 350);
   }
 
   static styles = css`
@@ -243,10 +272,28 @@ export class SearchTab extends LitElement {
       gap: 6px;
       margin-bottom: 16px;
     }
+    .hass-loading,
+    .hass-error,
+    .hass-empty {
+      padding: 30px 14px;
+      text-align: center;
+      color: var(--hf-text-dim);
+      font-size: 13px;
+    }
+    .hass-error {
+      color: #e0413a;
+    }
+    .library-note {
+      padding: 8px 14px 0;
+      font-size: 10.5px;
+      color: var(--hf-text-dim);
+      font-style: italic;
+    }
   `;
 
   protected render() {
     if (!this.store) return html``;
+    if (this.store.isHassMode) return this._renderHass();
     const s = this.store;
     const q = s.search.query.trim().toLowerCase();
     const filter = s.search.filter;
@@ -474,6 +521,184 @@ export class SearchTab extends LitElement {
         })}
       </div>
     `;
+  }
+
+  // ── hass-mode rendering ──────────────────────────────────────────────────
+
+  private _renderHass(): TemplateResult {
+    const s = this.store;
+    const query = s.search.query;
+    const filter = s.search.filter;
+    const results = s.hassSearchResults;
+
+    return html`
+      <div class="top">
+        <div class="input-wrap">
+          ${Icons.search({ size: 16 })}
+          <input
+            .value=${query}
+            placeholder="Search MA library + connected providers…"
+            @input=${(e: Event) => {
+              const v = (e.target as HTMLInputElement).value;
+              s.setSearch({ query: v });
+              this._scheduleHassSearch(v, filter);
+            }}
+          />
+          ${query
+            ? html`
+                <button
+                  class="clear-btn"
+                  aria-label="Clear search"
+                  @click=${() => {
+                    s.setSearch({ query: '' });
+                    this._lastFiredQuery = '';
+                    void s.searchMa('', []);
+                  }}
+                >
+                  ${Icons.x({ size: 14 })}
+                </button>
+              `
+            : ''}
+        </div>
+        <div class="filters">
+          ${FILTERS.map(
+            (f) => html`
+              <button
+                class="filter"
+                data-active=${filter === f.id}
+                @click=${() => {
+                  s.setSearch({ filter: f.id });
+                  if (query) {
+                    this._lastFiredQuery = '';
+                    this._scheduleHassSearch(query, f.id);
+                  }
+                }}
+              >
+                ${f.label}
+              </button>
+            `,
+          )}
+        </div>
+        <div class="library-note">
+          Search is library-wide — results are merged across all providers
+          and accounts (MA API limitation).
+        </div>
+      </div>
+
+      <div class="scroll">
+        ${!query
+          ? this._renderHassSuggestions()
+          : s.hassSearchLoading && !results
+            ? html`<div class="hass-loading">Searching…</div>`
+            : s.hassSearchError
+              ? html`<div class="hass-error">${s.hassSearchError}</div>`
+              : results
+                ? this._renderHassResults(results, filter)
+                : html`<div class="hass-empty">Type to search</div>`}
+      </div>
+    `;
+  }
+
+  private _renderHassResults(
+    results: HassSearchResults,
+    filter: SearchFilter,
+  ): TemplateResult {
+    const sections: Array<{ key: string; label: string; items: SearchResultItem[] }> = [
+      { key: 'tracks', label: 'Tracks', items: results.tracks },
+      { key: 'albums', label: 'Albums', items: results.albums },
+      { key: 'artists', label: 'Artists', items: results.artists },
+      { key: 'playlists', label: 'Playlists', items: results.playlists },
+      { key: 'radio', label: 'Radio', items: results.radio },
+    ];
+    const visible = sections.filter((sec) => {
+      if (sec.items.length === 0) return false;
+      if (filter === 'all') return true;
+      return filter === sec.key;
+    });
+    if (visible.length === 0) {
+      return html`<div class="hass-empty">No matches for "${results.query}"</div>`;
+    }
+    return html`
+      <div class="body" style="padding:10px 14px 16px">
+        ${visible.map(
+          (sec) => html`
+            <div style="margin-bottom:16px">
+              <div class="small-label">${sec.label} · ${sec.items.length}</div>
+              ${sec.items.map((item) => this._renderHassResultRow(item))}
+            </div>
+          `,
+        )}
+      </div>
+    `;
+  }
+
+  private _renderHassResultRow(item: SearchResultItem): TemplateResult {
+    const title = item.title ?? item.name ?? '(untitled)';
+    const subtitleParts: string[] = [];
+    if (item.artist) subtitleParts.push(item.artist);
+    if (item.album && item.album !== title) subtitleParts.push(item.album);
+    if (item.provider) subtitleParts.push(item.provider);
+    const subtitle = subtitleParts.join(' · ');
+    const image = item.image_url ?? item.thumbnail;
+    return html`
+      <div class="track-row" @click=${() => this.store.playSearchResult(item)}>
+        ${image
+          ? html`<hf-album-art
+              .obj=${null}
+              .imageUrl=${image}
+              size="36"
+              radius="6"
+            ></hf-album-art>`
+          : html`<div
+              style="width:36px;height:36px;border-radius:6px;background:var(--hf-input);flex:none"
+            ></div>`}
+        <div class="row-meta">
+          <div class="row-name">${title}</div>
+          ${subtitle ? html`<div class="row-sub">${subtitle}</div>` : ''}
+        </div>
+        ${item.duration ? html`<div class="row-time">${fmtTime(item.duration)}</div>` : ''}
+      </div>
+    `;
+  }
+
+  private _renderHassSuggestions(): TemplateResult {
+    return html`
+      <div class="suggestions">
+        <div class="small-label">Try searching</div>
+        <div class="suggest-row">
+          ${SUGGESTIONS.map(
+            (t) => html`
+              <button
+                class="suggest-pill"
+                @click=${() => {
+                  this.store.setSearch({ query: t });
+                  this._scheduleHassSearch(t, this.store.search.filter);
+                }}
+              >
+                ${t}
+              </button>
+            `,
+          )}
+        </div>
+      </div>
+    `;
+  }
+}
+
+/** Convert the SearchTab's UI filter to MA's media_type values. */
+function filterToMediaTypes(filter: SearchFilter): string[] {
+  switch (filter) {
+    case 'tracks':
+      return ['track'];
+    case 'albums':
+      return ['album'];
+    case 'artists':
+      return ['artist'];
+    case 'playlists':
+      return ['playlist'];
+    case 'all':
+    default:
+      return [];
   }
 }
 

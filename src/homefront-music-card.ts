@@ -15,6 +15,7 @@ import './components/OutputTab.js';
 import './components/GroupChipRail.js';
 import './components/GroupSheet.js';
 import './components/SetupHelp.js';
+import './components/CardEditor.js';
 
 declare global {
   interface Window {
@@ -91,6 +92,20 @@ export class HomefrontMusicCard extends LitElement {
 
   public getCardSize(): number {
     return 12;
+  }
+
+  /**
+   * Returns the editor element HA uses when the user clicks "Edit card"
+   * in the dashboard. Without this, HA shows the YAML-only fallback +
+   * the "Visual editor not supported" message.
+   */
+  public static getConfigElement(): HTMLElement {
+    return document.createElement('hf-card-editor');
+  }
+
+  /** Default config used when adding the card from HA's card picker. */
+  public static getStubConfig(): HomefrontCardConfig {
+    return { type: 'custom:homefront-music-card' };
   }
 
   public override disconnectedCallback(): void {

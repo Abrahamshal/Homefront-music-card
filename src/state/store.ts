@@ -85,6 +85,33 @@ export interface GroupingSheetState {
   leadId: string | null;
 }
 
+/** Generic search result item. Shape may vary between MA versions. */
+export interface SearchResultItem {
+  name?: string;
+  title?: string;
+  artist?: string;
+  album?: string;
+  uri?: string;
+  media_content_id?: string;
+  media_content_type?: string;
+  image_url?: string;
+  thumbnail?: string;
+  duration?: number;
+  /** Where this item came from (e.g. "spotify", "apple_music"). */
+  provider?: string;
+}
+
+/** Grouped search results by media_type. */
+export interface HassSearchResults {
+  tracks: SearchResultItem[];
+  albums: SearchResultItem[];
+  artists: SearchResultItem[];
+  playlists: SearchResultItem[];
+  radio: SearchResultItem[];
+  /** The query that produced these results — for cache invalidation. */
+  query: string;
+}
+
 function defaultPlayer(queue: readonly string[], position: number, gv: number): PlayerState {
   return {
     queue: queue.slice(),
@@ -157,6 +184,16 @@ export class Store extends EventTarget {
   hassQueueError: string | null = null;
   /** Which leadId the current hassQueue belongs to (for invalidation). */
   private _hassQueueLeadId: string | null = null;
+
+  // ── hass-mode search state ───────────────────────────────────────────────
+
+  /** MA's config_entry_id, captured during registry discovery. Required
+   *  for `music_assistant.search` and `get_library`. */
+  private _maConfigEntryId: string | null = null;
+  /** Raw search response (we keep the shape flexible until we see it live). */
+  hassSearchResults: HassSearchResults | null = null;
+  hassSearchLoading = false;
+  hassSearchError: string | null = null;
 
   constructor() {
     super();
@@ -291,6 +328,7 @@ export class Store extends EventTarget {
 
     // Registry won. Adopt its zones; re-derive everything.
     this._zones = result.zones;
+    if (result.maConfigEntryId) this._maConfigEntryId = result.maConfigEntryId;
     this.diagnosticNotes = ['Discovery: entity registry', ...result.notes];
     if (!this._isHassMode) {
       this._isHassMode = true;
@@ -694,6 +732,128 @@ export class Store extends EventTarget {
       { entity_id: ma },
     );
     window.setTimeout(() => void this.loadQueue(), 400);
+  }
+
+  // ── search (hass-mode) ───────────────────────────────────────────────────
+
+  /**
+   * Search MA's library + connected providers via the `music_assistant.search`
+   * service. Stores grouped results on `hassSearchResults`. SearchTab
+   * debounces input and calls this on user typing.
+   *
+   * Note: MA's search service is **library-wide** — results aren't
+   * separated by account/provider. Same trade-off as `get_library`.
+   *
+   * @param query Free-text search query.
+   * @param mediaTypes Restrict to these types; empty = all.
+   * @param limit Max results per type (1–100, MA default is 5).
+   */
+  async searchMa(
+    query: string,
+    mediaTypes: string[] = [],
+    limit = 25,
+  ): Promise<void> {
+    if (!this._isHassMode || !this._hass) return;
+    const trimmed = query.trim();
+    if (!trimmed) {
+      this.hassSearchResults = null;
+      this.hassSearchError = null;
+      this._emit();
+      return;
+    }
+    if (!this._maConfigEntryId) {
+      this.hassSearchError =
+        'MA config entry not yet discovered — try again in a moment.';
+      this._emit();
+      return;
+    }
+    this.hassSearchLoading = true;
+    this.hassSearchError = null;
+    this._emit();
+
+    const data: Record<string, unknown> = {
+      config_entry_id: this._maConfigEntryId,
+      name: trimmed,
+      limit,
+    };
+    if (mediaTypes.length > 0) data.media_type = mediaTypes;
+
+    const response = await this._callServiceWithResponse<unknown>(
+      'music_assistant',
+      'search',
+      data,
+      {},
+    );
+    // eslint-disable-next-line no-console
+    console.debug('[homefront-music-card] search response:', response);
+    this.hassSearchResults = this._normalizeSearchResponse(response, trimmed);
+    this.hassSearchLoading = false;
+    this._emit();
+  }
+
+  /**
+   * Coerce MA's search response into a uniform shape. The actual
+   * field names have varied across MA releases — we accept several
+   * common variants and fall back gracefully.
+   */
+  private _normalizeSearchResponse(
+    response: unknown,
+    query: string,
+  ): HassSearchResults {
+    const empty: HassSearchResults = {
+      tracks: [],
+      albums: [],
+      artists: [],
+      playlists: [],
+      radio: [],
+      query,
+    };
+    if (!response || typeof response !== 'object') return empty;
+    const r = response as Record<string, unknown>;
+    const pluck = (...keys: string[]): SearchResultItem[] => {
+      for (const k of keys) {
+        const v = r[k];
+        if (Array.isArray(v)) return v as SearchResultItem[];
+      }
+      return [];
+    };
+    return {
+      tracks: pluck('tracks', 'track'),
+      albums: pluck('albums', 'album'),
+      artists: pluck('artists', 'artist'),
+      playlists: pluck('playlists', 'playlist'),
+      radio: pluck('radio', 'stations'),
+      query,
+    };
+  }
+
+  /** Play (or enqueue) a search result on the active group leader. */
+  playSearchResult(
+    item: SearchResultItem,
+    enqueue: 'replace' | 'add' | 'next' = 'replace',
+  ): void {
+    const ma = this._maFor(this.activeLeadId);
+    if (!ma) return;
+    const media_id = item.uri ?? item.media_content_id;
+    if (!media_id) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        '[homefront-music-card] search item has no uri/media_content_id:',
+        item,
+      );
+      return;
+    }
+    this._callService(
+      'music_assistant',
+      'play_media',
+      {
+        media_id,
+        media_type: item.media_content_type,
+        enqueue,
+        radio_mode: false,
+      },
+      { entity_id: ma },
+    );
   }
 
   // ── tab ──────────────────────────────────────────────────────────────────

@@ -5,6 +5,7 @@ interface EntityRegistryEntry {
   entity_id: string;
   platform: string;
   device_id: string | null;
+  config_entry_id: string | null;
 }
 
 /**
@@ -33,6 +34,12 @@ export interface DiscoveryResult {
   zones: ZoneConfig[];
   /** Diagnostic trace for the discovery pass. Surfaced in console + UI. */
   notes: string[];
+  /**
+   * MA integration's config_entry_id. Required by service calls like
+   * `music_assistant.search` and `music_assistant.get_library`. Only set
+   * by registry-based discovery (the sync heuristic can't see it).
+   */
+  maConfigEntryId?: string;
 }
 
 export function discoverZones(hass: HomeAssistant): ZoneConfig[] {
@@ -163,6 +170,7 @@ export async function discoverZonesFromRegistry(
     byDevice.set(e.device_id, list);
   }
 
+  let maConfigEntryId: string | undefined;
   for (const [deviceId, list] of byDevice) {
     // Pick the non-group-master WiiM entity (there may be both for an
     // active master).
@@ -183,6 +191,9 @@ export async function discoverZonesFromRegistry(
       );
       continue;
     }
+    if (!maConfigEntryId && ma.config_entry_id) {
+      maConfigEntryId = ma.config_entry_id;
+    }
     const wiimState = states[wiim.entity_id];
     const friendly =
       (wiimState?.attributes.friendly_name as string | undefined) ??
@@ -195,5 +206,6 @@ export async function discoverZonesFromRegistry(
 
   zones.sort((a, b) => a.name.localeCompare(b.name));
   notes.push(`final: ${zones.length} zone(s) via entity registry`);
-  return { zones, notes };
+  if (maConfigEntryId) notes.push(`MA config_entry_id captured`);
+  return { zones, notes, maConfigEntryId };
 }
