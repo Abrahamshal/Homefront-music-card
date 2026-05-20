@@ -238,33 +238,21 @@ export class CardEditor extends LitElement {
   }
 
   /**
-   * Render an entity selector. Uses HA's built-in `<ha-entity-picker>`
-   * when available (it's auto-registered by HA's frontend in the editor
-   * context); falls back to a plain text input elsewhere.
+   * Render HA's `<ha-entity-picker>` directly. It's globally registered
+   * by the frontend bundle in any dashboard-editor context, so we don't
+   * need to gate on its presence — the prior conditional fallback was
+   * over-defensive and meant most installs got plain text inputs.
    */
   private _renderEntityField(value: string, onChange: (v: string) => void) {
-    if (
-      typeof customElements !== 'undefined' &&
-      customElements.get('ha-entity-picker')
-    ) {
-      return html`
-        <ha-entity-picker
-          .hass=${this.hass}
-          .value=${value ?? ''}
-          .includeDomains=${['media_player']}
-          allow-custom-entity
-          @value-changed=${(e: CustomEvent<{ value: string }>) =>
-            onChange(e.detail.value)}
-        ></ha-entity-picker>
-      `;
-    }
     return html`
-      <input
-        type="text"
+      <ha-entity-picker
+        .hass=${this.hass}
         .value=${value ?? ''}
-        placeholder="media_player.…"
-        @input=${(e: Event) => onChange((e.target as HTMLInputElement).value)}
-      />
+        .includeDomains=${['media_player']}
+        allow-custom-entity
+        @value-changed=${(e: CustomEvent<{ value: string }>) =>
+          onChange(e.detail.value)}
+      ></ha-entity-picker>
     `;
   }
 

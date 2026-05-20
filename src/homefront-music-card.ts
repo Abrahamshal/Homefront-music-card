@@ -69,6 +69,7 @@ export class HomefrontMusicCard extends LitElement {
     }
     this._config = config;
     this._store.setConfig(config);
+
     // Reflect the chosen layout onto the host so :host([data-layout=…])
     // styles apply.
     if (config.layout === 'panel') {
@@ -76,6 +77,27 @@ export class HomefrontMusicCard extends LitElement {
     } else {
       this.removeAttribute('data-layout');
     }
+
+    // Wire accent_color → overrides --hf-accent. Inline style on the
+    // host beats the CSS rule from themeVars (same specificity, but
+    // inline wins). Also computes a contrasting --hf-accent-text by
+    // luminance so accent buttons remain readable.
+    if (config.accent_color) {
+      this.style.setProperty('--hf-accent', config.accent_color);
+      this.style.setProperty(
+        '--hf-accent-text',
+        pickAccentText(config.accent_color),
+      );
+    } else {
+      this.style.removeProperty('--hf-accent');
+      this.style.removeProperty('--hf-accent-text');
+    }
+
+    // Wire density → controls padding and row heights via CSS vars
+    // that key selectors in this component consume. Components
+    // downstream can opt in to these for finer-grained spacing.
+    const density = config.density ?? 'regular';
+    this.setAttribute('data-density', density);
   }
 
   protected willUpdate(changed: Map<string, unknown>): void {
@@ -129,6 +151,25 @@ export class HomefrontMusicCard extends LitElement {
            internally. Capped at 90vh so it always fits the viewport. */
         height: min(820px, 90vh);
       }
+      /* Density variants — drive shared spacing tokens that selectors
+         in this file (and others, if they consume the vars) read from.
+         Defaults to 'regular' via the :host fallbacks below. */
+      :host {
+        --hf-density-title-pad-y: 10px;
+        --hf-density-tab-pad-y: 8px;
+        --hf-density-tab-label-fs: 10px;
+      }
+      :host([data-density='compact']) {
+        --hf-density-title-pad-y: 6px;
+        --hf-density-tab-pad-y: 5px;
+        --hf-density-tab-label-fs: 9.5px;
+      }
+      :host([data-density='comfy']) {
+        --hf-density-title-pad-y: 14px;
+        --hf-density-tab-pad-y: 11px;
+        --hf-density-tab-label-fs: 11px;
+      }
+
       :host([data-layout='panel']) {
         /* Panel layout — pair with a Lovelace view in "Panel (1 card)".
            Size against the viewport directly rather than relying on
@@ -154,7 +195,7 @@ export class HomefrontMusicCard extends LitElement {
         display: flex;
         align-items: center;
         gap: 8px;
-        padding: 10px 14px 8px;
+        padding: var(--hf-density-title-pad-y) 14px var(--hf-density-tab-pad-y);
       }
       .title-icon {
         color: var(--hf-text);
@@ -185,7 +226,7 @@ export class HomefrontMusicCard extends LitElement {
       .tab {
         background: transparent;
         border: 0;
-        padding: 8px 0 6px;
+        padding: var(--hf-density-tab-pad-y) 0 calc(var(--hf-density-tab-pad-y) - 2px);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -209,7 +250,7 @@ export class HomefrontMusicCard extends LitElement {
         border-radius: 2px;
       }
       .tab-label {
-        font-size: 10px;
+        font-size: var(--hf-density-tab-label-fs);
         font-weight: 600;
         letter-spacing: 0.01em;
       }
@@ -331,4 +372,28 @@ export class HomefrontMusicCard extends LitElement {
       </div>
     `;
   }
+}
+
+/**
+ * Pick a contrasting text color (#fff or #111) for a given background hex
+ * using the standard relative-luminance formula. Used when the user sets
+ * a custom accent color so the accent-button text stays readable.
+ */
+function pickAccentText(hex: string): string {
+  const norm = hex.trim().replace(/^#/, '');
+  if (norm.length !== 3 && norm.length !== 6) return '#fff';
+  const full =
+    norm.length === 3
+      ? norm
+          .split('')
+          .map((c) => c + c)
+          .join('')
+      : norm;
+  const r = parseInt(full.slice(0, 2), 16);
+  const g = parseInt(full.slice(2, 4), 16);
+  const b = parseInt(full.slice(4, 6), 16);
+  if ([r, g, b].some((v) => Number.isNaN(v))) return '#fff';
+  // Standard luminance approximation; >0.55 → use dark text.
+  const lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+  return lum > 0.55 ? '#111' : '#fff';
 }

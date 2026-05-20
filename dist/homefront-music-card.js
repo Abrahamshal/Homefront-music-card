@@ -3092,21 +3092,14 @@ function e(e,t,s,r){var a,o=arguments.length,n=o<3?t:null===r?r=Object.getOwnPro
           ${this._renderEntityField(e.ma,e=>this._updateZone(t,"ma",e))}
         </div>
       </div>
-    `}_renderEntityField(e,t){return"undefined"!=typeof customElements&&customElements.get("ha-entity-picker")?X`
-        <ha-entity-picker
-          .hass=${this.hass}
-          .value=${e??""}
-          .includeDomains=${["media_player"]}
-          allow-custom-entity
-          @value-changed=${e=>t(e.detail.value)}
-        ></ha-entity-picker>
-      `:X`
-      <input
-        type="text"
+    `}_renderEntityField(e,t){return X`
+      <ha-entity-picker
+        .hass=${this.hass}
         .value=${e??""}
-        placeholder="media_player.…"
-        @input=${e=>t(e.target.value)}
-      />
+        .includeDomains=${["media_player"]}
+        allow-custom-entity
+        @value-changed=${e=>t(e.detail.value)}
+      ></ha-entity-picker>
     `}_renderDisplaySection(){const e=this._config;return X`
       <div class="section">
         <div class="section-title">Display</div>
@@ -3257,7 +3250,7 @@ function e(e,t,s,r){var a,o=arguments.length,n=o<3?t:null===r?r=Object.getOwnPro
       color: var(--secondary-text-color, rgba(0, 0, 0, 0.55));
       line-height: 1.5;
     }
-  `,e([ue({attribute:!1})],dt.prototype,"hass",void 0),e([me()],dt.prototype,"_config",void 0),dt=e([ce("hf-card-editor")],dt),window.customCards=window.customCards||[],window.customCards.push({type:"homefront-music-card",name:"Homefront Music Card",description:"Music Assistant + WiiM multi-room controller",preview:!1});const ct=[{id:"player",label:"Player",icon:"play"},{id:"browser",label:"Browse",icon:"home"},{id:"search",label:"Search",icon:"search"},{id:"queue",label:"Queue",icon:"queue"},{id:"group",label:"Output",icon:"speaker"}];let ht=class extends i{constructor(){super(),this._store=new Store,new StoreController(this,this._store)}setConfig(e){if(!e)throw new Error("Invalid configuration");this._config=e,this._store.setConfig(e),"panel"===e.layout?this.setAttribute("data-layout","panel"):this.removeAttribute("data-layout")}willUpdate(e){e.has("hass")&&this.hass&&(this._integrationStatus=function(e){const t=e.services??{},s=e.states??{},r=[],a=t.music_assistant??{},o=t.mass_queue??{},n=t.wiim??{},l=!!a.play_media;r.push({target:"MA",label:"service music_assistant.play_media",matched:l});const d=["get_queue_items","remove_queue_item","move_queue_item_up","play_queue_item","clear_queue_from_here"],c=d.find(e=>!!o[e]),h=!!c;r.push({target:"QueueActions",label:`mass_queue domain has any of ${d.join(", ")}`,matched:h});const p=Object.keys(o);p.length>0&&r.push({target:"QueueActions",label:`mass_queue domain services found: ${p.slice(0,6).join(", ")}${p.length>6?"…":""}`,matched:!0});const u=["play_preset","play_url","set_eq","get_queue"],m=u.find(e=>!!n[e]),f=!!m;r.push({target:"WiiM",label:`wiim domain has any of ${u.join(", ")}`,matched:f});const v=Object.keys(n);v.length>0&&r.push({target:"WiiM",label:`wiim domain services found: ${v.slice(0,6).join(", ")}${v.length>6?"…":""}`,matched:!0});const g=Object.values(s).some(e=>{if(!e.entity_id.startsWith("media_player."))return!1;const t=e.attributes.group_role;return"master"===t||"slave"===t||"solo"===t});r.push({target:"WiiM",label:"any media_player.* attribute group_role is master/slave/solo",matched:g});const b=f||g;return{hasMA:l,hasQueueActions:h,hasWiim:b,allPresent:l&&h&&b,diagnostics:r}}(this.hass),this._integrationStatus.allPresent&&this._store.setHass(this.hass))}getCardSize(){return 12}static getConfigElement(){return document.createElement("hf-card-editor")}static getStubConfig(){return{type:"custom:homefront-music-card"}}disconnectedCallback(){super.disconnectedCallback(),this._store.dispose()}render(){return this._integrationStatus&&!this._integrationStatus.allPresent?X`<hf-setup-help .status=${this._integrationStatus}></hf-setup-help>`:X`
+  `,e([ue({attribute:!1})],dt.prototype,"hass",void 0),e([me()],dt.prototype,"_config",void 0),dt=e([ce("hf-card-editor")],dt),window.customCards=window.customCards||[],window.customCards.push({type:"homefront-music-card",name:"Homefront Music Card",description:"Music Assistant + WiiM multi-room controller",preview:!1});const ct=[{id:"player",label:"Player",icon:"play"},{id:"browser",label:"Browse",icon:"home"},{id:"search",label:"Search",icon:"search"},{id:"queue",label:"Queue",icon:"queue"},{id:"group",label:"Output",icon:"speaker"}];let ht=class extends i{constructor(){super(),this._store=new Store,new StoreController(this,this._store)}setConfig(e){if(!e)throw new Error("Invalid configuration");this._config=e,this._store.setConfig(e),"panel"===e.layout?this.setAttribute("data-layout","panel"):this.removeAttribute("data-layout"),e.accent_color?(this.style.setProperty("--hf-accent",e.accent_color),this.style.setProperty("--hf-accent-text",function(e){const t=e.trim().replace(/^#/,"");if(3!==t.length&&6!==t.length)return"#fff";const s=3===t.length?t.split("").map(e=>e+e).join(""):t,r=parseInt(s.slice(0,2),16),a=parseInt(s.slice(2,4),16),o=parseInt(s.slice(4,6),16);if([r,a,o].some(e=>Number.isNaN(e)))return"#fff";const n=(.2126*r+.7152*a+.0722*o)/255;return n>.55?"#111":"#fff"}(e.accent_color))):(this.style.removeProperty("--hf-accent"),this.style.removeProperty("--hf-accent-text"));const t=e.density??"regular";this.setAttribute("data-density",t)}willUpdate(e){e.has("hass")&&this.hass&&(this._integrationStatus=function(e){const t=e.services??{},s=e.states??{},r=[],a=t.music_assistant??{},o=t.mass_queue??{},n=t.wiim??{},l=!!a.play_media;r.push({target:"MA",label:"service music_assistant.play_media",matched:l});const d=["get_queue_items","remove_queue_item","move_queue_item_up","play_queue_item","clear_queue_from_here"],c=d.find(e=>!!o[e]),h=!!c;r.push({target:"QueueActions",label:`mass_queue domain has any of ${d.join(", ")}`,matched:h});const p=Object.keys(o);p.length>0&&r.push({target:"QueueActions",label:`mass_queue domain services found: ${p.slice(0,6).join(", ")}${p.length>6?"…":""}`,matched:!0});const u=["play_preset","play_url","set_eq","get_queue"],m=u.find(e=>!!n[e]),f=!!m;r.push({target:"WiiM",label:`wiim domain has any of ${u.join(", ")}`,matched:f});const v=Object.keys(n);v.length>0&&r.push({target:"WiiM",label:`wiim domain services found: ${v.slice(0,6).join(", ")}${v.length>6?"…":""}`,matched:!0});const g=Object.values(s).some(e=>{if(!e.entity_id.startsWith("media_player."))return!1;const t=e.attributes.group_role;return"master"===t||"slave"===t||"solo"===t});r.push({target:"WiiM",label:"any media_player.* attribute group_role is master/slave/solo",matched:g});const b=f||g;return{hasMA:l,hasQueueActions:h,hasWiim:b,allPresent:l&&h&&b,diagnostics:r}}(this.hass),this._integrationStatus.allPresent&&this._store.setHass(this.hass))}getCardSize(){return 12}static getConfigElement(){return document.createElement("hf-card-editor")}static getStubConfig(){return{type:"custom:homefront-music-card"}}disconnectedCallback(){super.disconnectedCallback(),this._store.dispose()}render(){return this._integrationStatus&&!this._integrationStatus.allPresent?X`<hf-setup-help .status=${this._integrationStatus}></hf-setup-help>`:X`
       <div class="frame">
         ${this._renderTitle()}
         <hf-group-chip-rail .store=${this._store}></hf-group-chip-rail>
@@ -3309,6 +3302,25 @@ function e(e,t,s,r){var a,o=arguments.length,n=o<3?t:null===r?r=Object.getOwnPro
            internally. Capped at 90vh so it always fits the viewport. */
         height: min(820px, 90vh);
       }
+      /* Density variants — drive shared spacing tokens that selectors
+         in this file (and others, if they consume the vars) read from.
+         Defaults to 'regular' via the :host fallbacks below. */
+      :host {
+        --hf-density-title-pad-y: 10px;
+        --hf-density-tab-pad-y: 8px;
+        --hf-density-tab-label-fs: 10px;
+      }
+      :host([data-density='compact']) {
+        --hf-density-title-pad-y: 6px;
+        --hf-density-tab-pad-y: 5px;
+        --hf-density-tab-label-fs: 9.5px;
+      }
+      :host([data-density='comfy']) {
+        --hf-density-title-pad-y: 14px;
+        --hf-density-tab-pad-y: 11px;
+        --hf-density-tab-label-fs: 11px;
+      }
+
       :host([data-layout='panel']) {
         /* Panel layout — pair with a Lovelace view in "Panel (1 card)".
            Size against the viewport directly rather than relying on
@@ -3334,7 +3346,7 @@ function e(e,t,s,r){var a,o=arguments.length,n=o<3?t:null===r?r=Object.getOwnPro
         display: flex;
         align-items: center;
         gap: 8px;
-        padding: 10px 14px 8px;
+        padding: var(--hf-density-title-pad-y) 14px var(--hf-density-tab-pad-y);
       }
       .title-icon {
         color: var(--hf-text);
@@ -3365,7 +3377,7 @@ function e(e,t,s,r){var a,o=arguments.length,n=o<3?t:null===r?r=Object.getOwnPro
       .tab {
         background: transparent;
         border: 0;
-        padding: 8px 0 6px;
+        padding: var(--hf-density-tab-pad-y) 0 calc(var(--hf-density-tab-pad-y) - 2px);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -3389,7 +3401,7 @@ function e(e,t,s,r){var a,o=arguments.length,n=o<3?t:null===r?r=Object.getOwnPro
         border-radius: 2px;
       }
       .tab-label {
-        font-size: 10px;
+        font-size: var(--hf-density-tab-label-fs);
         font-weight: 600;
         letter-spacing: 0.01em;
       }
