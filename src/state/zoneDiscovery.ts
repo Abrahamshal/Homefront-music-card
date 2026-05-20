@@ -38,57 +38,62 @@ export function discoverZonesWithDiagnostics(hass: HomeAssistant): DiscoveryResu
   const zones: ZoneConfig[] = [];
   const notes: string[] = [];
 
-  // Pass 1: strict — entities that expose `group_role` (mjcumming/wiim).
-  const wiimByRole = Object.values(states).filter((e) => {
+  // Find every WiiM device entity by its `group_role` attribute (unique
+  // to the mjcumming/wiim integration). This is direction-agnostic — we
+  // don't care whether the WiiM got the unsuffixed entity_id or the `_2`
+  // variant. The MA pair is identified by *not* having `group_role`.
+  const wiimEntities = Object.values(states).filter((e) => {
     if (!e.entity_id.startsWith('media_player.')) return false;
     const role = (e.attributes as { group_role?: unknown }).group_role;
     return role === 'master' || role === 'slave' || role === 'solo';
   });
   notes.push(
-    `pass 1 (group_role): ${wiimByRole.length} candidate WiiM device entities`,
+    `WiiM device entities (group_role present): ${wiimEntities.length}`,
   );
 
-  for (const entity of wiimByRole) {
-    const base = entity.entity_id.replace(/^media_player\./, '');
-    const candidates = [
-      `media_player.${base}_2`,
-      `media_player.${base}_ma`,
-    ];
-    const maEntityId = candidates.find((id) => states[id] !== undefined);
+  for (const wiim of wiimEntities) {
+    const base = wiim.entity_id.replace(/^media_player\./, '');
+    // Strip a trailing `_<N>` suffix (HA's auto-uniquification) so we can
+    // also probe the base name as the MA partner — covers the case
+    // where MA was installed first and got the unsuffixed entity_id.
+    const stripped = base.replace(/_\d+$/, '');
+    const candidates: string[] = [];
+    if (stripped !== base) candidates.push(`media_player.${stripped}`);
+    candidates.push(`media_player.${base}_2`);
+    candidates.push(`media_player.${base}_ma`);
+    candidates.push(`media_player.${base}_music_assistant`);
+
+    let maEntityId: string | null = null;
+    let triedDetail: string[] = [];
+    for (const cand of candidates) {
+      if (cand === wiim.entity_id) continue;
+      const state = states[cand];
+      if (!state) {
+        triedDetail.push(`${cand} (missing)`);
+        continue;
+      }
+      const role = (state.attributes as { group_role?: unknown }).group_role;
+      if (role === undefined) {
+        // No group_role → not a WiiM → this is the MA sibling.
+        maEntityId = cand;
+        triedDetail.push(`${cand} ✓`);
+        break;
+      }
+      triedDetail.push(`${cand} (another WiiM)`);
+    }
+
     if (!maEntityId) {
       notes.push(
-        `  ${entity.entity_id}: no MA pair at ${candidates.join(' / ')}`,
+        `  ${wiim.entity_id}: no MA partner. Tried: ${triedDetail.join(', ')}`,
       );
       continue;
     }
     const friendly =
-      (entity.attributes.friendly_name as string | undefined) ?? base;
-    zones.push({ name: friendly, wiim: entity.entity_id, ma: maEntityId });
-    notes.push(`  ${entity.entity_id} → ${maEntityId} as "${friendly}"`);
-  }
-
-  // Pass 2 (fallback): if pass 1 found nothing, try a permissive name-pair
-  // scan. Look for `media_player.<name>` that has a `media_player.<name>_2`
-  // sibling whose attributes look like MA's wrapper.
-  if (zones.length === 0) {
-    notes.push('pass 2 (fallback name-pair scan, since pass 1 was empty):');
-    const allMps = Object.values(states).filter((e) =>
-      e.entity_id.startsWith('media_player.'),
+      (wiim.attributes.friendly_name as string | undefined) ?? base;
+    zones.push({ name: friendly, wiim: wiim.entity_id, ma: maEntityId });
+    notes.push(
+      `  ${friendly}: WiiM=${wiim.entity_id}, MA=${maEntityId}`,
     );
-    notes.push(`  ${allMps.length} total media_player entities in hass`);
-    for (const candidate of allMps) {
-      const id = candidate.entity_id;
-      if (id.endsWith('_2') || id.endsWith('_ma') || id.endsWith('_group_master')) continue;
-      const base = id.replace(/^media_player\./, '');
-      const maEntityId = [`media_player.${base}_2`, `media_player.${base}_ma`].find(
-        (eid) => states[eid] !== undefined,
-      );
-      if (!maEntityId) continue;
-      const friendly =
-        (candidate.attributes.friendly_name as string | undefined) ?? base;
-      zones.push({ name: friendly, wiim: id, ma: maEntityId });
-      notes.push(`  ${id} → ${maEntityId} as "${friendly}" (no group_role attr)`);
-    }
   }
 
   zones.sort((a, b) => a.name.localeCompare(b.name));
