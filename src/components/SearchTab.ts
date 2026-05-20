@@ -635,13 +635,24 @@ export class SearchTab extends LitElement {
   }
 
   private _renderHassResultRow(item: SearchResultItem): TemplateResult {
-    const title = item.title ?? item.name ?? '(untitled)';
+    const rec = item as unknown as Record<string, unknown>;
+    const title =
+      extractName(rec.title) ?? extractName(rec.name) ?? '(untitled)';
     const subtitleParts: string[] = [];
-    if (item.artist) subtitleParts.push(item.artist);
-    if (item.album && item.album !== title) subtitleParts.push(item.album);
-    if (item.provider) subtitleParts.push(item.provider);
+    const artistStr = extractName(rec.artist) ?? extractName(rec.artists);
+    if (artistStr) subtitleParts.push(artistStr);
+    const albumStr = extractName(rec.album);
+    if (albumStr && albumStr !== title) subtitleParts.push(albumStr);
+    const providerStr = extractName(rec.provider) ?? extractName(rec.provider_mappings);
+    if (providerStr) subtitleParts.push(providerStr);
     const subtitle = subtitleParts.join(' · ');
-    const image = item.image_url ?? item.thumbnail;
+    const image = extractImage(rec);
+    const duration =
+      typeof rec.duration === 'number'
+        ? rec.duration
+        : typeof rec.duration_seconds === 'number'
+          ? (rec.duration_seconds as number)
+          : undefined;
     return html`
       <div class="track-row" @click=${() => this.store.playSearchResult(item)}>
         ${image
@@ -658,7 +669,7 @@ export class SearchTab extends LitElement {
           <div class="row-name">${title}</div>
           ${subtitle ? html`<div class="row-sub">${subtitle}</div>` : ''}
         </div>
-        ${item.duration ? html`<div class="row-time">${fmtTime(item.duration)}</div>` : ''}
+        ${duration ? html`<div class="row-time">${fmtTime(duration)}</div>` : ''}
       </div>
     `;
   }
@@ -702,6 +713,70 @@ function filterToMediaTypes(filter: SearchFilter): string[] {
     default:
       return [];
   }
+}
+
+/**
+ * Pull a human-readable name from a MA response field that could be a
+ * string, an object with `.name`/`.title`, or an array of either.
+ * MA's search response wraps artist/album/provider in nested objects
+ * rather than flat strings.
+ */
+function extractName(v: unknown): string | undefined {
+  if (typeof v === 'string') return v.length > 0 ? v : undefined;
+  if (Array.isArray(v) && v.length > 0) return extractName(v[0]);
+  if (v && typeof v === 'object') {
+    const obj = v as Record<string, unknown>;
+    return (
+      extractName(obj.name) ??
+      extractName(obj.title) ??
+      extractName(obj.display_name) ??
+      undefined
+    );
+  }
+  return undefined;
+}
+
+/**
+ * Find an image URL on a MA search result. Tries several common
+ * locations: top-level `image_url`/`thumbnail`/`image`, or MA's
+ * structured `metadata.images[0].path` (their canonical pattern).
+ * Filters out HTTP URLs on HTTPS pages to dodge mixed-content blocking.
+ */
+function extractImage(item: Record<string, unknown>): string | undefined {
+  const tryUrl = (u: unknown): string | undefined => {
+    if (typeof u !== 'string' || !u) return undefined;
+    if (
+      typeof location !== 'undefined' &&
+      location.protocol === 'https:' &&
+      u.startsWith('http:')
+    ) {
+      return undefined;
+    }
+    return u;
+  };
+  const direct =
+    tryUrl(item.image_url) ?? tryUrl(item.thumbnail) ?? tryUrl(item.image);
+  if (direct) return direct;
+  const metadata = item.metadata as
+    | { images?: Array<Record<string, unknown>> }
+    | undefined;
+  const firstMetaImage = metadata?.images?.[0];
+  if (firstMetaImage) {
+    const u = tryUrl(firstMetaImage.path) ?? tryUrl(firstMetaImage.url);
+    if (u) return u;
+  }
+  // Look one level deeper (album/artist often carry their own art).
+  for (const key of ['album', 'artist', 'artists']) {
+    const nested = item[key];
+    if (Array.isArray(nested) && nested.length > 0) {
+      const inner = extractImage(nested[0] as Record<string, unknown>);
+      if (inner) return inner;
+    } else if (nested && typeof nested === 'object') {
+      const inner = extractImage(nested as Record<string, unknown>);
+      if (inner) return inner;
+    }
+  }
+  return undefined;
 }
 
 declare global {
