@@ -117,7 +117,11 @@ export class HomefrontMusicCard extends LitElement {
       :host([data-layout='panel']) {
         /* Panel layout — pair with a Lovelace view in "Panel (1 card)"
            mode for a full-page UI. Fills the container with no cap and
-           drops rounded corners + border to look native at full size. */
+           drops rounded corners + border to look native at full size.
+           The view itself must be in Panel mode; setting layout: panel
+           on the card alone does not change the view's container. */
+        width: 100%;
+        max-width: 100%;
         height: 100%;
         max-height: none;
         min-height: 100vh;

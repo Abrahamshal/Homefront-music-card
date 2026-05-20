@@ -151,15 +151,45 @@ export function deriveCurrentTrack(hass: HomeAssistant, maEntityId: string): Tra
 }
 
 /**
- * Build a synthetic Album with the MA entity's `entity_picture` URL, so
- * the card can render real album art instead of a gradient.
+ * Build a synthetic Album with an image URL pulled from the MA entity.
+ *
+ * Image attribute priority (most-current first):
+ *   1. `media_image_url` — raw URL from MA; updates with the track.
+ *   2. `entity_picture` — HA's standard, but sometimes a proxied/hashed
+ *      URL that lags behind track changes.
+ *   3. `entity_picture_local` — local cache variant some integrations use.
+ *
+ * We log the candidates the first few times we see them so we can
+ * diagnose which is the right one for any given MA version.
  */
+const _loggedImageAttrsFor = new Set<string>();
 export function deriveCurrentAlbum(hass: HomeAssistant, maEntityId: string): (Album & { imageUrl?: string }) | null {
   const ma = hass.states?.[maEntityId];
   if (!ma) return null;
   const attrs = ma.attributes as Record<string, unknown>;
+
+  const candidates = {
+    media_image_url: attrs.media_image_url as string | undefined,
+    entity_picture: attrs.entity_picture as string | undefined,
+    entity_picture_local: attrs.entity_picture_local as string | undefined,
+  };
+  if (!_loggedImageAttrsFor.has(maEntityId) || _loggedImageAttrsFor.size < 5) {
+    _loggedImageAttrsFor.add(maEntityId);
+    // eslint-disable-next-line no-console
+    console.debug(
+      `[homefront-music-card] image attrs for ${maEntityId}:`,
+      candidates,
+      'title=',
+      attrs.media_title,
+    );
+  }
+  const imageUrl =
+    candidates.media_image_url ||
+    candidates.entity_picture ||
+    candidates.entity_picture_local ||
+    undefined;
+
   const name = (attrs.media_album_name as string | undefined) ?? '';
-  const imageUrl = (attrs.entity_picture as string | undefined) ?? undefined;
   return {
     id: HASS_QUEUE_SENTINEL,
     name,

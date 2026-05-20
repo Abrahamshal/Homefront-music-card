@@ -59,7 +59,7 @@ export class GroupSheet extends LitElement {
       z-index: 50;
       pointer-events: none;
     }
-    :host([data-open='true']) {
+    :host([data-open]) {
       pointer-events: auto;
     }
     .scrim {
