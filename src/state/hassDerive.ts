@@ -153,15 +153,28 @@ export function deriveCurrentTrack(hass: HomeAssistant, maEntityId: string): Tra
 /**
  * Build a synthetic Album with an image URL pulled from the MA entity.
  *
- * Image attribute priority (most-current first):
- *   1. `media_image_url` — raw URL from MA; updates with the track.
- *   2. `entity_picture` — HA's standard, but sometimes a proxied/hashed
- *      URL that lags behind track changes.
- *   3. `entity_picture_local` — local cache variant some integrations use.
+ * Image attribute priority:
+ *   1. `entity_picture` — HA's standard. Almost always a *relative* URL
+ *      like `/api/media_player_proxy/...` that HA serves over whatever
+ *      protocol the dashboard is loaded over (works HTTPS-from-anywhere).
+ *   2. `entity_picture_local` — same idea, local-cached variant some
+ *      integrations expose.
+ *   3. `media_image_url` — raw URL from MA, often `http://<lan-ip>:8095/...`
+ *      which fails as mixed content on HTTPS dashboards and is
+ *      unreachable from outside the LAN. Last resort.
  *
- * We log the candidates the first few times we see them so we can
- * diagnose which is the right one for any given MA version.
+ * URLs that would cause mixed-content blocking on the current page are
+ * filtered out before being returned — better to fall back to the
+ * gradient than render a broken image icon.
  */
+function isUsableImageUrl(url: string | undefined | null): url is string {
+  if (!url) return false;
+  if (typeof location === 'undefined') return true;
+  // HTTPS page + plain-http URL → browser blocks it as mixed content.
+  if (location.protocol === 'https:' && url.startsWith('http:')) return false;
+  return true;
+}
+
 const _loggedImageAttrsFor = new Set<string>();
 export function deriveCurrentAlbum(hass: HomeAssistant, maEntityId: string): (Album & { imageUrl?: string }) | null {
   const ma = hass.states?.[maEntityId];
@@ -169,9 +182,9 @@ export function deriveCurrentAlbum(hass: HomeAssistant, maEntityId: string): (Al
   const attrs = ma.attributes as Record<string, unknown>;
 
   const candidates = {
-    media_image_url: attrs.media_image_url as string | undefined,
     entity_picture: attrs.entity_picture as string | undefined,
     entity_picture_local: attrs.entity_picture_local as string | undefined,
+    media_image_url: attrs.media_image_url as string | undefined,
   };
   if (!_loggedImageAttrsFor.has(maEntityId) || _loggedImageAttrsFor.size < 5) {
     _loggedImageAttrsFor.add(maEntityId);
@@ -184,10 +197,8 @@ export function deriveCurrentAlbum(hass: HomeAssistant, maEntityId: string): (Al
     );
   }
   const imageUrl =
-    candidates.media_image_url ||
-    candidates.entity_picture ||
-    candidates.entity_picture_local ||
-    undefined;
+    [candidates.entity_picture, candidates.entity_picture_local, candidates.media_image_url]
+      .find(isUsableImageUrl) ?? undefined;
 
   const name = (attrs.media_album_name as string | undefined) ?? '';
   return {
