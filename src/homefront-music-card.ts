@@ -115,15 +115,17 @@ export class HomefrontMusicCard extends LitElement {
         height: min(820px, 90vh);
       }
       :host([data-layout='panel']) {
-        /* Panel layout — pair with a Lovelace view in "Panel (1 card)"
-           mode for a full-page UI. Fills the container set by HA's
-           hui-panel-view (which is viewport height minus the HA header).
-           No min-height here — that would push the tab bar past the
-           fold. The body's internal scroll handles overflow. */
+        /* Panel layout — pair with a Lovelace view in "Panel (1 card)".
+           Size against the viewport directly rather than relying on
+           height:100% propagating through HA's container chain, which
+           breaks in some HA versions / themes. dvh adjusts for mobile
+           browser chrome; --header-height is the HA app bar (fallback
+           56px if the theme doesn't set it). */
         width: 100%;
         max-width: 100%;
-        height: 100%;
-        max-height: none;
+        height: calc(100vh - var(--header-height, 56px));
+        height: calc(100dvh - var(--header-height, 56px));
+        max-height: calc(100dvh - var(--header-height, 56px));
         border-radius: 0;
         border: 0;
       }
