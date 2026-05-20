@@ -11,7 +11,10 @@ import type {
   QueueItem,
   ZoneConfig,
 } from '../types.js';
-import { discoverZonesWithDiagnostics } from './zoneDiscovery.js';
+import {
+  discoverZonesFromRegistry,
+  discoverZonesWithDiagnostics,
+} from './zoneDiscovery.js';
 import {
   deriveSpeakers,
   derivePlayers,
@@ -135,6 +138,7 @@ export class Store extends EventTarget {
   private _isHassMode = false;
   /** Last discovery diagnostic for the debug overlay. */
   diagnosticNotes: string[] = [];
+  private _registryAttempted = false;
 
   // ── hass-mode browse state ───────────────────────────────────────────────
 
@@ -260,6 +264,47 @@ export class Store extends EventTarget {
   setHass(hass: HomeAssistant): void {
     this._hass = hass;
     this._deriveFromHass();
+    this._emit();
+    // Kick off the authoritative entity-registry-based discovery once per
+    // session. If it returns zones, they replace whatever the sync
+    // heuristic found. If it fails, the sync result stays in play.
+    if (!this._registryAttempted) {
+      this._registryAttempted = true;
+      void this._reconcileFromRegistry();
+    }
+  }
+
+  private async _reconcileFromRegistry(): Promise<void> {
+    if (!this._hass) return;
+    const result = await discoverZonesFromRegistry(this._hass);
+    if (result.zones.length === 0) {
+      // Registry returned nothing — leave the sync result in place but
+      // surface the diagnostic so we know why.
+      this.diagnosticNotes = [
+        ...this.diagnosticNotes,
+        '— registry attempt —',
+        ...result.notes,
+      ];
+      this._emit();
+      return;
+    }
+
+    // Registry won. Adopt its zones; re-derive everything.
+    this._zones = result.zones;
+    this.diagnosticNotes = ['Discovery: entity registry', ...result.notes];
+    if (!this._isHassMode) {
+      this._isHassMode = true;
+      this._stopTick();
+    }
+    if (!this._hass) return;
+    const speakers = deriveSpeakers(this._hass, this._zones);
+    this.speakers = speakers;
+    this.players = derivePlayers(this._hass, this._zones, speakers);
+    if (!speakers.find((s) => s.id === this.activeLeadId)) {
+      const firstLead =
+        speakers.find((s) => s.id === s.leadId) ?? speakers[0];
+      if (firstLead) this.activeLeadId = firstLead.id;
+    }
     this._emit();
   }
 
@@ -441,10 +486,22 @@ export class Store extends EventTarget {
         type: 'media_player/browse_media',
         entity_id: ma,
       });
-      // Per architecture: bypass the merged "Library" view at the root.
-      const filteredChildren = root.children?.filter(
-        (c) => c.title.toLowerCase() !== 'library',
+      // eslint-disable-next-line no-console
+      console.debug(
+        '[homefront-music-card] browse root response:',
+        JSON.parse(JSON.stringify(root)),
       );
+      // Filter out:
+      //   - The merged "Library" view at MA's root (architecture rule).
+      //   - HA's media-source framework entries (`media_class === 'app'`),
+      //     which surface things like Camera, DLNA, Radio Browser, TTS —
+      //     none of which are MA library content.
+      const dropTitles = new Set(['library', 'music library', 'my music']);
+      const filteredChildren = root.children?.filter((c) => {
+        if (dropTitles.has(c.title.toLowerCase())) return false;
+        if (c.media_class === 'app') return false;
+        return true;
+      });
       const rootWithFiltered = { ...root, children: filteredChildren };
       this._browseCache.clear();
       this._browseCache.set(root.media_content_id || '__root__', rootWithFiltered);

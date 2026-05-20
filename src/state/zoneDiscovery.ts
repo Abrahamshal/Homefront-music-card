@@ -1,6 +1,12 @@
 import type { HomeAssistant } from '../types.js';
 import type { ZoneConfig } from '../types.js';
 
+interface EntityRegistryEntry {
+  entity_id: string;
+  platform: string;
+  device_id: string | null;
+}
+
 /**
  * Auto-discover zones by finding WiiM device entities in hass and pairing
  * each with its Music Assistant counterpart.
@@ -98,5 +104,96 @@ export function discoverZonesWithDiagnostics(hass: HomeAssistant): DiscoveryResu
 
   zones.sort((a, b) => a.name.localeCompare(b.name));
   notes.push(`final: ${zones.length} zone(s) discovered`);
+  return { zones, notes };
+}
+
+/**
+ * Discover zones via HA's entity registry — the authoritative source for
+ * "which integration owns this entity" and "which physical device this
+ * entity belongs to."
+ *
+ * Path:
+ * 1. WS `config/entity_registry/list` returns every entity, with its
+ *    `platform` (the integration domain) and `device_id` (the HA Device
+ *    Registry ID for the physical hardware).
+ * 2. Filter to `media_player.*` from platforms `wiim` or `music_assistant`.
+ * 3. Group by `device_id`. Each device with both a WiiM and an MA entity
+ *    becomes a zone.
+ * 4. Skip the WiiM `*_group_master` virtual entity — it shares the
+ *    device_id with the main WiiM entity but isn't the one we control.
+ *
+ * Naming-independent and order-independent. Falls back to
+ * [[discoverZonesWithDiagnostics]] if the WS call errors (e.g. old HA).
+ */
+export async function discoverZonesFromRegistry(
+  hass: HomeAssistant,
+): Promise<DiscoveryResult> {
+  const states = hass.states ?? {};
+  const zones: ZoneConfig[] = [];
+  const notes: string[] = [];
+
+  let entries: EntityRegistryEntry[];
+  try {
+    entries = await hass.callWS<EntityRegistryEntry[]>({
+      type: 'config/entity_registry/list',
+    });
+  } catch (err) {
+    notes.push(`registry call failed: ${String(err)}`);
+    return { zones, notes };
+  }
+
+  const mediaPlayers = entries.filter(
+    (e) =>
+      e.entity_id.startsWith('media_player.') &&
+      (e.platform === 'wiim' || e.platform === 'music_assistant'),
+  );
+  notes.push(
+    `registry: ${mediaPlayers.length} media_player entities from wiim/MA`,
+  );
+
+  // Group by device_id
+  const byDevice = new Map<string, EntityRegistryEntry[]>();
+  for (const e of mediaPlayers) {
+    if (!e.device_id) {
+      notes.push(`  ${e.entity_id} (${e.platform}): no device_id`);
+      continue;
+    }
+    const list = byDevice.get(e.device_id) ?? [];
+    list.push(e);
+    byDevice.set(e.device_id, list);
+  }
+
+  for (const [deviceId, list] of byDevice) {
+    // Pick the non-group-master WiiM entity (there may be both for an
+    // active master).
+    const wiim =
+      list.find(
+        (e) => e.platform === 'wiim' && !e.entity_id.endsWith('_group_master'),
+      ) ?? list.find((e) => e.platform === 'wiim');
+    const ma = list.find((e) => e.platform === 'music_assistant');
+    if (!wiim || !ma) {
+      const which = [
+        wiim ? '' : 'WiiM',
+        ma ? '' : 'MA',
+      ]
+        .filter(Boolean)
+        .join(' + ');
+      notes.push(
+        `  device ${deviceId.slice(0, 8)}…: incomplete (missing ${which})`,
+      );
+      continue;
+    }
+    const wiimState = states[wiim.entity_id];
+    const friendly =
+      (wiimState?.attributes.friendly_name as string | undefined) ??
+      wiim.entity_id;
+    zones.push({ name: friendly, wiim: wiim.entity_id, ma: ma.entity_id });
+    notes.push(
+      `  ${friendly}: WiiM=${wiim.entity_id} MA=${ma.entity_id} (device ${deviceId.slice(0, 8)}…)`,
+    );
+  }
+
+  zones.sort((a, b) => a.name.localeCompare(b.name));
+  notes.push(`final: ${zones.length} zone(s) via entity registry`);
   return { zones, notes };
 }

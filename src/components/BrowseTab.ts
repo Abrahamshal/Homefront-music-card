@@ -439,13 +439,11 @@ export class BrowseTab extends LitElement {
     if (children.length === 0) {
       return html`<div class="hass-empty">No items</div>`;
     }
-    // Decide layout: grid for albums/playlists, list for everything else.
-    const usesGrid = children.every(
-      (c) =>
-        c.media_class === 'album' ||
-        c.media_class === 'playlist' ||
-        c.media_class === 'directory',
-    ) && children.some((c) => c.thumbnail);
+    // Grid is reserved for playlists (visually distinctive). Albums,
+    // tracks, artists, directories, radio — all easier to scan as lists.
+    const usesGrid =
+      children.every((c) => c.media_class === 'playlist') &&
+      children.some((c) => c.thumbnail);
     return html`
       <div class="body">
         ${usesGrid ? this._renderHassGrid(children) : this._renderHassList(children)}
