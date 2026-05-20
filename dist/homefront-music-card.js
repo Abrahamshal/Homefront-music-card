@@ -2980,15 +2980,14 @@ function e(e,t,s,r){var a,o=arguments.length,n=o<3?t:null===r?r=Object.getOwnPro
       }
       :host([data-layout='panel']) {
         /* Panel layout — pair with a Lovelace view in "Panel (1 card)"
-           mode for a full-page UI. Fills the container with no cap and
-           drops rounded corners + border to look native at full size.
-           The view itself must be in Panel mode; setting layout: panel
-           on the card alone does not change the view's container. */
+           mode for a full-page UI. Fills the container set by HA's
+           hui-panel-view (which is viewport height minus the HA header).
+           No min-height here — that would push the tab bar past the
+           fold. The body's internal scroll handles overflow. */
         width: 100%;
         max-width: 100%;
         height: 100%;
         max-height: none;
-        min-height: 100vh;
         border-radius: 0;
         border: 0;
       }
@@ -2996,7 +2995,7 @@ function e(e,t,s,r){var a,o=arguments.length,n=o<3?t:null===r?r=Object.getOwnPro
         display: flex;
         flex-direction: column;
         height: 100%;
-        min-height: inherit;
+        min-height: 0;
       }
       .title-row {
         display: flex;
