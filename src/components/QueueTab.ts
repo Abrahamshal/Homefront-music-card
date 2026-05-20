@@ -1,4 +1,4 @@
-import { LitElement, html, css, type PropertyValues } from 'lit';
+import { LitElement, html, css, type PropertyValues, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { mockData, fmtTime } from '../state/mockData.js';
 import { Store } from '../state/store.js';
@@ -8,6 +8,7 @@ import './primitives/AlbumArt.js';
 import './primitives/SwipeRow.js';
 import './primitives/DraggableQueue.js';
 import type { DraggableItem, RowRenderHelpers } from './primitives/DraggableQueue.js';
+import type { QueueItem } from '../types.js';
 
 interface QueueRowItem extends DraggableItem {
   /** Track ID. */
@@ -25,10 +26,27 @@ export class QueueTab extends LitElement {
   @property({ attribute: false }) store!: Store;
 
   private _ctrl?: StoreController;
+  private _queueLoadKickedOff = false;
 
   protected willUpdate(changed: PropertyValues): void {
     if (changed.has('store') && this.store && !this._ctrl) {
       this._ctrl = new StoreController(this, this.store);
+    }
+  }
+
+  protected updated(): void {
+    // Lazy-load queue on first hass-mode render or after the active
+    // lead changes (which invalidates the cached queue).
+    if (
+      this.store?.isHassMode &&
+      !this.store.hassQueueLoading &&
+      !this.store.hassQueueIsFresh &&
+      !this._queueLoadKickedOff
+    ) {
+      this._queueLoadKickedOff = true;
+      void this.store.loadQueue().finally(() => {
+        this._queueLoadKickedOff = false;
+      });
     }
   }
 
@@ -228,10 +246,22 @@ export class QueueTab extends LitElement {
       color: var(--hf-accent-text);
       border-color: var(--hf-accent);
     }
+    .hass-loading,
+    .hass-error,
+    .hass-empty {
+      padding: 40px 14px;
+      text-align: center;
+      color: var(--hf-text-dim);
+      font-size: 13px;
+    }
+    .hass-error {
+      color: #e0413a;
+    }
   `;
 
   protected render() {
     if (!this.store) return html``;
+    if (this.store.isHassMode) return this._renderHass();
     const s = this.store;
     const player = s.activePlayer;
     const upcoming = player.queue.slice(player.currentIdx + 1);
@@ -397,6 +427,188 @@ export class QueueTab extends LitElement {
         </div>
       </hf-swipe-row>
     `;
+  }
+
+  // ── hass-mode rendering ──────────────────────────────────────────────────
+
+  private _renderHass(): TemplateResult {
+    const s = this.store;
+    const items = s.hassQueue;
+    // Now-playing comes from the leader's MA entity (already derived).
+    const nowTitle = s.currentTrack.name;
+    const nowArtist = s.currentTrack.artist;
+    const nowAlbumImage =
+      (s.currentAlbum as unknown as { imageUrl?: string }).imageUrl;
+    const selectedCount = s.selectedTracks.size;
+
+    return html`
+      ${s.multiMode
+        ? html`
+            <div class="toolbar multi">
+              <button
+                class="icon-btn-sq"
+                @click=${() => s.setMultiMode(false)}
+                aria-label="Cancel selection"
+              >
+                ${Icons.x({ size: 16 })}
+              </button>
+              <div class="multi-count">${selectedCount} selected</div>
+              <div class="multi-actions">
+                <button
+                  class="pill-primary"
+                  @click=${() => this._bulkRemoveHass()}
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          `
+        : html`
+            <div class="toolbar">
+              <div>
+                <div class="title">Queue</div>
+                <div class="sub">
+                  ${items.length} item${items.length === 1 ? '' : 's'} ·
+                  drag-reorder coming soon
+                </div>
+              </div>
+              <div style="display:flex;gap:6px">
+                <button
+                  class="icon-btn-sq"
+                  aria-label="Reload queue"
+                  @click=${() => void s.loadQueue()}
+                >
+                  ${Icons.search({ size: 16 })}
+                </button>
+                <button
+                  class="icon-btn-sq"
+                  aria-label="Multi-select"
+                  @click=${() => s.setMultiMode(true)}
+                >
+                  ${Icons.check({ size: 16 })}
+                </button>
+                <button
+                  class="icon-btn-sq"
+                  aria-label="Clear queue from here"
+                  @click=${() => s.clearQueueFromHere()}
+                >
+                  ${Icons.trash({ size: 16 })}
+                </button>
+              </div>
+            </div>
+          `}
+
+      ${nowTitle && nowTitle !== 'Nothing playing'
+        ? html`
+            <div class="now-playing">
+              <div class="small-label">Now playing</div>
+              <div class="now-playing-card">
+                <hf-album-art
+                  .obj=${null}
+                  .imageUrl=${nowAlbumImage}
+                  size="44"
+                  radius="8"
+                ></hf-album-art>
+                <div class="np-meta">
+                  <div class="np-line">
+                    <div class="np-pulse"></div>
+                    <div class="np-name">${nowTitle}</div>
+                  </div>
+                  <div class="np-artist">${nowArtist}</div>
+                </div>
+              </div>
+            </div>
+          `
+        : ''}
+
+      <div class="scroll">
+        <div class="small-label">Up next · ${items.length}</div>
+        ${s.hassQueueLoading
+          ? html`<div class="hass-loading">Loading queue…</div>`
+          : s.hassQueueError
+            ? html`<div class="hass-error">${s.hassQueueError}</div>`
+            : items.length === 0
+              ? html`<div class="empty">Queue is empty</div>`
+              : html`<div>${items.map((it) => this._renderHassRow(it))}</div>`}
+      </div>
+    `;
+  }
+
+  private _renderHassRow(item: QueueItem): TemplateResult {
+    const s = this.store;
+    const title = item.title ?? item.name ?? '(untitled)';
+    const artist = item.artist ?? '';
+    const duration = item.duration ?? item.duration_seconds ?? 0;
+    const image = item.image_url ?? item.thumbnail;
+    const selected = s.selectedTracks.has(item.queue_item_id as unknown as number);
+
+    return html`
+      <hf-swipe-row
+        .rowHeight=${56}
+        @hf-delete=${() => s.removeQueueItem(item.queue_item_id)}
+      >
+        <div class="row-inner" data-selected=${selected}>
+          ${s.multiMode
+            ? html`
+                <button
+                  class="checkbox"
+                  data-checked=${selected}
+                  @click=${(e: Event) => {
+                    e.stopPropagation();
+                    this._toggleSelectHass(item.queue_item_id);
+                  }}
+                >
+                  ${selected ? Icons.check({ size: 12, sw: 3 }) : ''}
+                </button>
+              `
+            : ''}
+          <hf-album-art
+            .obj=${null}
+            .imageUrl=${image}
+            size="40"
+            radius="6"
+          ></hf-album-art>
+          <div
+            class="row-track"
+            @click=${() =>
+              s.multiMode ? null : s.playQueueItem(item.queue_item_id)}
+          >
+            <div class="row-name">${title}</div>
+            <div class="row-artist">${artist}</div>
+          </div>
+          <div class="row-time">${duration ? fmtTime(duration) : ''}</div>
+          ${!s.multiMode
+            ? html`
+                <button
+                  class="row-next"
+                  aria-label="Play next"
+                  @click=${(e: Event) => {
+                    e.stopPropagation();
+                    s.moveQueueItemToTop(item.queue_item_id);
+                  }}
+                >
+                  ${Icons.playNext({ size: 14 })}
+                </button>
+              `
+            : ''}
+        </div>
+      </hf-swipe-row>
+    `;
+  }
+
+  private _toggleSelectHass(queueItemId: string): void {
+    // selectedTracks is a Set<number> in mock; for hass we abuse it as a
+    // Set of queue_item_id values for now. Cast through unknown.
+    const set = this.store.selectedTracks as unknown as Set<string>;
+    const next = new Set(set);
+    if (next.has(queueItemId)) next.delete(queueItemId);
+    else next.add(queueItemId);
+    this.store.setSelectedTracks(next as unknown as Set<number>);
+  }
+
+  private _bulkRemoveHass(): void {
+    const set = this.store.selectedTracks as unknown as Set<string>;
+    this.store.removeQueueItems(new Set(set));
   }
 }
 

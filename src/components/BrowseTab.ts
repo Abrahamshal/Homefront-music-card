@@ -13,6 +13,7 @@ import { Store } from '../state/store.js';
 import { StoreController } from '../state/storeController.js';
 import { Icons } from './Icons.js';
 import './primitives/AlbumArt.js';
+import type { BrowseMediaNode } from '../types.js';
 
 const SUBTABS = [
   { id: 'playlists', label: 'Playlists' },
@@ -32,10 +33,24 @@ export class BrowseTab extends LitElement {
   @property({ attribute: false }) store!: Store;
 
   private _ctrl?: StoreController;
+  private _kickedOffRoot = false;
 
   protected willUpdate(changed: PropertyValues): void {
     if (changed.has('store') && this.store && !this._ctrl) {
       this._ctrl = new StoreController(this, this.store);
+    }
+  }
+
+  protected updated(): void {
+    // On first hass-mode render with an empty stack, fetch the root.
+    if (
+      this.store?.isHassMode &&
+      !this._kickedOffRoot &&
+      this.store.hassBrowseStack.length === 0 &&
+      !this.store.hassBrowseLoading
+    ) {
+      this._kickedOffRoot = true;
+      void this.store.browseRoot();
     }
   }
 
@@ -359,11 +374,158 @@ export class BrowseTab extends LitElement {
       color: var(--hf-accent-text);
       border: 0;
     }
+    .hass-loading,
+    .hass-error,
+    .hass-empty {
+      padding: 40px 14px;
+      text-align: center;
+      color: var(--hf-text-dim);
+      font-size: 13px;
+    }
+    .hass-error {
+      color: #e0413a;
+    }
   `;
 
   protected render() {
     if (!this.store) return html``;
+    if (this.store.isHassMode) return this._renderHass();
     return html`${this._renderCrumbs()} ${this._renderBody()}`;
+  }
+
+  // ── hass-mode rendering ──────────────────────────────────────────────────
+
+  private _renderHass(): TemplateResult {
+    const stack = this.store.hassBrowseStack;
+    const current = stack[stack.length - 1];
+    return html`
+      ${this._renderHassCrumbs(stack)}
+      ${this.store.hassBrowseError
+        ? html`<div class="hass-error">${this.store.hassBrowseError}</div>`
+        : this.store.hassBrowseLoading && !current
+          ? html`<div class="hass-loading">Loading library…</div>`
+          : current
+            ? this._renderHassNode(current)
+            : html`<div class="hass-empty">No library available</div>`}
+    `;
+  }
+
+  private _renderHassCrumbs(stack: BrowseMediaNode[]): TemplateResult {
+    if (stack.length === 0) return html``;
+    return html`
+      <div class="crumbs">
+        ${stack.map((node, i) => {
+          const current = i === stack.length - 1;
+          const label = i === 0 ? 'Sources' : node.title;
+          return html`
+            <button
+              class="crumb-btn"
+              data-current=${current}
+              @click=${() => this.store.browsePop(i)}
+            >
+              ${label}
+            </button>
+            ${i < stack.length - 1
+              ? html`<span aria-hidden="true">${Icons.chev({ size: 11 })}</span>`
+              : ''}
+          `;
+        })}
+      </div>
+    `;
+  }
+
+  private _renderHassNode(node: BrowseMediaNode): TemplateResult {
+    const children = node.children ?? [];
+    if (children.length === 0) {
+      return html`<div class="hass-empty">No items</div>`;
+    }
+    // Decide layout: grid for albums/playlists, list for everything else.
+    const usesGrid = children.every(
+      (c) =>
+        c.media_class === 'album' ||
+        c.media_class === 'playlist' ||
+        c.media_class === 'directory',
+    ) && children.some((c) => c.thumbnail);
+    return html`
+      <div class="body">
+        ${usesGrid ? this._renderHassGrid(children) : this._renderHassList(children)}
+      </div>
+    `;
+  }
+
+  private _renderHassGrid(children: BrowseMediaNode[]): TemplateResult {
+    return html`
+      <div class="grid2">
+        ${children.map(
+          (c) => html`
+            <button class="art-tile" @click=${() => this._onHassChildClick(c)}>
+              <hf-album-art
+                .obj=${null}
+                .imageUrl=${c.thumbnail ?? undefined}
+                size="100%"
+                radius="8"
+                style="aspect-ratio:1/1; width:100%"
+              ></hf-album-art>
+              <div>
+                <div class="art-tile-name">${c.title}</div>
+                <div class="art-tile-sub">${c.media_class}</div>
+              </div>
+            </button>
+          `,
+        )}
+      </div>
+    `;
+  }
+
+  private _renderHassList(children: BrowseMediaNode[]): TemplateResult {
+    return html`
+      <div>
+        ${children.map(
+          (c) => html`
+            <button class="track-row" @click=${() => this._onHassChildClick(c)}>
+              ${c.thumbnail
+                ? html`<hf-album-art
+                    .obj=${null}
+                    .imageUrl=${c.thumbnail}
+                    size="36"
+                    radius="6"
+                  ></hf-album-art>`
+                : html`<div
+                    style="width:36px;height:36px;border-radius:6px;background:var(--hf-input);display:grid;place-items:center;color:var(--hf-text-dim);flex:none"
+                  >
+                    ${this._iconForClass(c.media_class)}
+                  </div>`}
+              <div class="track-meta">
+                <div class="track-name">${c.title}</div>
+                <div class="track-sub">${c.media_class}</div>
+              </div>
+              ${c.can_expand
+                ? Icons.chev({ size: 14 })
+                : c.can_play
+                  ? Icons.play({ size: 14 })
+                  : ''}
+            </button>
+          `,
+        )}
+      </div>
+    `;
+  }
+
+  private _onHassChildClick(node: BrowseMediaNode): void {
+    if (node.can_expand) {
+      void this.store.browseInto(node);
+    } else if (node.can_play) {
+      this.store.playBrowseNode(node, 'replace');
+    }
+  }
+
+  private _iconForClass(cls: string): TemplateResult {
+    if (cls === 'track' || cls === 'music') return Icons.note({ size: 16 });
+    if (cls === 'album') return Icons.album({ size: 16 });
+    if (cls === 'artist') return Icons.artist({ size: 16 });
+    if (cls === 'playlist') return Icons.list({ size: 16 });
+    if (cls === 'radio') return Icons.radio({ size: 16 });
+    return Icons.home({ size: 16 });
   }
 
   private _renderCrumbs(): TemplateResult {

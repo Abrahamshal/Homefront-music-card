@@ -4,7 +4,13 @@ import {
   type MockSpeaker,
   type Track,
 } from './mockData.js';
-import type { HomeAssistant, HomefrontCardConfig, ZoneConfig } from '../types.js';
+import type {
+  BrowseMediaNode,
+  HomeAssistant,
+  HomefrontCardConfig,
+  QueueItem,
+  ZoneConfig,
+} from '../types.js';
 import { discoverZonesWithDiagnostics } from './zoneDiscovery.js';
 import {
   deriveSpeakers,
@@ -129,6 +135,24 @@ export class Store extends EventTarget {
   private _isHassMode = false;
   /** Last discovery diagnostic for the debug overlay. */
   diagnosticNotes: string[] = [];
+
+  // ── hass-mode browse state ───────────────────────────────────────────────
+
+  /** Stack of fetched browse nodes; last entry is the current view. */
+  hassBrowseStack: BrowseMediaNode[] = [];
+  hassBrowseLoading = false;
+  hassBrowseError: string | null = null;
+  /** Cache of fetched nodes keyed by media_content_id. */
+  private _browseCache = new Map<string, BrowseMediaNode>();
+
+  // ── hass-mode queue state ────────────────────────────────────────────────
+
+  /** Queue items per leader's MA entity. Lazy-loaded on Queue tab open. */
+  hassQueue: QueueItem[] = [];
+  hassQueueLoading = false;
+  hassQueueError: string | null = null;
+  /** Which leadId the current hassQueue belongs to (for invalidation). */
+  private _hassQueueLeadId: string | null = null;
 
   constructor() {
     super();
@@ -367,6 +391,252 @@ export class Store extends EventTarget {
   /** Resolve the MA entity ID for a given group leader, or undefined. */
   private _maFor(leadId: string): string | undefined {
     return this._zones.find((z) => z.wiim === leadId)?.ma;
+  }
+
+  /**
+   * Call a HA service that returns response data (e.g.
+   * `mass_queue.get_queue_items`). Uses the raw `call_service` WS frame
+   * with `return_response: true` since `hass.callService` doesn't
+   * surface the response payload.
+   */
+  private async _callServiceWithResponse<T = unknown>(
+    domain: string,
+    service: string,
+    data: Record<string, unknown> = {},
+    target: { entity_id?: string | string[] } = {},
+  ): Promise<T | undefined> {
+    if (!this._isHassMode || !this._hass) return undefined;
+    try {
+      const result = await this._hass.callWS<{ response: T }>({
+        type: 'call_service',
+        domain,
+        service,
+        service_data: data,
+        target,
+        return_response: true,
+      });
+      return result?.response;
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[homefront-music-card] ${domain}.${service} (with response) failed:`,
+        err,
+      );
+      return undefined;
+    }
+  }
+
+  // ── browse (hass-mode) ───────────────────────────────────────────────────
+
+  /** Fetch the MA browse root for the active leader and reset the stack. */
+  async browseRoot(): Promise<void> {
+    if (!this._isHassMode || !this._hass) return;
+    const ma = this._maFor(this.activeLeadId);
+    if (!ma) return;
+    this.hassBrowseLoading = true;
+    this.hassBrowseError = null;
+    this._emit();
+    try {
+      const root = await this._hass.callWS<BrowseMediaNode>({
+        type: 'media_player/browse_media',
+        entity_id: ma,
+      });
+      // Per architecture: bypass the merged "Library" view at the root.
+      const filteredChildren = root.children?.filter(
+        (c) => c.title.toLowerCase() !== 'library',
+      );
+      const rootWithFiltered = { ...root, children: filteredChildren };
+      this._browseCache.clear();
+      this._browseCache.set(root.media_content_id || '__root__', rootWithFiltered);
+      this.hassBrowseStack = [rootWithFiltered];
+    } catch (err) {
+      this.hassBrowseError = String(err);
+      // eslint-disable-next-line no-console
+      console.warn('[homefront-music-card] browse_media root failed:', err);
+    } finally {
+      this.hassBrowseLoading = false;
+      this._emit();
+    }
+  }
+
+  /** Drill into a child node (push it onto the stack). */
+  async browseInto(node: BrowseMediaNode): Promise<void> {
+    if (!this._isHassMode || !this._hass) return;
+    const ma = this._maFor(this.activeLeadId);
+    if (!ma) return;
+    const cached = this._browseCache.get(node.media_content_id);
+    if (cached && cached.children) {
+      this.hassBrowseStack = [...this.hassBrowseStack, cached];
+      this._emit();
+      return;
+    }
+    this.hassBrowseLoading = true;
+    this.hassBrowseError = null;
+    this._emit();
+    try {
+      const fetched = await this._hass.callWS<BrowseMediaNode>({
+        type: 'media_player/browse_media',
+        entity_id: ma,
+        media_content_type: node.media_content_type,
+        media_content_id: node.media_content_id,
+      });
+      this._browseCache.set(node.media_content_id, fetched);
+      this.hassBrowseStack = [...this.hassBrowseStack, fetched];
+    } catch (err) {
+      this.hassBrowseError = String(err);
+      // eslint-disable-next-line no-console
+      console.warn('[homefront-music-card] browse_media drill failed:', err);
+    } finally {
+      this.hassBrowseLoading = false;
+      this._emit();
+    }
+  }
+
+  /** Pop the browse stack back to a specific depth. */
+  browsePop(toDepth: number): void {
+    this.hassBrowseStack = this.hassBrowseStack.slice(0, toDepth + 1);
+    this._emit();
+  }
+
+  /**
+   * Play a browse leaf via `music_assistant.play_media`. Targets the
+   * active group leader's MA entity, per architecture.
+   */
+  playBrowseNode(
+    node: BrowseMediaNode,
+    enqueue: 'replace' | 'add' | 'next' | 'replace_next' = 'replace',
+  ): void {
+    if (!this._isHassMode) return;
+    const ma = this._maFor(this.activeLeadId);
+    if (!ma) return;
+    this._callService(
+      'music_assistant',
+      'play_media',
+      {
+        media_id: node.media_content_id,
+        media_type: node.media_content_type,
+        enqueue,
+        radio_mode: false,
+      },
+      { entity_id: ma },
+    );
+  }
+
+  // ── queue (hass-mode) ────────────────────────────────────────────────────
+
+  /**
+   * Fetch the current MA queue for the active leader via
+   * `mass_queue.get_queue_items` (with response). Called when the Queue
+   * tab opens or after a mutating action.
+   */
+  async loadQueue(): Promise<void> {
+    if (!this._isHassMode) return;
+    const ma = this._maFor(this.activeLeadId);
+    if (!ma) return;
+    this.hassQueueLoading = true;
+    this.hassQueueError = null;
+    this._emit();
+    const response = await this._callServiceWithResponse<{ queue_items?: QueueItem[] } | QueueItem[]>(
+      'mass_queue',
+      'get_queue_items',
+      {},
+      { entity_id: ma },
+    );
+    // Response shape varies between versions: sometimes the array is at
+    // the top level, sometimes under `queue_items`.
+    let items: QueueItem[] = [];
+    if (Array.isArray(response)) {
+      items = response;
+    } else if (response && Array.isArray((response as { queue_items?: QueueItem[] }).queue_items)) {
+      items = (response as { queue_items: QueueItem[] }).queue_items;
+    } else if (response && typeof response === 'object') {
+      // Try generic key search — first array value
+      for (const v of Object.values(response)) {
+        if (Array.isArray(v)) {
+          items = v as QueueItem[];
+          break;
+        }
+      }
+    }
+    this.hassQueue = items;
+    this._hassQueueLeadId = this.activeLeadId;
+    this.hassQueueLoading = false;
+    this._emit();
+  }
+
+  /** Whether the loaded queue belongs to the current active lead. */
+  get hassQueueIsFresh(): boolean {
+    return this._hassQueueLeadId === this.activeLeadId;
+  }
+
+  /** Play a queue item by ID. */
+  playQueueItem(queueItemId: string): void {
+    const ma = this._maFor(this.activeLeadId);
+    if (!ma) return;
+    this._callService(
+      'mass_queue',
+      'play_queue_item',
+      { queue_item_id: queueItemId },
+      { entity_id: ma },
+    );
+    // Optimistic refresh after a beat so the now-playing reflects.
+    window.setTimeout(() => void this.loadQueue(), 400);
+  }
+
+  /** Remove a queue item by ID. */
+  removeQueueItem(queueItemId: string): void {
+    const ma = this._maFor(this.activeLeadId);
+    if (!ma) return;
+    this._callService(
+      'mass_queue',
+      'remove_queue_item',
+      { queue_item_id: queueItemId },
+      { entity_id: ma },
+    );
+    // Optimistic local removal so UI updates instantly; reload to confirm.
+    this.hassQueue = this.hassQueue.filter((q) => q.queue_item_id !== queueItemId);
+    this._emit();
+    window.setTimeout(() => void this.loadQueue(), 400);
+  }
+
+  /** Bulk remove. */
+  removeQueueItems(queueItemIds: Set<string>): void {
+    const ma = this._maFor(this.activeLeadId);
+    if (!ma) return;
+    for (const id of queueItemIds) {
+      this._callService(
+        'mass_queue',
+        'remove_queue_item',
+        { queue_item_id: id },
+        { entity_id: ma },
+      );
+    }
+    this.hassQueue = this.hassQueue.filter((q) => !queueItemIds.has(q.queue_item_id));
+    this.selectedTracks = new Set();
+    this.multiMode = false;
+    this._emit();
+    window.setTimeout(() => void this.loadQueue(), 600);
+  }
+
+  /** Clear all items after the current one. */
+  clearQueueFromHere(): void {
+    const ma = this._maFor(this.activeLeadId);
+    if (!ma) return;
+    this._callService('mass_queue', 'clear_queue_from_here', {}, { entity_id: ma });
+    window.setTimeout(() => void this.loadQueue(), 400);
+  }
+
+  /** Move a single item to play next (top of upcoming). */
+  moveQueueItemToTop(queueItemId: string): void {
+    const ma = this._maFor(this.activeLeadId);
+    if (!ma) return;
+    this._callService(
+      'mass_queue',
+      'move_queue_item_next',
+      { queue_item_id: queueItemId },
+      { entity_id: ma },
+    );
+    window.setTimeout(() => void this.loadQueue(), 400);
   }
 
   // ── tab ──────────────────────────────────────────────────────────────────

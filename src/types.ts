@@ -98,3 +98,26 @@ export interface BrowseMediaNode {
   children?: BrowseMediaNode[];
   children_media_class?: string;
 }
+
+/**
+ * A queue item returned by `mass_queue.get_queue_items`. Field names
+ * follow the droans/mass_queue integration — verify against the live
+ * response shape; some fields may be optional or named differently
+ * across versions.
+ */
+export interface QueueItem {
+  queue_item_id: string;
+  name?: string;
+  /** Some versions return `title` instead of `name`. */
+  title?: string;
+  artist?: string;
+  album?: string;
+  /** Seconds. Some versions use `duration_seconds`. */
+  duration?: number;
+  duration_seconds?: number;
+  /** URL of the cover art, when available. */
+  image_url?: string;
+  thumbnail?: string;
+  /** Whether this item is the currently-playing one. */
+  is_current?: boolean;
+}

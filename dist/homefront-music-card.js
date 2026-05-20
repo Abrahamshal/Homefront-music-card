@@ -1,51 +1,51 @@
-function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPropertyDescriptor(e,r):s;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)n=Reflect.decorate(t,e,r,s);else for(var l=t.length-1;l>=0;l--)(a=t[l])&&(n=(o<3?a(n):o>3?a(e,r,n):a(e,r))||n);return o>3&&n&&Object.defineProperty(e,r,n),n}"function"==typeof SuppressedError&&SuppressedError;const e=globalThis,r=e.ShadowRoot&&(void 0===e.ShadyCSS||e.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,s=Symbol(),a=new WeakMap;let o=class{constructor(t,e,r){if(this._$cssResult$=!0,r!==s)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t,this.t=e}get styleSheet(){let t=this.o;const e=this.t;if(r&&void 0===t){const r=void 0!==e&&1===e.length;r&&(t=a.get(e)),void 0===t&&((this.o=t=new CSSStyleSheet).replaceSync(this.cssText),r&&a.set(e,t))}return t}toString(){return this.cssText}};const n=t=>new o("string"==typeof t?t:t+"",void 0,s),l=(t,...e)=>{const r=1===t.length?t[0]:e.reduce((e,r,s)=>e+(t=>{if(!0===t._$cssResult$)return t.cssText;if("number"==typeof t)return t;throw Error("Value passed to 'css' function must be a 'css' function result: "+t+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(r)+t[s+1],t[0]);return new o(r,t,s)},d=r?t=>t:t=>t instanceof CSSStyleSheet?(t=>{let e="";for(const r of t.cssRules)e+=r.cssText;return n(e)})(t):t,{is:c,defineProperty:h,getOwnPropertyDescriptor:p,getOwnPropertyNames:u,getOwnPropertySymbols:f,getPrototypeOf:m}=Object,v=globalThis,g=v.trustedTypes,b=g?g.emptyScript:"",x=v.reactiveElementPolyfillSupport,y=(t,e)=>t,$={toAttribute(t,e){switch(e){case Boolean:t=t?b:null;break;case Object:case Array:t=null==t?t:JSON.stringify(t)}return t},fromAttribute(t,e){let r=t;switch(e){case Boolean:r=null!==t;break;case Number:r=null===t?null:Number(t);break;case Object:case Array:try{r=JSON.parse(t)}catch(t){r=null}}return r}},w=(t,e)=>!c(t,e),_={attribute:!0,type:String,converter:$,reflect:!1,useDefault:!1,hasChanged:w};Symbol.metadata??=Symbol("metadata"),v.litPropertyMetadata??=new WeakMap;let A=class extends HTMLElement{static addInitializer(t){this._$Ei(),(this.l??=[]).push(t)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(t,e=_){if(e.state&&(e.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(t)&&((e=Object.create(e)).wrapped=!0),this.elementProperties.set(t,e),!e.noAccessor){const r=Symbol(),s=this.getPropertyDescriptor(t,r,e);void 0!==s&&h(this.prototype,t,s)}}static getPropertyDescriptor(t,e,r){const{get:s,set:a}=p(this.prototype,t)??{get(){return this[e]},set(t){this[e]=t}};return{get:s,set(e){const o=s?.call(this);a?.call(this,e),this.requestUpdate(t,o,r)},configurable:!0,enumerable:!0}}static getPropertyOptions(t){return this.elementProperties.get(t)??_}static _$Ei(){if(this.hasOwnProperty(y("elementProperties")))return;const t=m(this);t.finalize(),void 0!==t.l&&(this.l=[...t.l]),this.elementProperties=new Map(t.elementProperties)}static finalize(){if(this.hasOwnProperty(y("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(y("properties"))){const t=this.properties,e=[...u(t),...f(t)];for(const r of e)this.createProperty(r,t[r])}const t=this[Symbol.metadata];if(null!==t){const e=litPropertyMetadata.get(t);if(void 0!==e)for(const[t,r]of e)this.elementProperties.set(t,r)}this._$Eh=new Map;for(const[t,e]of this.elementProperties){const r=this._$Eu(t,e);void 0!==r&&this._$Eh.set(r,t)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(t){const e=[];if(Array.isArray(t)){const r=new Set(t.flat(1/0).reverse());for(const t of r)e.unshift(d(t))}else void 0!==t&&e.push(d(t));return e}static _$Eu(t,e){const r=e.attribute;return!1===r?void 0:"string"==typeof r?r:"string"==typeof t?t.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(t=>this.enableUpdating=t),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(t=>t(this))}addController(t){(this._$EO??=new Set).add(t),void 0!==this.renderRoot&&this.isConnected&&t.hostConnected?.()}removeController(t){this._$EO?.delete(t)}_$E_(){const t=new Map,e=this.constructor.elementProperties;for(const r of e.keys())this.hasOwnProperty(r)&&(t.set(r,this[r]),delete this[r]);t.size>0&&(this._$Ep=t)}createRenderRoot(){const t=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return((t,s)=>{if(r)t.adoptedStyleSheets=s.map(t=>t instanceof CSSStyleSheet?t:t.styleSheet);else for(const r of s){const s=document.createElement("style"),a=e.litNonce;void 0!==a&&s.setAttribute("nonce",a),s.textContent=r.cssText,t.appendChild(s)}})(t,this.constructor.elementStyles),t}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach(t=>t.hostConnected?.())}enableUpdating(t){}disconnectedCallback(){this._$EO?.forEach(t=>t.hostDisconnected?.())}attributeChangedCallback(t,e,r){this._$AK(t,r)}_$ET(t,e){const r=this.constructor.elementProperties.get(t),s=this.constructor._$Eu(t,r);if(void 0!==s&&!0===r.reflect){const a=(void 0!==r.converter?.toAttribute?r.converter:$).toAttribute(e,r.type);this._$Em=t,null==a?this.removeAttribute(s):this.setAttribute(s,a),this._$Em=null}}_$AK(t,e){const r=this.constructor,s=r._$Eh.get(t);if(void 0!==s&&this._$Em!==s){const t=r.getPropertyOptions(s),a="function"==typeof t.converter?{fromAttribute:t.converter}:void 0!==t.converter?.fromAttribute?t.converter:$;this._$Em=s;const o=a.fromAttribute(e,t.type);this[s]=o??this._$Ej?.get(s)??o,this._$Em=null}}requestUpdate(t,e,r,s=!1,a){if(void 0!==t){const o=this.constructor;if(!1===s&&(a=this[t]),r??=o.getPropertyOptions(t),!((r.hasChanged??w)(a,e)||r.useDefault&&r.reflect&&a===this._$Ej?.get(t)&&!this.hasAttribute(o._$Eu(t,r))))return;this.C(t,e,r)}!1===this.isUpdatePending&&(this._$ES=this._$EP())}C(t,e,{useDefault:r,reflect:s,wrapped:a},o){r&&!(this._$Ej??=new Map).has(t)&&(this._$Ej.set(t,o??e??this[t]),!0!==a||void 0!==o)||(this._$AL.has(t)||(this.hasUpdated||r||(e=void 0),this._$AL.set(t,e)),!0===s&&this._$Em!==t&&(this._$Eq??=new Set).add(t))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(t){Promise.reject(t)}const t=this.scheduleUpdate();return null!=t&&await t,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[t,e]of this._$Ep)this[t]=e;this._$Ep=void 0}const t=this.constructor.elementProperties;if(t.size>0)for(const[e,r]of t){const{wrapped:t}=r,s=this[e];!0!==t||this._$AL.has(e)||void 0===s||this.C(e,void 0,r,s)}}let t=!1;const e=this._$AL;try{t=this.shouldUpdate(e),t?(this.willUpdate(e),this._$EO?.forEach(t=>t.hostUpdate?.()),this.update(e)):this._$EM()}catch(e){throw t=!1,this._$EM(),e}t&&this._$AE(e)}willUpdate(t){}_$AE(t){this._$EO?.forEach(t=>t.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(t)),this.updated(t)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(t){return!0}update(t){this._$Eq&&=this._$Eq.forEach(t=>this._$ET(t,this[t])),this._$EM()}updated(t){}firstUpdated(t){}};A.elementStyles=[],A.shadowRootOptions={mode:"open"},A[y("elementProperties")]=new Map,A[y("finalized")]=new Map,x?.({ReactiveElement:A}),(v.reactiveElementVersions??=[]).push("2.1.2");const M=globalThis,C=t=>t,P=M.trustedTypes,E=P?P.createPolicy("lit-html",{createHTML:t=>t}):void 0,T="$lit$",U=`lit$${Math.random().toFixed(9).slice(2)}$`,O="?"+U,q=`<${O}>`,B=document,j=()=>B.createComment(""),D=t=>null===t||"object"!=typeof t&&"function"!=typeof t,N=Array.isArray,F="[ \t\n\f\r]",G=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,W=/-->/g,Q=/>/g,V=RegExp(`>|${F}(?:([^\\s"'>=/]+)(${F}*=${F}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),Y=/'/g,K=/"/g,J=/^(?:script|style|textarea|title)$/i,X=(t=>(e,...r)=>({_$litType$:t,strings:e,values:r}))(1),tt=Symbol.for("lit-noChange"),et=Symbol.for("lit-nothing"),it=new WeakMap,rt=B.createTreeWalker(B,129);function st(t,e){if(!N(t)||!t.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==E?E.createHTML(e):e}const at=(t,e)=>{const r=t.length-1,s=[];let a,o=2===e?"<svg>":3===e?"<math>":"",n=G;for(let e=0;e<r;e++){const r=t[e];let l,d,c=-1,h=0;for(;h<r.length&&(n.lastIndex=h,d=n.exec(r),null!==d);)h=n.lastIndex,n===G?"!--"===d[1]?n=W:void 0!==d[1]?n=Q:void 0!==d[2]?(J.test(d[2])&&(a=RegExp("</"+d[2],"g")),n=V):void 0!==d[3]&&(n=V):n===V?">"===d[0]?(n=a??G,c=-1):void 0===d[1]?c=-2:(c=n.lastIndex-d[2].length,l=d[1],n=void 0===d[3]?V:'"'===d[3]?K:Y):n===K||n===Y?n=V:n===W||n===Q?n=G:(n=V,a=void 0);const p=n===V&&t[e+1].startsWith("/>")?" ":"";o+=n===G?r+q:c>=0?(s.push(l),r.slice(0,c)+T+r.slice(c)+U+p):r+U+(-2===c?e:p)}return[st(t,o+(t[r]||"<?>")+(2===e?"</svg>":3===e?"</math>":"")),s]};class S{constructor({strings:t,_$litType$:e},r){let s;this.parts=[];let a=0,o=0;const n=t.length-1,l=this.parts,[d,c]=at(t,e);if(this.el=S.createElement(d,r),rt.currentNode=this.el.content,2===e||3===e){const t=this.el.content.firstChild;t.replaceWith(...t.childNodes)}for(;null!==(s=rt.nextNode())&&l.length<n;){if(1===s.nodeType){if(s.hasAttributes())for(const t of s.getAttributeNames())if(t.endsWith(T)){const e=c[o++],r=s.getAttribute(t).split(U),n=/([.?@])?(.*)/.exec(e);l.push({type:1,index:a,name:n[2],strings:r,ctor:"."===n[1]?I:"?"===n[1]?L:"@"===n[1]?z:H}),s.removeAttribute(t)}else t.startsWith(U)&&(l.push({type:6,index:a}),s.removeAttribute(t));if(J.test(s.tagName)){const t=s.textContent.split(U),e=t.length-1;if(e>0){s.textContent=P?P.emptyScript:"";for(let r=0;r<e;r++)s.append(t[r],j()),rt.nextNode(),l.push({type:2,index:++a});s.append(t[e],j())}}}else if(8===s.nodeType)if(s.data===O)l.push({type:2,index:a});else{let t=-1;for(;-1!==(t=s.data.indexOf(U,t+1));)l.push({type:7,index:a}),t+=U.length-1}a++}}static createElement(t,e){const r=B.createElement("template");return r.innerHTML=t,r}}function ot(t,e,r=t,s){if(e===tt)return e;let a=void 0!==s?r._$Co?.[s]:r._$Cl;const o=D(e)?void 0:e._$litDirective$;return a?.constructor!==o&&(a?._$AO?.(!1),void 0===o?a=void 0:(a=new o(t),a._$AT(t,r,s)),void 0!==s?(r._$Co??=[])[s]=a:r._$Cl=a),void 0!==a&&(e=ot(t,a._$AS(t,e.values),a,s)),e}class R{constructor(t,e){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=e}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){const{el:{content:e},parts:r}=this._$AD,s=(t?.creationScope??B).importNode(e,!0);rt.currentNode=s;let a=rt.nextNode(),o=0,n=0,l=r[0];for(;void 0!==l;){if(o===l.index){let e;2===l.type?e=new k(a,a.nextSibling,this,t):1===l.type?e=new l.ctor(a,l.name,l.strings,this,t):6===l.type&&(e=new Z(a,this,t)),this._$AV.push(e),l=r[++n]}o!==l?.index&&(a=rt.nextNode(),o++)}return rt.currentNode=B,s}p(t){let e=0;for(const r of this._$AV)void 0!==r&&(void 0!==r.strings?(r._$AI(t,r,e),e+=r.strings.length-2):r._$AI(t[e])),e++}}class k{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(t,e,r,s){this.type=2,this._$AH=et,this._$AN=void 0,this._$AA=t,this._$AB=e,this._$AM=r,this.options=s,this._$Cv=s?.isConnected??!0}get parentNode(){let t=this._$AA.parentNode;const e=this._$AM;return void 0!==e&&11===t?.nodeType&&(t=e.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,e=this){t=ot(this,t,e),D(t)?t===et||null==t||""===t?(this._$AH!==et&&this._$AR(),this._$AH=et):t!==this._$AH&&t!==tt&&this._(t):void 0!==t._$litType$?this.$(t):void 0!==t.nodeType?this.T(t):(t=>N(t)||"function"==typeof t?.[Symbol.iterator])(t)?this.k(t):this._(t)}O(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}T(t){this._$AH!==t&&(this._$AR(),this._$AH=this.O(t))}_(t){this._$AH!==et&&D(this._$AH)?this._$AA.nextSibling.data=t:this.T(B.createTextNode(t)),this._$AH=t}$(t){const{values:e,_$litType$:r}=t,s="number"==typeof r?this._$AC(t):(void 0===r.el&&(r.el=S.createElement(st(r.h,r.h[0]),this.options)),r);if(this._$AH?._$AD===s)this._$AH.p(e);else{const t=new R(s,this),r=t.u(this.options);t.p(e),this.T(r),this._$AH=t}}_$AC(t){let e=it.get(t.strings);return void 0===e&&it.set(t.strings,e=new S(t)),e}k(t){N(this._$AH)||(this._$AH=[],this._$AR());const e=this._$AH;let r,s=0;for(const a of t)s===e.length?e.push(r=new k(this.O(j()),this.O(j()),this,this.options)):r=e[s],r._$AI(a),s++;s<e.length&&(this._$AR(r&&r._$AB.nextSibling,s),e.length=s)}_$AR(t=this._$AA.nextSibling,e){for(this._$AP?.(!1,!0,e);t!==this._$AB;){const e=C(t).nextSibling;C(t).remove(),t=e}}setConnected(t){void 0===this._$AM&&(this._$Cv=t,this._$AP?.(t))}}class H{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(t,e,r,s,a){this.type=1,this._$AH=et,this._$AN=void 0,this.element=t,this.name=e,this._$AM=s,this.options=a,r.length>2||""!==r[0]||""!==r[1]?(this._$AH=Array(r.length-1).fill(new String),this.strings=r):this._$AH=et}_$AI(t,e=this,r,s){const a=this.strings;let o=!1;if(void 0===a)t=ot(this,t,e,0),o=!D(t)||t!==this._$AH&&t!==tt,o&&(this._$AH=t);else{const s=t;let n,l;for(t=a[0],n=0;n<a.length-1;n++)l=ot(this,s[r+n],e,n),l===tt&&(l=this._$AH[n]),o||=!D(l)||l!==this._$AH[n],l===et?t=et:t!==et&&(t+=(l??"")+a[n+1]),this._$AH[n]=l}o&&!s&&this.j(t)}j(t){t===et?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,t??"")}}class I extends H{constructor(){super(...arguments),this.type=3}j(t){this.element[this.name]=t===et?void 0:t}}class L extends H{constructor(){super(...arguments),this.type=4}j(t){this.element.toggleAttribute(this.name,!!t&&t!==et)}}class z extends H{constructor(t,e,r,s,a){super(t,e,r,s,a),this.type=5}_$AI(t,e=this){if((t=ot(this,t,e,0)??et)===tt)return;const r=this._$AH,s=t===et&&r!==et||t.capture!==r.capture||t.once!==r.once||t.passive!==r.passive,a=t!==et&&(r===et||s);s&&this.element.removeEventListener(this.name,this,r),a&&this.element.addEventListener(this.name,this,t),this._$AH=t}handleEvent(t){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,t):this._$AH.handleEvent(t)}}class Z{constructor(t,e,r){this.element=t,this.type=6,this._$AN=void 0,this._$AM=e,this.options=r}get _$AU(){return this._$AM._$AU}_$AI(t){ot(this,t)}}const nt=M.litHtmlPolyfillSupport;nt?.(S,k),(M.litHtmlVersions??=[]).push("3.3.3");const lt=globalThis;class i extends A{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){const t=super.createRenderRoot();return this.renderOptions.renderBefore??=t.firstChild,t}update(t){const e=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Do=((t,e,r)=>{const s=r?.renderBefore??e;let a=s._$litPart$;if(void 0===a){const t=r?.renderBefore??null;s._$litPart$=a=new k(e.insertBefore(j(),t),t,void 0,r??{})}return a._$AI(t),a})(e,this.renderRoot,this.renderOptions)}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(!0)}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(!1)}render(){return tt}}i._$litElement$=!0,i.finalized=!0,lt.litElementHydrateSupport?.({LitElement:i});const dt=lt.litElementPolyfillSupport;dt?.({LitElement:i}),(lt.litElementVersions??=[]).push("4.2.2");const ct=t=>(e,r)=>{void 0!==r?r.addInitializer(()=>{customElements.define(t,e)}):customElements.define(t,e)},ht={attribute:!0,type:String,converter:$,reflect:!1,hasChanged:w},pt=(t=ht,e,r)=>{const{kind:s,metadata:a}=r;let o=globalThis.litPropertyMetadata.get(a);if(void 0===o&&globalThis.litPropertyMetadata.set(a,o=new Map),"setter"===s&&((t=Object.create(t)).wrapped=!0),o.set(r.name,t),"accessor"===s){const{name:s}=r;return{set(r){const a=e.get.call(this);e.set.call(this,r),this.requestUpdate(s,a,t,!0,r)},init(e){return void 0!==e&&this.C(s,void 0,t,e),e}}}if("setter"===s){const{name:s}=r;return function(r){const a=this[s];e.call(this,r),this.requestUpdate(s,a,t,!0,r)}}throw Error("Unsupported decorator location: "+s)};function ut(t){return(e,r)=>"object"==typeof r?pt(t,e,r):((t,e,r)=>{const s=e.hasOwnProperty(r);return e.constructor.createProperty(r,t),s?Object.getOwnPropertyDescriptor(e,r):void 0})(t,e,r)}function ft(t){return ut({...t,state:!0,attribute:!1})}const mt="#1d2026",vt="#23272f",gt="#ecedef",bt="rgba(236,237,239,0.55)",xt="rgba(255,255,255,0.07)",yt="rgba(255,255,255,0.16)",$t="rgba(255,255,255,0.05)",wt="#e08a4a",_t="#1b0f06",kt="rgba(255,255,255,0.12)",zt="rgba(255,255,255,0.04)",At="rgba(224,138,74,0.12)",St="14px",Mt=l`
+function e(e,t,s,r){var a,o=arguments.length,n=o<3?t:null===r?r=Object.getOwnPropertyDescriptor(t,s):r;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)n=Reflect.decorate(e,t,s,r);else for(var l=e.length-1;l>=0;l--)(a=e[l])&&(n=(o<3?a(n):o>3?a(t,s,n):a(t,s))||n);return o>3&&n&&Object.defineProperty(t,s,n),n}"function"==typeof SuppressedError&&SuppressedError;const t=globalThis,s=t.ShadowRoot&&(void 0===t.ShadyCSS||t.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,r=Symbol(),a=new WeakMap;let o=class{constructor(e,t,s){if(this._$cssResult$=!0,s!==r)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=e,this.t=t}get styleSheet(){let e=this.o;const t=this.t;if(s&&void 0===e){const s=void 0!==t&&1===t.length;s&&(e=a.get(t)),void 0===e&&((this.o=e=new CSSStyleSheet).replaceSync(this.cssText),s&&a.set(t,e))}return e}toString(){return this.cssText}};const n=e=>new o("string"==typeof e?e:e+"",void 0,r),l=(e,...t)=>{const s=1===e.length?e[0]:t.reduce((t,s,r)=>t+(e=>{if(!0===e._$cssResult$)return e.cssText;if("number"==typeof e)return e;throw Error("Value passed to 'css' function must be a 'css' function result: "+e+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(s)+e[r+1],e[0]);return new o(s,e,r)},d=s?e=>e:e=>e instanceof CSSStyleSheet?(e=>{let t="";for(const s of e.cssRules)t+=s.cssText;return n(t)})(e):e,{is:c,defineProperty:h,getOwnPropertyDescriptor:p,getOwnPropertyNames:u,getOwnPropertySymbols:m,getPrototypeOf:f}=Object,v=globalThis,g=v.trustedTypes,b=g?g.emptyScript:"",x=v.reactiveElementPolyfillSupport,y=(e,t)=>e,_={toAttribute(e,t){switch(t){case Boolean:e=e?b:null;break;case Object:case Array:e=null==e?e:JSON.stringify(e)}return e},fromAttribute(e,t){let s=e;switch(t){case Boolean:s=null!==e;break;case Number:s=null===e?null:Number(e);break;case Object:case Array:try{s=JSON.parse(e)}catch(e){s=null}}return s}},w=(e,t)=>!c(e,t),$={attribute:!0,type:String,converter:_,reflect:!1,useDefault:!1,hasChanged:w};Symbol.metadata??=Symbol("metadata"),v.litPropertyMetadata??=new WeakMap;let A=class extends HTMLElement{static addInitializer(e){this._$Ei(),(this.l??=[]).push(e)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(e,t=$){if(t.state&&(t.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(e)&&((t=Object.create(t)).wrapped=!0),this.elementProperties.set(e,t),!t.noAccessor){const s=Symbol(),r=this.getPropertyDescriptor(e,s,t);void 0!==r&&h(this.prototype,e,r)}}static getPropertyDescriptor(e,t,s){const{get:r,set:a}=p(this.prototype,e)??{get(){return this[t]},set(e){this[t]=e}};return{get:r,set(t){const o=r?.call(this);a?.call(this,t),this.requestUpdate(e,o,s)},configurable:!0,enumerable:!0}}static getPropertyOptions(e){return this.elementProperties.get(e)??$}static _$Ei(){if(this.hasOwnProperty(y("elementProperties")))return;const e=f(this);e.finalize(),void 0!==e.l&&(this.l=[...e.l]),this.elementProperties=new Map(e.elementProperties)}static finalize(){if(this.hasOwnProperty(y("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(y("properties"))){const e=this.properties,t=[...u(e),...m(e)];for(const s of t)this.createProperty(s,e[s])}const e=this[Symbol.metadata];if(null!==e){const t=litPropertyMetadata.get(e);if(void 0!==t)for(const[e,s]of t)this.elementProperties.set(e,s)}this._$Eh=new Map;for(const[e,t]of this.elementProperties){const s=this._$Eu(e,t);void 0!==s&&this._$Eh.set(s,e)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(e){const t=[];if(Array.isArray(e)){const s=new Set(e.flat(1/0).reverse());for(const e of s)t.unshift(d(e))}else void 0!==e&&t.push(d(e));return t}static _$Eu(e,t){const s=t.attribute;return!1===s?void 0:"string"==typeof s?s:"string"==typeof e?e.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(e=>this.enableUpdating=e),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(e=>e(this))}addController(e){(this._$EO??=new Set).add(e),void 0!==this.renderRoot&&this.isConnected&&e.hostConnected?.()}removeController(e){this._$EO?.delete(e)}_$E_(){const e=new Map,t=this.constructor.elementProperties;for(const s of t.keys())this.hasOwnProperty(s)&&(e.set(s,this[s]),delete this[s]);e.size>0&&(this._$Ep=e)}createRenderRoot(){const e=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return((e,r)=>{if(s)e.adoptedStyleSheets=r.map(e=>e instanceof CSSStyleSheet?e:e.styleSheet);else for(const s of r){const r=document.createElement("style"),a=t.litNonce;void 0!==a&&r.setAttribute("nonce",a),r.textContent=s.cssText,e.appendChild(r)}})(e,this.constructor.elementStyles),e}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach(e=>e.hostConnected?.())}enableUpdating(e){}disconnectedCallback(){this._$EO?.forEach(e=>e.hostDisconnected?.())}attributeChangedCallback(e,t,s){this._$AK(e,s)}_$ET(e,t){const s=this.constructor.elementProperties.get(e),r=this.constructor._$Eu(e,s);if(void 0!==r&&!0===s.reflect){const a=(void 0!==s.converter?.toAttribute?s.converter:_).toAttribute(t,s.type);this._$Em=e,null==a?this.removeAttribute(r):this.setAttribute(r,a),this._$Em=null}}_$AK(e,t){const s=this.constructor,r=s._$Eh.get(e);if(void 0!==r&&this._$Em!==r){const e=s.getPropertyOptions(r),a="function"==typeof e.converter?{fromAttribute:e.converter}:void 0!==e.converter?.fromAttribute?e.converter:_;this._$Em=r;const o=a.fromAttribute(t,e.type);this[r]=o??this._$Ej?.get(r)??o,this._$Em=null}}requestUpdate(e,t,s,r=!1,a){if(void 0!==e){const o=this.constructor;if(!1===r&&(a=this[e]),s??=o.getPropertyOptions(e),!((s.hasChanged??w)(a,t)||s.useDefault&&s.reflect&&a===this._$Ej?.get(e)&&!this.hasAttribute(o._$Eu(e,s))))return;this.C(e,t,s)}!1===this.isUpdatePending&&(this._$ES=this._$EP())}C(e,t,{useDefault:s,reflect:r,wrapped:a},o){s&&!(this._$Ej??=new Map).has(e)&&(this._$Ej.set(e,o??t??this[e]),!0!==a||void 0!==o)||(this._$AL.has(e)||(this.hasUpdated||s||(t=void 0),this._$AL.set(e,t)),!0===r&&this._$Em!==e&&(this._$Eq??=new Set).add(e))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(e){Promise.reject(e)}const e=this.scheduleUpdate();return null!=e&&await e,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[e,t]of this._$Ep)this[e]=t;this._$Ep=void 0}const e=this.constructor.elementProperties;if(e.size>0)for(const[t,s]of e){const{wrapped:e}=s,r=this[t];!0!==e||this._$AL.has(t)||void 0===r||this.C(t,void 0,s,r)}}let e=!1;const t=this._$AL;try{e=this.shouldUpdate(t),e?(this.willUpdate(t),this._$EO?.forEach(e=>e.hostUpdate?.()),this.update(t)):this._$EM()}catch(t){throw e=!1,this._$EM(),t}e&&this._$AE(t)}willUpdate(e){}_$AE(e){this._$EO?.forEach(e=>e.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(e)),this.updated(e)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(e){return!0}update(e){this._$Eq&&=this._$Eq.forEach(e=>this._$ET(e,this[e])),this._$EM()}updated(e){}firstUpdated(e){}};A.elementStyles=[],A.shadowRootOptions={mode:"open"},A[y("elementProperties")]=new Map,A[y("finalized")]=new Map,x?.({ReactiveElement:A}),(v.reactiveElementVersions??=[]).push("2.1.2");const M=globalThis,C=e=>e,E=M.trustedTypes,P=E?E.createPolicy("lit-html",{createHTML:e=>e}):void 0,T="$lit$",q=`lit$${Math.random().toFixed(9).slice(2)}$`,B="?"+q,U=`<${B}>`,O=document,j=()=>O.createComment(""),Q=e=>null===e||"object"!=typeof e&&"function"!=typeof e,N=Array.isArray,D="[ \t\n\f\r]",F=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,W=/-->/g,G=/>/g,V=RegExp(`>|${D}(?:([^\\s"'>=/]+)(${D}*=${D}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),K=/'/g,Y=/"/g,J=/^(?:script|style|textarea|title)$/i,X=(e=>(t,...s)=>({_$litType$:e,strings:t,values:s}))(1),ee=Symbol.for("lit-noChange"),te=Symbol.for("lit-nothing"),ie=new WeakMap,se=O.createTreeWalker(O,129);function re(e,t){if(!N(e)||!e.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==P?P.createHTML(t):t}const ae=(e,t)=>{const s=e.length-1,r=[];let a,o=2===t?"<svg>":3===t?"<math>":"",n=F;for(let t=0;t<s;t++){const s=e[t];let l,d,c=-1,h=0;for(;h<s.length&&(n.lastIndex=h,d=n.exec(s),null!==d);)h=n.lastIndex,n===F?"!--"===d[1]?n=W:void 0!==d[1]?n=G:void 0!==d[2]?(J.test(d[2])&&(a=RegExp("</"+d[2],"g")),n=V):void 0!==d[3]&&(n=V):n===V?">"===d[0]?(n=a??F,c=-1):void 0===d[1]?c=-2:(c=n.lastIndex-d[2].length,l=d[1],n=void 0===d[3]?V:'"'===d[3]?Y:K):n===Y||n===K?n=V:n===W||n===G?n=F:(n=V,a=void 0);const p=n===V&&e[t+1].startsWith("/>")?" ":"";o+=n===F?s+U:c>=0?(r.push(l),s.slice(0,c)+T+s.slice(c)+q+p):s+q+(-2===c?t:p)}return[re(e,o+(e[s]||"<?>")+(2===t?"</svg>":3===t?"</math>":"")),r]};class S{constructor({strings:e,_$litType$:t},s){let r;this.parts=[];let a=0,o=0;const n=e.length-1,l=this.parts,[d,c]=ae(e,t);if(this.el=S.createElement(d,s),se.currentNode=this.el.content,2===t||3===t){const e=this.el.content.firstChild;e.replaceWith(...e.childNodes)}for(;null!==(r=se.nextNode())&&l.length<n;){if(1===r.nodeType){if(r.hasAttributes())for(const e of r.getAttributeNames())if(e.endsWith(T)){const t=c[o++],s=r.getAttribute(e).split(q),n=/([.?@])?(.*)/.exec(t);l.push({type:1,index:a,name:n[2],strings:s,ctor:"."===n[1]?I:"?"===n[1]?L:"@"===n[1]?z:H}),r.removeAttribute(e)}else e.startsWith(q)&&(l.push({type:6,index:a}),r.removeAttribute(e));if(J.test(r.tagName)){const e=r.textContent.split(q),t=e.length-1;if(t>0){r.textContent=E?E.emptyScript:"";for(let s=0;s<t;s++)r.append(e[s],j()),se.nextNode(),l.push({type:2,index:++a});r.append(e[t],j())}}}else if(8===r.nodeType)if(r.data===B)l.push({type:2,index:a});else{let e=-1;for(;-1!==(e=r.data.indexOf(q,e+1));)l.push({type:7,index:a}),e+=q.length-1}a++}}static createElement(e,t){const s=O.createElement("template");return s.innerHTML=e,s}}function oe(e,t,s=e,r){if(t===ee)return t;let a=void 0!==r?s._$Co?.[r]:s._$Cl;const o=Q(t)?void 0:t._$litDirective$;return a?.constructor!==o&&(a?._$AO?.(!1),void 0===o?a=void 0:(a=new o(e),a._$AT(e,s,r)),void 0!==r?(s._$Co??=[])[r]=a:s._$Cl=a),void 0!==a&&(t=oe(e,a._$AS(e,t.values),a,r)),t}class R{constructor(e,t){this._$AV=[],this._$AN=void 0,this._$AD=e,this._$AM=t}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(e){const{el:{content:t},parts:s}=this._$AD,r=(e?.creationScope??O).importNode(t,!0);se.currentNode=r;let a=se.nextNode(),o=0,n=0,l=s[0];for(;void 0!==l;){if(o===l.index){let t;2===l.type?t=new k(a,a.nextSibling,this,e):1===l.type?t=new l.ctor(a,l.name,l.strings,this,e):6===l.type&&(t=new Z(a,this,e)),this._$AV.push(t),l=s[++n]}o!==l?.index&&(a=se.nextNode(),o++)}return se.currentNode=O,r}p(e){let t=0;for(const s of this._$AV)void 0!==s&&(void 0!==s.strings?(s._$AI(e,s,t),t+=s.strings.length-2):s._$AI(e[t])),t++}}class k{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(e,t,s,r){this.type=2,this._$AH=te,this._$AN=void 0,this._$AA=e,this._$AB=t,this._$AM=s,this.options=r,this._$Cv=r?.isConnected??!0}get parentNode(){let e=this._$AA.parentNode;const t=this._$AM;return void 0!==t&&11===e?.nodeType&&(e=t.parentNode),e}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(e,t=this){e=oe(this,e,t),Q(e)?e===te||null==e||""===e?(this._$AH!==te&&this._$AR(),this._$AH=te):e!==this._$AH&&e!==ee&&this._(e):void 0!==e._$litType$?this.$(e):void 0!==e.nodeType?this.T(e):(e=>N(e)||"function"==typeof e?.[Symbol.iterator])(e)?this.k(e):this._(e)}O(e){return this._$AA.parentNode.insertBefore(e,this._$AB)}T(e){this._$AH!==e&&(this._$AR(),this._$AH=this.O(e))}_(e){this._$AH!==te&&Q(this._$AH)?this._$AA.nextSibling.data=e:this.T(O.createTextNode(e)),this._$AH=e}$(e){const{values:t,_$litType$:s}=e,r="number"==typeof s?this._$AC(e):(void 0===s.el&&(s.el=S.createElement(re(s.h,s.h[0]),this.options)),s);if(this._$AH?._$AD===r)this._$AH.p(t);else{const e=new R(r,this),s=e.u(this.options);e.p(t),this.T(s),this._$AH=e}}_$AC(e){let t=ie.get(e.strings);return void 0===t&&ie.set(e.strings,t=new S(e)),t}k(e){N(this._$AH)||(this._$AH=[],this._$AR());const t=this._$AH;let s,r=0;for(const a of e)r===t.length?t.push(s=new k(this.O(j()),this.O(j()),this,this.options)):s=t[r],s._$AI(a),r++;r<t.length&&(this._$AR(s&&s._$AB.nextSibling,r),t.length=r)}_$AR(e=this._$AA.nextSibling,t){for(this._$AP?.(!1,!0,t);e!==this._$AB;){const t=C(e).nextSibling;C(e).remove(),e=t}}setConnected(e){void 0===this._$AM&&(this._$Cv=e,this._$AP?.(e))}}class H{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(e,t,s,r,a){this.type=1,this._$AH=te,this._$AN=void 0,this.element=e,this.name=t,this._$AM=r,this.options=a,s.length>2||""!==s[0]||""!==s[1]?(this._$AH=Array(s.length-1).fill(new String),this.strings=s):this._$AH=te}_$AI(e,t=this,s,r){const a=this.strings;let o=!1;if(void 0===a)e=oe(this,e,t,0),o=!Q(e)||e!==this._$AH&&e!==ee,o&&(this._$AH=e);else{const r=e;let n,l;for(e=a[0],n=0;n<a.length-1;n++)l=oe(this,r[s+n],t,n),l===ee&&(l=this._$AH[n]),o||=!Q(l)||l!==this._$AH[n],l===te?e=te:e!==te&&(e+=(l??"")+a[n+1]),this._$AH[n]=l}o&&!r&&this.j(e)}j(e){e===te?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,e??"")}}class I extends H{constructor(){super(...arguments),this.type=3}j(e){this.element[this.name]=e===te?void 0:e}}class L extends H{constructor(){super(...arguments),this.type=4}j(e){this.element.toggleAttribute(this.name,!!e&&e!==te)}}class z extends H{constructor(e,t,s,r,a){super(e,t,s,r,a),this.type=5}_$AI(e,t=this){if((e=oe(this,e,t,0)??te)===ee)return;const s=this._$AH,r=e===te&&s!==te||e.capture!==s.capture||e.once!==s.once||e.passive!==s.passive,a=e!==te&&(s===te||r);r&&this.element.removeEventListener(this.name,this,s),a&&this.element.addEventListener(this.name,this,e),this._$AH=e}handleEvent(e){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,e):this._$AH.handleEvent(e)}}class Z{constructor(e,t,s){this.element=e,this.type=6,this._$AN=void 0,this._$AM=t,this.options=s}get _$AU(){return this._$AM._$AU}_$AI(e){oe(this,e)}}const ne=M.litHtmlPolyfillSupport;ne?.(S,k),(M.litHtmlVersions??=[]).push("3.3.3");const le=globalThis;class i extends A{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){const e=super.createRenderRoot();return this.renderOptions.renderBefore??=e.firstChild,e}update(e){const t=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(e),this._$Do=((e,t,s)=>{const r=s?.renderBefore??t;let a=r._$litPart$;if(void 0===a){const e=s?.renderBefore??null;r._$litPart$=a=new k(t.insertBefore(j(),e),e,void 0,s??{})}return a._$AI(e),a})(t,this.renderRoot,this.renderOptions)}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(!0)}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(!1)}render(){return ee}}i._$litElement$=!0,i.finalized=!0,le.litElementHydrateSupport?.({LitElement:i});const de=le.litElementPolyfillSupport;de?.({LitElement:i}),(le.litElementVersions??=[]).push("4.2.2");const ce=e=>(t,s)=>{void 0!==s?s.addInitializer(()=>{customElements.define(e,t)}):customElements.define(e,t)},he={attribute:!0,type:String,converter:_,reflect:!1,hasChanged:w},pe=(e=he,t,s)=>{const{kind:r,metadata:a}=s;let o=globalThis.litPropertyMetadata.get(a);if(void 0===o&&globalThis.litPropertyMetadata.set(a,o=new Map),"setter"===r&&((e=Object.create(e)).wrapped=!0),o.set(s.name,e),"accessor"===r){const{name:r}=s;return{set(s){const a=t.get.call(this);t.set.call(this,s),this.requestUpdate(r,a,e,!0,s)},init(t){return void 0!==t&&this.C(r,void 0,e,t),t}}}if("setter"===r){const{name:r}=s;return function(s){const a=this[r];t.call(this,s),this.requestUpdate(r,a,e,!0,s)}}throw Error("Unsupported decorator location: "+r)};function ue(e){return(t,s)=>"object"==typeof s?pe(e,t,s):((e,t,s)=>{const r=t.hasOwnProperty(s);return t.constructor.createProperty(s,e),r?Object.getOwnPropertyDescriptor(t,s):void 0})(e,t,s)}function me(e){return ue({...e,state:!0,attribute:!1})}const fe="#1d2026",ve="#23272f",ge="#ecedef",be="rgba(236,237,239,0.55)",xe="rgba(255,255,255,0.07)",ye="rgba(255,255,255,0.16)",_e="rgba(255,255,255,0.05)",we="#e08a4a",$e="#1b0f06",ke="rgba(255,255,255,0.12)",ze="rgba(255,255,255,0.04)",Se="rgba(224,138,74,0.12)",Ae="14px",Me=l`
   :host {
     --hf-bg: ${n("#16181d")};
-    --hf-surface: ${n(mt)};
-    --hf-surface-alt: ${n(vt)};
-    --hf-text: ${n(gt)};
-    --hf-text-dim: ${n(bt)};
-    --hf-border: ${n(xt)};
-    --hf-border-active: ${n(yt)};
-    --hf-divider: ${n($t)};
-    --hf-accent: ${n(wt)};
-    --hf-accent-text: ${n(_t)};
-    --hf-slider-track: ${n(kt)};
-    --hf-input: ${n(zt)};
-    --hf-selected: ${n(At)};
-    --hf-radius: ${n(St)};
+    --hf-surface: ${n(fe)};
+    --hf-surface-alt: ${n(ve)};
+    --hf-text: ${n(ge)};
+    --hf-text-dim: ${n(be)};
+    --hf-border: ${n(xe)};
+    --hf-border-active: ${n(ye)};
+    --hf-divider: ${n(_e)};
+    --hf-accent: ${n(we)};
+    --hf-accent-text: ${n($e)};
+    --hf-slider-track: ${n(ke)};
+    --hf-input: ${n(ze)};
+    --hf-selected: ${n(Se)};
+    --hf-radius: ${n(Ae)};
     --hf-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   }
-`;function It(t,e={}){return(r={})=>{const s=r.size??20,a=r.stroke??"currentColor",o=r.sw??e.sw??1.7;return X`<svg width=${s} height=${s} viewBox="0 0 24 24" fill="none" stroke=${a} stroke-width=${o} stroke-linecap="round" stroke-linejoin="round"><path d=${t} /></svg>`}}function Ct(t){return(e={})=>{const r=e.size??20,s=e.fill??"currentColor";return X`<svg width=${r} height=${r} viewBox="0 0 24 24" fill=${s} stroke="none"><path d=${t} /></svg>`}}const Pt={play:Ct("M7 5.5v13a1 1 0 0 0 1.55.83l10-6.5a1 1 0 0 0 0-1.66l-10-6.5A1 1 0 0 0 7 5.5z"),pause:(t={})=>{const e=t.size??20,r=t.fill??"currentColor";return X`<svg width=${e} height=${e} viewBox="0 0 24 24" fill=${r} stroke="none">
+`;function Ie(e,t={}){return(s={})=>{const r=s.size??20,a=s.stroke??"currentColor",o=s.sw??t.sw??1.7;return X`<svg width=${r} height=${r} viewBox="0 0 24 24" fill="none" stroke=${a} stroke-width=${o} stroke-linecap="round" stroke-linejoin="round"><path d=${e} /></svg>`}}function Ce(e){return(t={})=>{const s=t.size??20,r=t.fill??"currentColor";return X`<svg width=${s} height=${s} viewBox="0 0 24 24" fill=${r} stroke="none"><path d=${e} /></svg>`}}const Ee={play:Ce("M7 5.5v13a1 1 0 0 0 1.55.83l10-6.5a1 1 0 0 0 0-1.66l-10-6.5A1 1 0 0 0 7 5.5z"),pause:(e={})=>{const t=e.size??20,s=e.fill??"currentColor";return X`<svg width=${t} height=${t} viewBox="0 0 24 24" fill=${s} stroke="none">
       <rect x="6" y="5" width="4.2" height="14" rx="1.2" />
       <rect x="13.8" y="5" width="4.2" height="14" rx="1.2" />
-    </svg>`},prev:Ct("M6 5h2v14H6V5zm14 .9v12.2a1 1 0 0 1-1.55.83L9 12.83a1 1 0 0 1 0-1.66l9.45-6.1A1 1 0 0 1 20 5.9z"),next:Ct("M18 5h-2v14h2V5zM4 5.9v12.2a1 1 0 0 0 1.55.83L15 12.83a1 1 0 0 0 0-1.66L5.55 5.07A1 1 0 0 0 4 5.9z"),shuffle:It("M16 4h4v4 M20 4l-7 7 M4 4l16 16 M16 20h4v-4 M4 20l5-5"),rep:It("M4 9V8a3 3 0 0 1 3-3h11l-3-3 M20 15v1a3 3 0 0 1-3 3H6l3 3"),rep1:(t={})=>{const e=t.size??20,r=t.stroke??"currentColor",s=t.sw??1.7;return X`<svg width=${e} height=${e} viewBox="0 0 24 24" fill="none" stroke=${r} stroke-width=${s} stroke-linecap="round" stroke-linejoin="round">
+    </svg>`},prev:Ce("M6 5h2v14H6V5zm14 .9v12.2a1 1 0 0 1-1.55.83L9 12.83a1 1 0 0 1 0-1.66l9.45-6.1A1 1 0 0 1 20 5.9z"),next:Ce("M18 5h-2v14h2V5zM4 5.9v12.2a1 1 0 0 0 1.55.83L15 12.83a1 1 0 0 0 0-1.66L5.55 5.07A1 1 0 0 0 4 5.9z"),shuffle:Ie("M16 4h4v4 M20 4l-7 7 M4 4l16 16 M16 20h4v-4 M4 20l5-5"),rep:Ie("M4 9V8a3 3 0 0 1 3-3h11l-3-3 M20 15v1a3 3 0 0 1-3 3H6l3 3"),rep1:(e={})=>{const t=e.size??20,s=e.stroke??"currentColor",r=e.sw??1.7;return X`<svg width=${t} height=${t} viewBox="0 0 24 24" fill="none" stroke=${s} stroke-width=${r} stroke-linecap="round" stroke-linejoin="round">
       <path d="M4 9V8a3 3 0 0 1 3-3h11l-3-3 M20 15v1a3 3 0 0 1-3 3H6l3 3" />
       <text x="12" y="14" text-anchor="middle" font-size="7" font-weight="700" fill="currentColor" stroke="none">1</text>
-    </svg>`},queue:It("M4 7h11 M4 12h11 M4 17h7 M16 14v6 l3-2"),search:It("M11 4a7 7 0 1 0 4.6 12.3L20 20 M11 4a7 7 0 0 1 7 7"),home:It("M4 11l8-7 8 7v8a2 2 0 0 1-2 2h-3v-6h-6v6H6a2 2 0 0 1-2-2v-8z"),speaker:It("M5 9h3l4-4v14l-4-4H5z M16 8a5 5 0 0 1 0 8 M19 5a9 9 0 0 1 0 14"),group:It("M7 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M17 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M3 20c0-3 2.7-5 6-5s4 1 4 1 M14 21c0-2.5 1.5-4 4-4s4 1.5 4 4"),dot3:(t={})=>{const e=t.size??20,r=t.fill??"currentColor";return X`<svg width=${e} height=${e} viewBox="0 0 24 24" fill=${r} stroke="none">
+    </svg>`},queue:Ie("M4 7h11 M4 12h11 M4 17h7 M16 14v6 l3-2"),search:Ie("M11 4a7 7 0 1 0 4.6 12.3L20 20 M11 4a7 7 0 0 1 7 7"),home:Ie("M4 11l8-7 8 7v8a2 2 0 0 1-2 2h-3v-6h-6v6H6a2 2 0 0 1-2-2v-8z"),speaker:Ie("M5 9h3l4-4v14l-4-4H5z M16 8a5 5 0 0 1 0 8 M19 5a9 9 0 0 1 0 14"),group:Ie("M7 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M17 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M3 20c0-3 2.7-5 6-5s4 1 4 1 M14 21c0-2.5 1.5-4 4-4s4 1.5 4 4"),dot3:(e={})=>{const t=e.size??20,s=e.fill??"currentColor";return X`<svg width=${t} height=${t} viewBox="0 0 24 24" fill=${s} stroke="none">
       <circle cx="5" cy="12" r="1.6" />
       <circle cx="12" cy="12" r="1.6" />
       <circle cx="19" cy="12" r="1.6" />
-    </svg>`},x:It("M6 6l12 12 M18 6L6 18"),chev:It("M9 6l6 6-6 6"),chevL:It("M15 6l-6 6 6 6"),chevD:It("M6 9l6 6 6-6"),plus:It("M12 5v14 M5 12h14"),check:It("M5 12l4 4 10-10"),drag:(t={})=>{const e=t.size??20,r=t.fill??"currentColor";return X`<svg width=${e} height=${e} viewBox="0 0 24 24" fill=${r} stroke="none">
+    </svg>`},x:Ie("M6 6l12 12 M18 6L6 18"),chev:Ie("M9 6l6 6-6 6"),chevL:Ie("M15 6l-6 6 6 6"),chevD:Ie("M6 9l6 6 6-6"),plus:Ie("M12 5v14 M5 12h14"),check:Ie("M5 12l4 4 10-10"),drag:(e={})=>{const t=e.size??20,s=e.fill??"currentColor";return X`<svg width=${t} height=${t} viewBox="0 0 24 24" fill=${s} stroke="none">
       <circle cx="9" cy="6" r="1.5" /><circle cx="15" cy="6" r="1.5" />
       <circle cx="9" cy="12" r="1.5" /><circle cx="15" cy="12" r="1.5" />
       <circle cx="9" cy="18" r="1.5" /><circle cx="15" cy="18" r="1.5" />
-    </svg>`},trash:It("M5 7h14 M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2 M7 7l1 13a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2l1-13"),top:It("M12 19V7 M6 13l6-6 6 6 M5 4h14"),playNext:It("M5 5l10 7-10 7V5z M19 6v12",{sw:2}),radio:It("M4 12a8 8 0 0 1 14-5.5 M6 16a4 4 0 0 1 5-5 M3 20l14-14"),list:It("M4 6h16 M4 12h16 M4 18h16"),album:(t={})=>{const e=t.size??20,r=t.stroke??"currentColor",s=t.sw??1.6;return X`<svg width=${e} height=${e} viewBox="0 0 24 24" fill="none" stroke=${r} stroke-width=${s} stroke-linecap="round" stroke-linejoin="round">
+    </svg>`},trash:Ie("M5 7h14 M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2 M7 7l1 13a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2l1-13"),top:Ie("M12 19V7 M6 13l6-6 6 6 M5 4h14"),playNext:Ie("M5 5l10 7-10 7V5z M19 6v12",{sw:2}),radio:Ie("M4 12a8 8 0 0 1 14-5.5 M6 16a4 4 0 0 1 5-5 M3 20l14-14"),list:Ie("M4 6h16 M4 12h16 M4 18h16"),album:(e={})=>{const t=e.size??20,s=e.stroke??"currentColor",r=e.sw??1.6;return X`<svg width=${t} height=${t} viewBox="0 0 24 24" fill="none" stroke=${s} stroke-width=${r} stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="9" />
       <circle cx="12" cy="12" r="2.5" />
-    </svg>`},artist:(t={})=>{const e=t.size??20,r=t.stroke??"currentColor",s=t.sw??1.7;return X`<svg width=${e} height=${e} viewBox="0 0 24 24" fill="none" stroke=${r} stroke-width=${s} stroke-linecap="round" stroke-linejoin="round">
+    </svg>`},artist:(e={})=>{const t=e.size??20,s=e.stroke??"currentColor",r=e.sw??1.7;return X`<svg width=${t} height=${t} viewBox="0 0 24 24" fill="none" stroke=${s} stroke-width=${r} stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="8" r="4" />
       <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" />
-    </svg>`},note:It("M9 18V6l11-2v12 M9 18a3 3 0 1 1-3-3 3 3 0 0 1 3 3z M20 16a3 3 0 1 1-3-3 3 3 0 0 1 3 3z"),heart:It("M12 21s-7-4.5-9-9.2C1.3 8 4 4 8 5c2 .5 3.2 2 4 3 .8-1 2-2.5 4-3 4-1 6.7 3 5 6.8C19 16.5 12 21 12 21z"),filter:It("M4 5h16l-6 8v6l-4-2v-4L4 5z"),sun:(t={})=>{const e=t.size??14,r=t.stroke??"currentColor",s=t.sw??1.7;return X`<svg width=${e} height=${e} viewBox="0 0 24 24" fill="none" stroke=${r} stroke-width=${s} stroke-linecap="round">
+    </svg>`},note:Ie("M9 18V6l11-2v12 M9 18a3 3 0 1 1-3-3 3 3 0 0 1 3 3z M20 16a3 3 0 1 1-3-3 3 3 0 0 1 3 3z"),heart:Ie("M12 21s-7-4.5-9-9.2C1.3 8 4 4 8 5c2 .5 3.2 2 4 3 .8-1 2-2.5 4-3 4-1 6.7 3 5 6.8C19 16.5 12 21 12 21z"),filter:Ie("M4 5h16l-6 8v6l-4-2v-4L4 5z"),sun:(e={})=>{const t=e.size??14,s=e.stroke??"currentColor",r=e.sw??1.7;return X`<svg width=${t} height=${t} viewBox="0 0 24 24" fill="none" stroke=${s} stroke-width=${r} stroke-linecap="round">
       <circle cx="12" cy="12" r="4" />
       <path d="M12 3v2 M12 19v2 M3 12h2 M19 12h2 M5.6 5.6l1.4 1.4 M17 17l1.4 1.4 M5.6 18.4l1.4-1.4 M17 7l1.4-1.4" />
-    </svg>`},moon:It("M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z")},Et=[{id:"al1",name:"Mordechai",artist:"Khruangbin",h1:22,h2:350,year:2020},{id:"al2",name:"Salad Days",artist:"Mac DeMarco",h1:142,h2:80,year:2014},{id:"al3",name:"Awake",artist:"Tycho",h1:200,h2:280,year:2014},{id:"al4",name:"Migration",artist:"Bonobo",h1:32,h2:210,year:2017},{id:"al5",name:"Crush",artist:"Floating Points",h1:320,h2:18,year:2019},{id:"al6",name:"Pang",artist:"Caroline Polachek",h1:290,h2:340,year:2019},{id:"al7",name:"Mood Valiant",artist:"Hiatus Kaiyote",h1:12,h2:330,year:2021},{id:"al8",name:"In Colour",artist:"Jamie xx",h1:50,h2:200,year:2015},{id:"al9",name:"Spaces",artist:"Nils Frahm",h1:220,h2:240,year:2013},{id:"al10",name:"Untitled (Black Is)",artist:"SAULT",h1:0,h2:18,year:2020},{id:"al11",name:"French Kiwi Juice",artist:"FKJ",h1:175,h2:90,year:2017},{id:"al12",name:"Oncle Jazz",artist:"Men I Trust",h1:195,h2:250,year:2019},{id:"al13",name:"U.F.O.F.",artist:"Big Thief",h1:100,h2:175,year:2019},{id:"al14",name:"Bloom",artist:"Beach House",h1:280,h2:200,year:2012},{id:"al15",name:"Skiptracing",artist:"Mild High Club",h1:36,h2:5,year:2016},{id:"al16",name:"A Moment Apart",artist:"ODESZA",h1:245,h2:300,year:2017},{id:"al17",name:"Punisher",artist:"Phoebe Bridgers",h1:215,h2:245,year:2020},{id:"al18",name:"Vulture Prince",artist:"Arooj Aftab",h1:18,h2:28,year:2021}],Tt=["Pelota","White Gloves","A Walk","Cirrus","Birth","Welcome To My Island","Red Room","Loud Places","Says","Wildfires","Skyline","Tides","Lemon Twigs","Last Light","Mountain at My Gates","Slow Burn","Vega","Daydream","Mirror Maru","Late Night","Soft Universe","Ondas","Reverie","Long Way Home","Eclipse","Powder Blue","Dreamcaster","After Hours","Ember"].map((t,e)=>{const r=Et[e%Et.length];return{id:`tr${e+1}`,name:t,artist:r.artist,album:r.name,albumId:r.id,durationSec:120+47*e%240}}),Ht=[{id:"spotify",name:"Spotify",glyph:"S",brandHue:140,accounts:[{id:"sp-main",name:"tom@home",tier:"Premium",email:"tom@home.local"},{id:"sp-shared",name:"Family · shared",tier:"Family",email:"fam@home.local"}]},{id:"apple",name:"Apple Music",glyph:"",brandHue:0,accounts:[{id:"ap-tom",name:"tom@icloud",tier:"Individual",email:"tom@icloud.com"}]},{id:"soundcloud",name:"SoundCloud",glyph:"~",brandHue:25,accounts:[{id:"sc-tom",name:"@tom_listens",tier:"Go+",email:"tom@sc.local"}]}];function Lt(t){const e=Math.max(0,Math.floor(t)),r=e%60;return`${Math.floor(e/60)}:${r<10?`0${r}`:r}`}function Ut(t,e={}){const{angle:r=135,lift:s=0}=e;if(!t)return"linear-gradient(135deg,#444,#222)";return`linear-gradient(${r}deg, oklch(${56+s}% 0.18 ${t.h1??200}), oklch(${30+s}% 0.16 ${t.h2??280}))`}const Ot={albums:Et,tracks:Tt,playlists:[{id:"pl1",name:"Deep Focus",owner:"Music Assistant",trackCount:86,h1:220,h2:280,mood:"instrumental·calm"},{id:"pl2",name:"Late-Night Drive",owner:"you",trackCount:42,h1:260,h2:340,mood:"atmospheric·downtempo"},{id:"pl3",name:"Sunday Cooking",owner:"you",trackCount:58,h1:30,h2:18,mood:"soul·jazz"},{id:"pl4",name:"Mellow Mornings",owner:"Editorial",trackCount:64,h1:50,h2:30,mood:"acoustic·warm"},{id:"pl5",name:"Workout",owner:"you",trackCount:38,h1:0,h2:340,mood:"high tempo·electronic"},{id:"pl6",name:"Liked Songs",owner:"you",trackCount:312,h1:130,h2:180,mood:"your favorites"},{id:"pl7",name:"Patio Sessions",owner:"you",trackCount:51,h1:180,h2:220,mood:"summer·chill"},{id:"pl8",name:"Discover Weekly",owner:"Editorial",trackCount:30,h1:290,h2:200,mood:"new finds"}],radioStations:[{id:"rd1",name:"KCRW · Eclectic 24",genre:"Eclectic",h1:12,h2:340},{id:"rd2",name:"NTS Radio 1",genre:"Underground",h1:30,h2:12},{id:"rd3",name:"BBC 6 Music",genre:"Alternative",h1:200,h2:250},{id:"rd4",name:"WWOZ New Orleans",genre:"Jazz · Blues",h1:38,h2:5},{id:"rd5",name:"Worldwide FM",genre:"Global",h1:165,h2:220}],providers:Ht,speakers:[{id:"sp1",name:"Living Room",room:"Living Room",model:"Sonos Era 300",volume:38},{id:"sp2",name:"Kitchen",room:"Kitchen",model:"Sonos One",volume:28},{id:"sp3",name:"Bedroom",room:"Bedroom",model:"HomePod mini",volume:18},{id:"sp4",name:"Office",room:"Office",model:"WiiM Pro + KEF",volume:45},{id:"sp5",name:"Patio",room:"Outside",model:"Sonos Move 2",volume:60},{id:"sp6",name:"Bathroom",room:"Bathroom",model:"HomePod mini",volume:22}],initialQueue:["tr1","tr5","tr12","tr18","tr9","tr3","tr22","tr7","tr15","tr27","tr2","tr11"],artistList:["Khruangbin","Mac DeMarco","Tycho","Bonobo","Floating Points","Caroline Polachek","Hiatus Kaiyote","Jamie xx","Nils Frahm","SAULT","FKJ","Men I Trust","Big Thief","Beach House","Mild High Club","ODESZA","Phoebe Bridgers","Vulfpeck","Yussef Dayes","Arooj Aftab"],fmtTime:Lt,albumById:function(t){return Et.find(e=>e.id===t)},trackById:function(t){return Tt.find(e=>e.id===t)},providerById:function(t){return Ht.find(e=>e.id===t)},artGradient:Ut};const qt="__hass__";function Rt(t,e,r){return{queue:t.slice(),currentIdx:0,position:e,playing:!0,shuffle:!1,repeat:"off",groupVolume:r}}function Bt(t){return Math.max(0,Math.min(1,t))}class Store extends EventTarget{constructor(){super(),this.tab="player",this.browser={crumbs:[{kind:"root",label:"Sources"}],providerId:null,accountId:null,sub:"playlists",detailId:null},this.search={query:"",filter:"all"},this.selectedTracks=new Set,this.multiMode=!1,this.groupingSheet={open:!1,leadId:null},this._tickInterval=null,this._zones=[],this._isHassMode=!1,this.diagnosticNotes=[],this.speakers=Ot.speakers.map(t=>({...t,leadId:t.id}));const t=this.speakers.find(t=>"sp2"===t.id);t&&(t.leadId="sp1"),this.players={sp1:{...Rt(Ot.initialQueue,48,38),playing:!0},sp5:{...Rt(["tr3","tr18","tr7","tr12","tr22"],14,60),playing:!0,shuffle:!0}},this.activeLeadId="sp1",this._startTick()}get groups(){var t;const e={};for(const r of this.speakers)(e[t=r.leadId]??(e[t]=[])).push(r);return Object.keys(e).map(t=>{const r=e[t],s=r.find(e=>e.id===t)??r[0],a=this.players[t],o=1===r.length?s.name:r.map(t=>t.name).join(" + ");return{leadId:t,lead:s,members:r,name:o,player:a,playing:!!a?.playing,isActive:t===this.activeLeadId,isIdle:!a}}).sort((t,e)=>t.isActive!==e.isActive?t.isActive?-1:1:t.isIdle!==e.isIdle?t.isIdle?1:-1:t.lead.name.localeCompare(e.lead.name))}get activePlayer(){const t=this.players[this.activeLeadId];return t||(this._isHassMode?Rt([qt],0,0):Rt(Ot.initialQueue,0,30))}get activeGroup(){return this.groups.find(t=>t.leadId===this.activeLeadId)}get currentTrack(){if(this._isHassMode&&this._hass){const t=this._zones.find(t=>t.wiim===this.activeLeadId);if(t){const e=function(t,e){const r=t.states?.[e];if(!r)return null;const s=r.attributes,a=s.media_title??"";return a?{id:qt,name:a,artist:s.media_artist??"",album:s.media_album_name??"",albumId:qt,durationSec:"number"==typeof s.media_duration?s.media_duration:0}:null}(this._hass,t.ma);if(e)return e}return{id:qt,name:"Nothing playing",artist:"",album:"",albumId:qt,durationSec:0}}const t=this.activePlayer,e=t.queue[t.currentIdx];return(e?Ot.trackById(e):void 0)??Ot.tracks[0]}get currentAlbum(){if(this._isHassMode&&this._hass){const t=this._zones.find(t=>t.wiim===this.activeLeadId);if(t){const e=function(t,e){const r=t.states?.[e];if(!r)return null;const s=r.attributes,a=s.media_album_name??"",o=s.entity_picture??void 0;return{id:qt,name:a,artist:s.media_artist??"",h1:220,h2:280,year:0,imageUrl:o}}(this._hass,t.ma);if(e)return e}return{id:qt,name:"",artist:"",h1:220,h2:280,year:0}}const t=Ot.albumById(this.currentTrack.albumId);if(!t)throw new Error(`Missing album for track ${this.currentTrack.id}`);return t}setHass(t){this._hass=t,this._deriveFromHass(),this._emit()}setConfig(t){t.zones&&t.zones.length>0?this._zones=t.zones:this._zones=[],this._hass&&(this._deriveFromHass(),this._emit())}_deriveFromHass(){if(!this._hass)return;let t;if(this._zones.length>0&&this._isHassMode)t=this._zones,this.diagnosticNotes=["using explicit config.zones from card YAML"];else{const e=function(t){const e=t.states??{},r=[],s=[],a=Object.values(e).filter(t=>{if(!t.entity_id.startsWith("media_player."))return!1;const e=t.attributes.group_role;return"master"===e||"slave"===e||"solo"===e});s.push(`pass 1 (group_role): ${a.length} candidate WiiM device entities`);for(const t of a){const a=t.entity_id.replace(/^media_player\./,""),o=[`media_player.${a}_2`,`media_player.${a}_ma`],n=o.find(t=>void 0!==e[t]);if(!n){s.push(`  ${t.entity_id}: no MA pair at ${o.join(" / ")}`);continue}const l=t.attributes.friendly_name??a;r.push({name:l,wiim:t.entity_id,ma:n}),s.push(`  ${t.entity_id} → ${n} as "${l}"`)}if(0===r.length){s.push("pass 2 (fallback name-pair scan, since pass 1 was empty):");const t=Object.values(e).filter(t=>t.entity_id.startsWith("media_player."));s.push(`  ${t.length} total media_player entities in hass`);for(const a of t){const t=a.entity_id;if(t.endsWith("_2")||t.endsWith("_ma")||t.endsWith("_group_master"))continue;const o=t.replace(/^media_player\./,""),n=[`media_player.${o}_2`,`media_player.${o}_ma`].find(t=>void 0!==e[t]);if(!n)continue;const l=a.attributes.friendly_name??o;r.push({name:l,wiim:t,ma:n}),s.push(`  ${t} → ${n} as "${l}" (no group_role attr)`)}}return r.sort((t,e)=>t.name.localeCompare(e.name)),s.push(`final: ${r.length} zone(s) discovered`),{zones:r,notes:s}}(this._hass);t=e.zones,this.diagnosticNotes=e.notes,console.debug("[homefront-music-card] zone discovery:\n"+e.notes.join("\n"))}if(0===t.length)return void console.warn("[homefront-music-card] No zones discovered — staying in mock mode. See store.diagnosticNotes for details.");this._isHassMode||(this._isHassMode=!0,this._stopTick()),this._zones=t;const e=function(t,e){const r=t.states??{},s=[];for(const t of e){const e=r[t.wiim];if(!e)continue;const a=e.attributes,o=a.group_role,n=a.group_members??[];let l=t.wiim;if("slave"===o){const t=n.find(t=>{const e=r[t];return"master"===e?.attributes?.group_role});t&&(l=t)}const d="number"==typeof a.volume_level?a.volume_level:0;s.push({id:t.wiim,name:t.name,room:t.name,model:a.device_model??"WiiM",volume:Math.round(100*d),leadId:l})}return s}(this._hass,t);if(this.speakers=e,this.players=function(t,e,r){const s=t.states??{},a={},o=new Set(r.map(t=>t.leadId));for(const t of o){const o=e.find(e=>e.wiim===t);if(!o)continue;const n=s[o.ma];if(!n)continue;const l=n.attributes,d=r.filter(e=>e.leadId===t),c=0===d.length?0:Math.round(d.reduce((t,e)=>t+e.volume,0)/d.length),h=l.repeat??"off";a[t]={queue:[qt],currentIdx:0,position:"number"==typeof l.media_position?l.media_position:0,playing:"playing"===n.state,shuffle:!!l.shuffle,repeat:h,groupVolume:c}}return a}(this._hass,t,e),!e.find(t=>t.id===this.activeLeadId)){const t=e.find(t=>t.id===t.leadId)??e[0];t&&(this.activeLeadId=t.id)}const r=[];for(const e of t){const t=this._hass.states?.[e.ma];if(!t){r.push(`${e.name}: MA entity ${e.ma} not found in hass.states`);continue}const s=t.attributes;r.push(`${e.name}: MA=${e.ma} state=${t.state} title=${JSON.stringify(s.media_title??null)} artist=${JSON.stringify(s.media_artist??null)} pos=${s.media_position??"-"} shuffle=${s.shuffle??"-"}`)}this.diagnosticNotes=[...this.diagnosticNotes,"— per-zone MA state —",...r]}get isHassMode(){return this._isHassMode}_stopTick(){null!==this._tickInterval&&(window.clearInterval(this._tickInterval),this._tickInterval=null)}_emit(){this.dispatchEvent(new Event("change"))}_callService(t,e,r={},s={}){this._isHassMode&&this._hass&&this._hass.callService(t,e,r,s).catch(r=>{console.warn(`[homefront-music-card] ${t}.${e} failed:`,r)})}_maFor(t){return this._zones.find(e=>e.wiim===t)?.ma}setTab(t){this.tab!==t&&(this.tab=t,this._emit())}setActiveLead(t){this.players[t]||(this.players[t]=Rt(Ot.initialQueue,0,30)),this.activeLeadId=t,this._emit()}_patchActive(t){const e=this.players[this.activeLeadId]??Rt(Ot.initialQueue,0,30);this.players[this.activeLeadId]={...e,...t},this._emit()}setPlaying(t){this._patchActive({playing:t});const e=this._maFor(this.activeLeadId);e&&this._callService("media_player",t?"media_play":"media_pause",{},{entity_id:e})}togglePlaying(){this.setPlaying(!this.activePlayer.playing)}setShuffle(t){this._patchActive({shuffle:t});const e=this._maFor(this.activeLeadId);e&&this._callService("media_player","shuffle_set",{shuffle:t},{entity_id:e})}toggleShuffle(){this.setShuffle(!this.activePlayer.shuffle)}setRepeat(t){this._patchActive({repeat:t});const e=this._maFor(this.activeLeadId);e&&this._callService("media_player","repeat_set",{repeat:t},{entity_id:e})}cycleRepeat(){const t=this.activePlayer.repeat,e="off"===t?"all":"all"===t?"one":"off";this.setRepeat(e)}setPosition(t){this._patchActive({position:t});const e=this._maFor(this.activeLeadId);e&&this._callService("media_player","media_seek",{seek_position:t},{entity_id:e})}next(){const t=this.activePlayer;this._patchActive({currentIdx:Math.min(t.queue.length-1,t.currentIdx+1),position:0});const e=this._maFor(this.activeLeadId);e&&this._callService("media_player","media_next_track",{},{entity_id:e})}prev(){const t=this.activePlayer;if(t.position>3){this._patchActive({position:0});const t=this._maFor(this.activeLeadId);t&&this._callService("media_player","media_seek",{seek_position:0},{entity_id:t})}else{this._patchActive({currentIdx:Math.max(0,t.currentIdx-1),position:0});const e=this._maFor(this.activeLeadId);e&&this._callService("media_player","media_previous_track",{},{entity_id:e})}}setSpeakerVol(t,e){const r=this.speakers.find(e=>e.id===t);r&&(r.volume=e,this._emit(),this._isHassMode&&this._callService("media_player","volume_set",{volume_level:Bt(e/100)},{entity_id:t}))}setGroupVolumeFor(t,e){const r=this.players[t];r&&(this.players[t]={...r,groupVolume:e});const s=[];for(const r of this.speakers)r.leadId===t&&(r.volume=e,s.push(r.id));if(this._emit(),this._isHassMode&&s.length>0){const t=Bt(e/100);for(const e of s)this._callService("media_player","volume_set",{volume_level:t},{entity_id:e})}}setGroupVolume(t){this.setGroupVolumeFor(this.activeLeadId,t)}ungroupSpeaker(t){const e=this.speakers.find(e=>e.id===t);e&&(e.leadId=t,this._emit(),this._isHassMode&&this._callService("media_player","unjoin",{},{entity_id:t}))}toggleGroupPlay(t){const e=this.players[t];if(!e)return;const r=!e.playing;this.players[t]={...e,playing:r},this._emit();const s=this._maFor(t);s&&this._callService("media_player",r?"media_play":"media_pause",{},{entity_id:s})}startSoloPlayback(t){if(this._isHassMode){this.activeLeadId=t;const e=this._maFor(t);return e&&this._callService("media_player","media_play",{},{entity_id:e}),void this._emit()}this.players[t]=Rt(Ot.initialQueue,0,30),this.activeLeadId=t,this._emit()}openGroupingSheet(t){this.groupingSheet={open:!0,leadId:t},this._emit()}closeGroupingSheet(){this.groupingSheet={...this.groupingSheet,open:!1},this._emit()}commitGroupMembers(t,e){const r=new Set(e),s=r.has(t)?t:e[0]??null,a=this.speakers.filter(e=>e.leadId===t).map(t=>t.id),o=a.filter(t=>!r.has(t)),n=e.filter(t=>!a.includes(t)&&t!==s);if(this.speakers=this.speakers.map(e=>{const a=e.leadId===t;return r.has(e.id)?{...e,leadId:s??e.id}:a?{...e,leadId:e.id}:e}),s){if(s!==t){const e=this.players[t]??Rt(Ot.initialQueue,0,30);this.players[s]=e,delete this.players[t]}}else delete this.players[t];for(const t of e)t!==s&&delete this.players[t];if(this.activeLeadId===t)if(s)this.activeLeadId=s;else{const t=this.speakers.find(t=>t.leadId===t.id);t&&(this.activeLeadId=t.id)}if(this.groupingSheet={...this.groupingSheet,open:!1},this._emit(),this._isHassMode){for(const t of o)this._callService("media_player","unjoin",{},{entity_id:t});s&&n.length>0&&this._callService("media_player","join",{group_members:n},{entity_id:s})}}setQueue(t){this._patchActive({queue:t})}removeFromQueue(t){const e=this.activePlayer,r=e.queue.slice();r.splice(t,1);const s=t<e.currentIdx?e.currentIdx-1:e.currentIdx;this._patchActive({queue:r,currentIdx:s})}moveQueue(t,e){if(t===e)return;const r=this.activePlayer,s=r.queue.slice(),[a]=s.splice(t,1);if(void 0===a)return;s.splice(e,0,a);let o=r.currentIdx;t===o?o=e:t<o&&e>=o?o-=1:t>o&&e<=o&&(o+=1),this._patchActive({queue:s,currentIdx:o})}playTrackAt(t){this._patchActive({currentIdx:t,position:0,playing:!0})}moveToTop(t){this.moveQueue(t,this.activePlayer.currentIdx+1)}clearQueue(){const t=this.activePlayer;this._patchActive({queue:t.queue.slice(0,t.currentIdx+1)})}removeBulk(t){const e=this.activePlayer,r=e.queue.filter((e,r)=>!t.has(r));this.players[this.activeLeadId]={...e,queue:r},this.selectedTracks=new Set,this.multiMode=!1,this._emit()}browserGo(t){this.browser={...this.browser,...t},this._emit()}pushCrumb(t,e={}){this.browser={...this.browser,...e,crumbs:[...this.browser.crumbs,t]},this._emit()}popToCrumb(t){const e=this.browser.crumbs.slice(0,t+1),r=e[e.length-1];let s={...this.browser,crumbs:e};"root"===r?.kind?s={...s,providerId:null,accountId:null,detailId:null}:"provider"===r?.kind?s={...s,accountId:null,detailId:null}:"account"===r?.kind&&(s={...s,detailId:null}),this.browser=s,this._emit()}setSearch(t){this.search={...this.search,...t},this._emit()}setSelectedTracks(t){this.selectedTracks=t,this._emit()}setMultiMode(t){this.multiMode=t,t||(this.selectedTracks=new Set),this._emit()}_startTick(){this._tickInterval=window.setInterval(()=>this._tick(),1e3)}_tick(){let t=!1;for(const e of Object.keys(this.players)){const r=this.players[e];if(!r.playing)continue;const s=r.queue[r.currentIdx];if(!s)continue;const a=Ot.trackById(s);a&&(r.position+1>=a.durationSec?this.players[e]={...r,position:0,currentIdx:Math.min(r.queue.length-1,r.currentIdx+1)}:this.players[e]={...r,position:r.position+1},t=!0)}t&&this._emit()}dispose(){this._stopTick()}}class StoreController{constructor(t,e){this.host=t,this.store=e,this._onChange=()=>{this.host.requestUpdate()},t.addController(this)}hostConnected(){this.store.addEventListener("change",this._onChange)}hostDisconnected(){this.store.removeEventListener("change",this._onChange)}}let jt=class extends i{constructor(){super(...arguments),this.size=48,this.radius=8,this.boxShadow=""}render(){const t="number"==typeof this.size?this.size:/^\d+(\.\d+)?$/.test(this.size)?Number(this.size):null,e=null!==t?`${t}px`:this.size,r=null!==t?.34*t:16,s=Ut(this.obj),a=`width:${e};height:${e};border-radius:${this.radius}px;background:${s};${this.boxShadow?`box-shadow:${this.boxShadow}`:""}`;return X`
+    </svg>`},moon:Ie("M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z")},Pe=[{id:"al1",name:"Mordechai",artist:"Khruangbin",h1:22,h2:350,year:2020},{id:"al2",name:"Salad Days",artist:"Mac DeMarco",h1:142,h2:80,year:2014},{id:"al3",name:"Awake",artist:"Tycho",h1:200,h2:280,year:2014},{id:"al4",name:"Migration",artist:"Bonobo",h1:32,h2:210,year:2017},{id:"al5",name:"Crush",artist:"Floating Points",h1:320,h2:18,year:2019},{id:"al6",name:"Pang",artist:"Caroline Polachek",h1:290,h2:340,year:2019},{id:"al7",name:"Mood Valiant",artist:"Hiatus Kaiyote",h1:12,h2:330,year:2021},{id:"al8",name:"In Colour",artist:"Jamie xx",h1:50,h2:200,year:2015},{id:"al9",name:"Spaces",artist:"Nils Frahm",h1:220,h2:240,year:2013},{id:"al10",name:"Untitled (Black Is)",artist:"SAULT",h1:0,h2:18,year:2020},{id:"al11",name:"French Kiwi Juice",artist:"FKJ",h1:175,h2:90,year:2017},{id:"al12",name:"Oncle Jazz",artist:"Men I Trust",h1:195,h2:250,year:2019},{id:"al13",name:"U.F.O.F.",artist:"Big Thief",h1:100,h2:175,year:2019},{id:"al14",name:"Bloom",artist:"Beach House",h1:280,h2:200,year:2012},{id:"al15",name:"Skiptracing",artist:"Mild High Club",h1:36,h2:5,year:2016},{id:"al16",name:"A Moment Apart",artist:"ODESZA",h1:245,h2:300,year:2017},{id:"al17",name:"Punisher",artist:"Phoebe Bridgers",h1:215,h2:245,year:2020},{id:"al18",name:"Vulture Prince",artist:"Arooj Aftab",h1:18,h2:28,year:2021}],He=["Pelota","White Gloves","A Walk","Cirrus","Birth","Welcome To My Island","Red Room","Loud Places","Says","Wildfires","Skyline","Tides","Lemon Twigs","Last Light","Mountain at My Gates","Slow Burn","Vega","Daydream","Mirror Maru","Late Night","Soft Universe","Ondas","Reverie","Long Way Home","Eclipse","Powder Blue","Dreamcaster","After Hours","Ember"].map((e,t)=>{const s=Pe[t%Pe.length];return{id:`tr${t+1}`,name:e,artist:s.artist,album:s.name,albumId:s.id,durationSec:120+47*t%240}}),Le=[{id:"spotify",name:"Spotify",glyph:"S",brandHue:140,accounts:[{id:"sp-main",name:"tom@home",tier:"Premium",email:"tom@home.local"},{id:"sp-shared",name:"Family · shared",tier:"Family",email:"fam@home.local"}]},{id:"apple",name:"Apple Music",glyph:"",brandHue:0,accounts:[{id:"ap-tom",name:"tom@icloud",tier:"Individual",email:"tom@icloud.com"}]},{id:"soundcloud",name:"SoundCloud",glyph:"~",brandHue:25,accounts:[{id:"sc-tom",name:"@tom_listens",tier:"Go+",email:"tom@sc.local"}]}];function Te(e){const t=Math.max(0,Math.floor(e)),s=t%60;return`${Math.floor(t/60)}:${s<10?`0${s}`:s}`}function qe(e,t={}){const{angle:s=135,lift:r=0}=t;if(!e)return"linear-gradient(135deg,#444,#222)";return`linear-gradient(${s}deg, oklch(${56+r}% 0.18 ${e.h1??200}), oklch(${30+r}% 0.16 ${e.h2??280}))`}const Be={albums:Pe,tracks:He,playlists:[{id:"pl1",name:"Deep Focus",owner:"Music Assistant",trackCount:86,h1:220,h2:280,mood:"instrumental·calm"},{id:"pl2",name:"Late-Night Drive",owner:"you",trackCount:42,h1:260,h2:340,mood:"atmospheric·downtempo"},{id:"pl3",name:"Sunday Cooking",owner:"you",trackCount:58,h1:30,h2:18,mood:"soul·jazz"},{id:"pl4",name:"Mellow Mornings",owner:"Editorial",trackCount:64,h1:50,h2:30,mood:"acoustic·warm"},{id:"pl5",name:"Workout",owner:"you",trackCount:38,h1:0,h2:340,mood:"high tempo·electronic"},{id:"pl6",name:"Liked Songs",owner:"you",trackCount:312,h1:130,h2:180,mood:"your favorites"},{id:"pl7",name:"Patio Sessions",owner:"you",trackCount:51,h1:180,h2:220,mood:"summer·chill"},{id:"pl8",name:"Discover Weekly",owner:"Editorial",trackCount:30,h1:290,h2:200,mood:"new finds"}],radioStations:[{id:"rd1",name:"KCRW · Eclectic 24",genre:"Eclectic",h1:12,h2:340},{id:"rd2",name:"NTS Radio 1",genre:"Underground",h1:30,h2:12},{id:"rd3",name:"BBC 6 Music",genre:"Alternative",h1:200,h2:250},{id:"rd4",name:"WWOZ New Orleans",genre:"Jazz · Blues",h1:38,h2:5},{id:"rd5",name:"Worldwide FM",genre:"Global",h1:165,h2:220}],providers:Le,speakers:[{id:"sp1",name:"Living Room",room:"Living Room",model:"Sonos Era 300",volume:38},{id:"sp2",name:"Kitchen",room:"Kitchen",model:"Sonos One",volume:28},{id:"sp3",name:"Bedroom",room:"Bedroom",model:"HomePod mini",volume:18},{id:"sp4",name:"Office",room:"Office",model:"WiiM Pro + KEF",volume:45},{id:"sp5",name:"Patio",room:"Outside",model:"Sonos Move 2",volume:60},{id:"sp6",name:"Bathroom",room:"Bathroom",model:"HomePod mini",volume:22}],initialQueue:["tr1","tr5","tr12","tr18","tr9","tr3","tr22","tr7","tr15","tr27","tr2","tr11"],artistList:["Khruangbin","Mac DeMarco","Tycho","Bonobo","Floating Points","Caroline Polachek","Hiatus Kaiyote","Jamie xx","Nils Frahm","SAULT","FKJ","Men I Trust","Big Thief","Beach House","Mild High Club","ODESZA","Phoebe Bridgers","Vulfpeck","Yussef Dayes","Arooj Aftab"],fmtTime:Te,albumById:function(e){return Pe.find(t=>t.id===e)},trackById:function(e){return He.find(t=>t.id===e)},providerById:function(e){return Le.find(t=>t.id===e)},artGradient:qe};const Ue="__hass__";function Re(e,t,s){return{queue:e.slice(),currentIdx:0,position:t,playing:!0,shuffle:!1,repeat:"off",groupVolume:s}}function Oe(e){return Math.max(0,Math.min(1,e))}class Store extends EventTarget{constructor(){super(),this.tab="player",this.browser={crumbs:[{kind:"root",label:"Sources"}],providerId:null,accountId:null,sub:"playlists",detailId:null},this.search={query:"",filter:"all"},this.selectedTracks=new Set,this.multiMode=!1,this.groupingSheet={open:!1,leadId:null},this._tickInterval=null,this._zones=[],this._isHassMode=!1,this.diagnosticNotes=[],this.hassBrowseStack=[],this.hassBrowseLoading=!1,this.hassBrowseError=null,this._browseCache=new Map,this.hassQueue=[],this.hassQueueLoading=!1,this.hassQueueError=null,this._hassQueueLeadId=null,this.speakers=Be.speakers.map(e=>({...e,leadId:e.id}));const e=this.speakers.find(e=>"sp2"===e.id);e&&(e.leadId="sp1"),this.players={sp1:{...Re(Be.initialQueue,48,38),playing:!0},sp5:{...Re(["tr3","tr18","tr7","tr12","tr22"],14,60),playing:!0,shuffle:!0}},this.activeLeadId="sp1",this._startTick()}get groups(){var e;const t={};for(const s of this.speakers)(t[e=s.leadId]??(t[e]=[])).push(s);return Object.keys(t).map(e=>{const s=t[e],r=s.find(t=>t.id===e)??s[0],a=this.players[e],o=1===s.length?r.name:s.map(e=>e.name).join(" + ");return{leadId:e,lead:r,members:s,name:o,player:a,playing:!!a?.playing,isActive:e===this.activeLeadId,isIdle:!a}}).sort((e,t)=>e.isActive!==t.isActive?e.isActive?-1:1:e.isIdle!==t.isIdle?e.isIdle?1:-1:e.lead.name.localeCompare(t.lead.name))}get activePlayer(){const e=this.players[this.activeLeadId];return e||(this._isHassMode?Re([Ue],0,0):Re(Be.initialQueue,0,30))}get activeGroup(){return this.groups.find(e=>e.leadId===this.activeLeadId)}get currentTrack(){if(this._isHassMode&&this._hass){const e=this._zones.find(e=>e.wiim===this.activeLeadId);if(e){const t=function(e,t){const s=e.states?.[t];if(!s)return null;const r=s.attributes,a=r.media_title??"";return a?{id:Ue,name:a,artist:r.media_artist??"",album:r.media_album_name??"",albumId:Ue,durationSec:"number"==typeof r.media_duration?r.media_duration:0}:null}(this._hass,e.ma);if(t)return t}return{id:Ue,name:"Nothing playing",artist:"",album:"",albumId:Ue,durationSec:0}}const e=this.activePlayer,t=e.queue[e.currentIdx];return(t?Be.trackById(t):void 0)??Be.tracks[0]}get currentAlbum(){if(this._isHassMode&&this._hass){const e=this._zones.find(e=>e.wiim===this.activeLeadId);if(e){const t=function(e,t){const s=e.states?.[t];if(!s)return null;const r=s.attributes,a=r.media_album_name??"",o=r.entity_picture??void 0;return{id:Ue,name:a,artist:r.media_artist??"",h1:220,h2:280,year:0,imageUrl:o}}(this._hass,e.ma);if(t)return t}return{id:Ue,name:"",artist:"",h1:220,h2:280,year:0}}const e=Be.albumById(this.currentTrack.albumId);if(!e)throw new Error(`Missing album for track ${this.currentTrack.id}`);return e}setHass(e){this._hass=e,this._deriveFromHass(),this._emit()}setConfig(e){e.zones&&e.zones.length>0?this._zones=e.zones:this._zones=[],this._hass&&(this._deriveFromHass(),this._emit())}_deriveFromHass(){if(!this._hass)return;let e;if(this._zones.length>0&&this._isHassMode)e=this._zones,this.diagnosticNotes=["using explicit config.zones from card YAML"];else{const t=function(e){const t=e.states??{},s=[],r=[],a=Object.values(t).filter(e=>{if(!e.entity_id.startsWith("media_player."))return!1;const t=e.attributes.group_role;return"master"===t||"slave"===t||"solo"===t});r.push(`pass 1 (group_role): ${a.length} candidate WiiM device entities`);for(const e of a){const a=e.entity_id.replace(/^media_player\./,""),o=[`media_player.${a}_2`,`media_player.${a}_ma`],n=o.find(e=>void 0!==t[e]);if(!n){r.push(`  ${e.entity_id}: no MA pair at ${o.join(" / ")}`);continue}const l=e.attributes.friendly_name??a;s.push({name:l,wiim:e.entity_id,ma:n}),r.push(`  ${e.entity_id} → ${n} as "${l}"`)}if(0===s.length){r.push("pass 2 (fallback name-pair scan, since pass 1 was empty):");const e=Object.values(t).filter(e=>e.entity_id.startsWith("media_player."));r.push(`  ${e.length} total media_player entities in hass`);for(const a of e){const e=a.entity_id;if(e.endsWith("_2")||e.endsWith("_ma")||e.endsWith("_group_master"))continue;const o=e.replace(/^media_player\./,""),n=[`media_player.${o}_2`,`media_player.${o}_ma`].find(e=>void 0!==t[e]);if(!n)continue;const l=a.attributes.friendly_name??o;s.push({name:l,wiim:e,ma:n}),r.push(`  ${e} → ${n} as "${l}" (no group_role attr)`)}}return s.sort((e,t)=>e.name.localeCompare(t.name)),r.push(`final: ${s.length} zone(s) discovered`),{zones:s,notes:r}}(this._hass);e=t.zones,this.diagnosticNotes=t.notes,console.debug("[homefront-music-card] zone discovery:\n"+t.notes.join("\n"))}if(0===e.length)return void console.warn("[homefront-music-card] No zones discovered — staying in mock mode. See store.diagnosticNotes for details.");this._isHassMode||(this._isHassMode=!0,this._stopTick()),this._zones=e;const t=function(e,t){const s=e.states??{},r=[];for(const e of t){const t=s[e.wiim];if(!t)continue;const a=t.attributes,o=a.group_role,n=a.group_members??[];let l=e.wiim;if("slave"===o){const e=n.find(e=>{const t=s[e];return"master"===t?.attributes?.group_role});e&&(l=e)}const d="number"==typeof a.volume_level?a.volume_level:0;r.push({id:e.wiim,name:e.name,room:e.name,model:a.device_model??"WiiM",volume:Math.round(100*d),leadId:l})}return r}(this._hass,e);if(this.speakers=t,this.players=function(e,t,s){const r=e.states??{},a={},o=new Set(s.map(e=>e.leadId));for(const e of o){const o=t.find(t=>t.wiim===e);if(!o)continue;const n=r[o.ma];if(!n)continue;const l=n.attributes,d=s.filter(t=>t.leadId===e),c=0===d.length?0:Math.round(d.reduce((e,t)=>e+t.volume,0)/d.length),h=l.repeat??"off";a[e]={queue:[Ue],currentIdx:0,position:"number"==typeof l.media_position?l.media_position:0,playing:"playing"===n.state,shuffle:!!l.shuffle,repeat:h,groupVolume:c}}return a}(this._hass,e,t),!t.find(e=>e.id===this.activeLeadId)){const e=t.find(e=>e.id===e.leadId)??t[0];e&&(this.activeLeadId=e.id)}const s=[];for(const t of e){const e=this._hass.states?.[t.ma];if(!e){s.push(`${t.name}: MA entity ${t.ma} not found in hass.states`);continue}const r=e.attributes;s.push(`${t.name}: MA=${t.ma} state=${e.state} title=${JSON.stringify(r.media_title??null)} artist=${JSON.stringify(r.media_artist??null)} pos=${r.media_position??"-"} shuffle=${r.shuffle??"-"}`)}this.diagnosticNotes=[...this.diagnosticNotes,"— per-zone MA state —",...s]}get isHassMode(){return this._isHassMode}_stopTick(){null!==this._tickInterval&&(window.clearInterval(this._tickInterval),this._tickInterval=null)}_emit(){this.dispatchEvent(new Event("change"))}_callService(e,t,s={},r={}){this._isHassMode&&this._hass&&this._hass.callService(e,t,s,r).catch(s=>{console.warn(`[homefront-music-card] ${e}.${t} failed:`,s)})}_maFor(e){return this._zones.find(t=>t.wiim===e)?.ma}async _callServiceWithResponse(e,t,s={},r={}){if(this._isHassMode&&this._hass)try{const a=await this._hass.callWS({type:"call_service",domain:e,service:t,service_data:s,target:r,return_response:!0});return a?.response}catch(s){return void console.warn(`[homefront-music-card] ${e}.${t} (with response) failed:`,s)}}async browseRoot(){if(!this._isHassMode||!this._hass)return;const e=this._maFor(this.activeLeadId);if(e){this.hassBrowseLoading=!0,this.hassBrowseError=null,this._emit();try{const t=await this._hass.callWS({type:"media_player/browse_media",entity_id:e}),s=t.children?.filter(e=>"library"!==e.title.toLowerCase()),r={...t,children:s};this._browseCache.clear(),this._browseCache.set(t.media_content_id||"__root__",r),this.hassBrowseStack=[r]}catch(e){this.hassBrowseError=String(e),console.warn("[homefront-music-card] browse_media root failed:",e)}finally{this.hassBrowseLoading=!1,this._emit()}}}async browseInto(e){if(!this._isHassMode||!this._hass)return;const t=this._maFor(this.activeLeadId);if(!t)return;const s=this._browseCache.get(e.media_content_id);if(s&&s.children)return this.hassBrowseStack=[...this.hassBrowseStack,s],void this._emit();this.hassBrowseLoading=!0,this.hassBrowseError=null,this._emit();try{const s=await this._hass.callWS({type:"media_player/browse_media",entity_id:t,media_content_type:e.media_content_type,media_content_id:e.media_content_id});this._browseCache.set(e.media_content_id,s),this.hassBrowseStack=[...this.hassBrowseStack,s]}catch(e){this.hassBrowseError=String(e),console.warn("[homefront-music-card] browse_media drill failed:",e)}finally{this.hassBrowseLoading=!1,this._emit()}}browsePop(e){this.hassBrowseStack=this.hassBrowseStack.slice(0,e+1),this._emit()}playBrowseNode(e,t="replace"){if(!this._isHassMode)return;const s=this._maFor(this.activeLeadId);s&&this._callService("music_assistant","play_media",{media_id:e.media_content_id,media_type:e.media_content_type,enqueue:t,radio_mode:!1},{entity_id:s})}async loadQueue(){if(!this._isHassMode)return;const e=this._maFor(this.activeLeadId);if(!e)return;this.hassQueueLoading=!0,this.hassQueueError=null,this._emit();const t=await this._callServiceWithResponse("mass_queue","get_queue_items",{},{entity_id:e});let s=[];if(Array.isArray(t))s=t;else if(t&&Array.isArray(t.queue_items))s=t.queue_items;else if(t&&"object"==typeof t)for(const e of Object.values(t))if(Array.isArray(e)){s=e;break}this.hassQueue=s,this._hassQueueLeadId=this.activeLeadId,this.hassQueueLoading=!1,this._emit()}get hassQueueIsFresh(){return this._hassQueueLeadId===this.activeLeadId}playQueueItem(e){const t=this._maFor(this.activeLeadId);t&&(this._callService("mass_queue","play_queue_item",{queue_item_id:e},{entity_id:t}),window.setTimeout(()=>{this.loadQueue()},400))}removeQueueItem(e){const t=this._maFor(this.activeLeadId);t&&(this._callService("mass_queue","remove_queue_item",{queue_item_id:e},{entity_id:t}),this.hassQueue=this.hassQueue.filter(t=>t.queue_item_id!==e),this._emit(),window.setTimeout(()=>{this.loadQueue()},400))}removeQueueItems(e){const t=this._maFor(this.activeLeadId);if(t){for(const s of e)this._callService("mass_queue","remove_queue_item",{queue_item_id:s},{entity_id:t});this.hassQueue=this.hassQueue.filter(t=>!e.has(t.queue_item_id)),this.selectedTracks=new Set,this.multiMode=!1,this._emit(),window.setTimeout(()=>{this.loadQueue()},600)}}clearQueueFromHere(){const e=this._maFor(this.activeLeadId);e&&(this._callService("mass_queue","clear_queue_from_here",{},{entity_id:e}),window.setTimeout(()=>{this.loadQueue()},400))}moveQueueItemToTop(e){const t=this._maFor(this.activeLeadId);t&&(this._callService("mass_queue","move_queue_item_next",{queue_item_id:e},{entity_id:t}),window.setTimeout(()=>{this.loadQueue()},400))}setTab(e){this.tab!==e&&(this.tab=e,this._emit())}setActiveLead(e){this.players[e]||(this.players[e]=Re(Be.initialQueue,0,30)),this.activeLeadId=e,this._emit()}_patchActive(e){const t=this.players[this.activeLeadId]??Re(Be.initialQueue,0,30);this.players[this.activeLeadId]={...t,...e},this._emit()}setPlaying(e){this._patchActive({playing:e});const t=this._maFor(this.activeLeadId);t&&this._callService("media_player",e?"media_play":"media_pause",{},{entity_id:t})}togglePlaying(){this.setPlaying(!this.activePlayer.playing)}setShuffle(e){this._patchActive({shuffle:e});const t=this._maFor(this.activeLeadId);t&&this._callService("media_player","shuffle_set",{shuffle:e},{entity_id:t})}toggleShuffle(){this.setShuffle(!this.activePlayer.shuffle)}setRepeat(e){this._patchActive({repeat:e});const t=this._maFor(this.activeLeadId);t&&this._callService("media_player","repeat_set",{repeat:e},{entity_id:t})}cycleRepeat(){const e=this.activePlayer.repeat,t="off"===e?"all":"all"===e?"one":"off";this.setRepeat(t)}setPosition(e){this._patchActive({position:e});const t=this._maFor(this.activeLeadId);t&&this._callService("media_player","media_seek",{seek_position:e},{entity_id:t})}next(){const e=this.activePlayer;this._patchActive({currentIdx:Math.min(e.queue.length-1,e.currentIdx+1),position:0});const t=this._maFor(this.activeLeadId);t&&this._callService("media_player","media_next_track",{},{entity_id:t})}prev(){const e=this.activePlayer;if(e.position>3){this._patchActive({position:0});const e=this._maFor(this.activeLeadId);e&&this._callService("media_player","media_seek",{seek_position:0},{entity_id:e})}else{this._patchActive({currentIdx:Math.max(0,e.currentIdx-1),position:0});const t=this._maFor(this.activeLeadId);t&&this._callService("media_player","media_previous_track",{},{entity_id:t})}}setSpeakerVol(e,t){const s=this.speakers.find(t=>t.id===e);s&&(s.volume=t,this._emit(),this._isHassMode&&this._callService("media_player","volume_set",{volume_level:Oe(t/100)},{entity_id:e}))}setGroupVolumeFor(e,t){const s=this.players[e];s&&(this.players[e]={...s,groupVolume:t});const r=[];for(const s of this.speakers)s.leadId===e&&(s.volume=t,r.push(s.id));if(this._emit(),this._isHassMode&&r.length>0){const e=Oe(t/100);for(const t of r)this._callService("media_player","volume_set",{volume_level:e},{entity_id:t})}}setGroupVolume(e){this.setGroupVolumeFor(this.activeLeadId,e)}ungroupSpeaker(e){const t=this.speakers.find(t=>t.id===e);t&&(t.leadId=e,this._emit(),this._isHassMode&&this._callService("media_player","unjoin",{},{entity_id:e}))}toggleGroupPlay(e){const t=this.players[e];if(!t)return;const s=!t.playing;this.players[e]={...t,playing:s},this._emit();const r=this._maFor(e);r&&this._callService("media_player",s?"media_play":"media_pause",{},{entity_id:r})}startSoloPlayback(e){if(this._isHassMode){this.activeLeadId=e;const t=this._maFor(e);return t&&this._callService("media_player","media_play",{},{entity_id:t}),void this._emit()}this.players[e]=Re(Be.initialQueue,0,30),this.activeLeadId=e,this._emit()}openGroupingSheet(e){this.groupingSheet={open:!0,leadId:e},this._emit()}closeGroupingSheet(){this.groupingSheet={...this.groupingSheet,open:!1},this._emit()}commitGroupMembers(e,t){const s=new Set(t),r=s.has(e)?e:t[0]??null,a=this.speakers.filter(t=>t.leadId===e).map(e=>e.id),o=a.filter(e=>!s.has(e)),n=t.filter(e=>!a.includes(e)&&e!==r);if(this.speakers=this.speakers.map(t=>{const a=t.leadId===e;return s.has(t.id)?{...t,leadId:r??t.id}:a?{...t,leadId:t.id}:t}),r){if(r!==e){const t=this.players[e]??Re(Be.initialQueue,0,30);this.players[r]=t,delete this.players[e]}}else delete this.players[e];for(const e of t)e!==r&&delete this.players[e];if(this.activeLeadId===e)if(r)this.activeLeadId=r;else{const e=this.speakers.find(e=>e.leadId===e.id);e&&(this.activeLeadId=e.id)}if(this.groupingSheet={...this.groupingSheet,open:!1},this._emit(),this._isHassMode){for(const e of o)this._callService("media_player","unjoin",{},{entity_id:e});r&&n.length>0&&this._callService("media_player","join",{group_members:n},{entity_id:r})}}setQueue(e){this._patchActive({queue:e})}removeFromQueue(e){const t=this.activePlayer,s=t.queue.slice();s.splice(e,1);const r=e<t.currentIdx?t.currentIdx-1:t.currentIdx;this._patchActive({queue:s,currentIdx:r})}moveQueue(e,t){if(e===t)return;const s=this.activePlayer,r=s.queue.slice(),[a]=r.splice(e,1);if(void 0===a)return;r.splice(t,0,a);let o=s.currentIdx;e===o?o=t:e<o&&t>=o?o-=1:e>o&&t<=o&&(o+=1),this._patchActive({queue:r,currentIdx:o})}playTrackAt(e){this._patchActive({currentIdx:e,position:0,playing:!0})}moveToTop(e){this.moveQueue(e,this.activePlayer.currentIdx+1)}clearQueue(){const e=this.activePlayer;this._patchActive({queue:e.queue.slice(0,e.currentIdx+1)})}removeBulk(e){const t=this.activePlayer,s=t.queue.filter((t,s)=>!e.has(s));this.players[this.activeLeadId]={...t,queue:s},this.selectedTracks=new Set,this.multiMode=!1,this._emit()}browserGo(e){this.browser={...this.browser,...e},this._emit()}pushCrumb(e,t={}){this.browser={...this.browser,...t,crumbs:[...this.browser.crumbs,e]},this._emit()}popToCrumb(e){const t=this.browser.crumbs.slice(0,e+1),s=t[t.length-1];let r={...this.browser,crumbs:t};"root"===s?.kind?r={...r,providerId:null,accountId:null,detailId:null}:"provider"===s?.kind?r={...r,accountId:null,detailId:null}:"account"===s?.kind&&(r={...r,detailId:null}),this.browser=r,this._emit()}setSearch(e){this.search={...this.search,...e},this._emit()}setSelectedTracks(e){this.selectedTracks=e,this._emit()}setMultiMode(e){this.multiMode=e,e||(this.selectedTracks=new Set),this._emit()}_startTick(){this._tickInterval=window.setInterval(()=>this._tick(),1e3)}_tick(){let e=!1;for(const t of Object.keys(this.players)){const s=this.players[t];if(!s.playing)continue;const r=s.queue[s.currentIdx];if(!r)continue;const a=Be.trackById(r);a&&(s.position+1>=a.durationSec?this.players[t]={...s,position:0,currentIdx:Math.min(s.queue.length-1,s.currentIdx+1)}:this.players[t]={...s,position:s.position+1},e=!0)}e&&this._emit()}dispose(){this._stopTick()}}class StoreController{constructor(e,t){this.host=e,this.store=t,this._onChange=()=>{this.host.requestUpdate()},e.addController(this)}hostConnected(){this.store.addEventListener("change",this._onChange)}hostDisconnected(){this.store.removeEventListener("change",this._onChange)}}let je=class extends i{constructor(){super(...arguments),this.size=48,this.radius=8,this.boxShadow=""}render(){const e="number"==typeof this.size?this.size:/^\d+(\.\d+)?$/.test(this.size)?Number(this.size):null,t=null!==e?`${e}px`:this.size,s=null!==e?.34*e:16,r=qe(this.obj),a=`width:${t};height:${t};border-radius:${this.radius}px;background:${r};${this.boxShadow?`box-shadow:${this.boxShadow}`:""}`;return X`
       <div class="art" style=${a}>
         ${this.imageUrl?X`<img src=${this.imageUrl} alt="" loading="lazy" />`:""}
-        ${this.glyph?X`<div class="glyph" style="font-size:${r}px">${this.glyph}</div>`:""}
+        ${this.glyph?X`<div class="glyph" style="font-size:${s}px">${this.glyph}</div>`:""}
         <div class="scan"></div>
       </div>
-    `}};jt.styles=l`
+    `}};je.styles=l`
     :host {
       display: inline-block;
       flex: none;
@@ -83,14 +83,14 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
       text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
       line-height: 1;
     }
-  `,t([ut({attribute:!1})],jt.prototype,"obj",void 0),t([ut()],jt.prototype,"size",void 0),t([ut({type:Number})],jt.prototype,"radius",void 0),t([ut({attribute:!1})],jt.prototype,"glyph",void 0),t([ut()],jt.prototype,"boxShadow",void 0),t([ut({attribute:"image-url"})],jt.prototype,"imageUrl",void 0),jt=t([ct("hf-album-art")],jt);let Dt=class extends i{constructor(){super(...arguments),this.value=0,this.min=0,this.max=100,this.color="#fff",this.track="rgba(255,255,255,0.18)",this.trackHeight=4,this.thumb=14,this.ariaLabel="",this._onInput=t=>{const e=Number(t.target.value);this.value=e,this.dispatchEvent(new CustomEvent("hf-input",{detail:e,bubbles:!0,composed:!0}))}}render(){const t=(this.value-this.min)/(this.max-this.min)*100;return this.style.setProperty("--hf-pct",`${t}%`),this.style.setProperty("--hf-color",this.color),this.style.setProperty("--hf-track",this.track),this.style.setProperty("--hf-track-h",`${this.trackHeight}px`),this.style.setProperty("--hf-thumb",`${this.thumb}px`),X`<input
+  `,e([ue({attribute:!1})],je.prototype,"obj",void 0),e([ue()],je.prototype,"size",void 0),e([ue({type:Number})],je.prototype,"radius",void 0),e([ue({attribute:!1})],je.prototype,"glyph",void 0),e([ue()],je.prototype,"boxShadow",void 0),e([ue({attribute:"image-url"})],je.prototype,"imageUrl",void 0),je=e([ce("hf-album-art")],je);let Qe=class extends i{constructor(){super(...arguments),this.value=0,this.min=0,this.max=100,this.color="#fff",this.track="rgba(255,255,255,0.18)",this.trackHeight=4,this.thumb=14,this.ariaLabel="",this._onInput=e=>{const t=Number(e.target.value);this.value=t,this.dispatchEvent(new CustomEvent("hf-input",{detail:t,bubbles:!0,composed:!0}))}}render(){const e=(this.value-this.min)/(this.max-this.min)*100;return this.style.setProperty("--hf-pct",`${e}%`),this.style.setProperty("--hf-color",this.color),this.style.setProperty("--hf-track",this.track),this.style.setProperty("--hf-track-h",`${this.trackHeight}px`),this.style.setProperty("--hf-thumb",`${this.thumb}px`),X`<input
       type="range"
       min=${this.min}
       max=${this.max}
       .value=${String(this.value)}
       aria-label=${this.ariaLabel||"Slider"}
       @input=${this._onInput}
-    />`}};Dt.styles=l`
+    />`}};Qe.styles=l`
     :host {
       --hf-pct: 0%;
       --hf-color: #fff;
@@ -151,10 +151,10 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
       border: 0;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
     }
-  `,t([ut({type:Number})],Dt.prototype,"value",void 0),t([ut({type:Number})],Dt.prototype,"min",void 0),t([ut({type:Number})],Dt.prototype,"max",void 0),t([ut()],Dt.prototype,"color",void 0),t([ut()],Dt.prototype,"track",void 0),t([ut({type:Number,attribute:"track-height"})],Dt.prototype,"trackHeight",void 0),t([ut({type:Number})],Dt.prototype,"thumb",void 0),t([ut({attribute:"aria-label"})],Dt.prototype,"ariaLabel",void 0),Dt=t([ct("hf-slider")],Dt);let Nt=class extends i{willUpdate(t){t.has("store")&&this.store&&!this._ctrl&&(this._ctrl=new StoreController(this,this.store))}render(){if(!this.store)return X``;const t=this.store,e=t.currentTrack,r=t.currentAlbum,s=t.activePlayer,a=t.activeGroup,o=t.groups.filter(t=>!t.isActive&&t.playing).length,n=r.imageUrl;return X`
+  `,e([ue({type:Number})],Qe.prototype,"value",void 0),e([ue({type:Number})],Qe.prototype,"min",void 0),e([ue({type:Number})],Qe.prototype,"max",void 0),e([ue()],Qe.prototype,"color",void 0),e([ue()],Qe.prototype,"track",void 0),e([ue({type:Number,attribute:"track-height"})],Qe.prototype,"trackHeight",void 0),e([ue({type:Number})],Qe.prototype,"thumb",void 0),e([ue({attribute:"aria-label"})],Qe.prototype,"ariaLabel",void 0),Qe=e([ce("hf-slider")],Qe);let Ne=class extends i{willUpdate(e){e.has("store")&&this.store&&!this._ctrl&&(this._ctrl=new StoreController(this,this.store))}render(){if(!this.store)return X``;const e=this.store,t=e.currentTrack,s=e.currentAlbum,r=e.activePlayer,a=e.activeGroup,o=e.groups.filter(e=>!e.isActive&&e.playing).length,n=s.imageUrl;return X`
       <div class="art-wrap">
         <hf-album-art
-          .obj=${r}
+          .obj=${s}
           size="100%"
           radius="18"
           boxShadow="0 18px 40px rgba(0,0,0,0.35)"
@@ -163,64 +163,64 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
       </div>
       <div class="meta">
         <div class="eyebrow">
-          ${s.shuffle?"Shuffle":"Now Playing"} · ${r.name}
+          ${r.shuffle?"Shuffle":"Now Playing"} · ${s.name}
         </div>
-        <div class="title">${e.name}</div>
-        <div class="artist">${e.artist}</div>
+        <div class="title">${t.name}</div>
+        <div class="artist">${t.artist}</div>
       </div>
       <div class="scrubber">
         <hf-slider
-          .value=${s.position}
+          .value=${r.position}
           .min=${0}
-          .max=${e.durationSec}
-          .color=${wt}
-          .track=${kt}
-          @hf-input=${e=>t.setPosition(e.detail)}
+          .max=${t.durationSec}
+          .color=${we}
+          .track=${ke}
+          @hf-input=${t=>e.setPosition(t.detail)}
         ></hf-slider>
         <div class="times">
-          <span>${Lt(s.position)}</span>
-          <span>-${Lt(e.durationSec-s.position)}</span>
+          <span>${Te(r.position)}</span>
+          <span>-${Te(t.durationSec-r.position)}</span>
         </div>
       </div>
       <div class="transport">
         <button
           class="icon-btn"
-          aria-pressed=${s.shuffle}
+          aria-pressed=${r.shuffle}
           aria-label="Shuffle"
-          @click=${()=>t.toggleShuffle()}
+          @click=${()=>e.toggleShuffle()}
         >
-          ${Pt.shuffle({size:18})}
+          ${Ee.shuffle({size:18})}
         </button>
-        <button class="icon-btn" aria-label="Previous" @click=${()=>t.prev()}>
-          ${Pt.prev({size:22})}
+        <button class="icon-btn" aria-label="Previous" @click=${()=>e.prev()}>
+          ${Ee.prev({size:22})}
         </button>
         <button
           class="play-btn"
-          aria-label=${s.playing?"Pause":"Play"}
-          @click=${()=>t.togglePlaying()}
+          aria-label=${r.playing?"Pause":"Play"}
+          @click=${()=>e.togglePlaying()}
         >
-          ${s.playing?Pt.pause({size:22}):Pt.play({size:22})}
+          ${r.playing?Ee.pause({size:22}):Ee.play({size:22})}
         </button>
-        <button class="icon-btn" aria-label="Next" @click=${()=>t.next()}>
-          ${Pt.next({size:22})}
+        <button class="icon-btn" aria-label="Next" @click=${()=>e.next()}>
+          ${Ee.next({size:22})}
         </button>
         <button
           class="icon-btn"
-          aria-pressed=${"off"!==s.repeat}
+          aria-pressed=${"off"!==r.repeat}
           aria-label="Repeat"
-          @click=${()=>t.cycleRepeat()}
+          @click=${()=>e.cycleRepeat()}
         >
-          ${"one"===s.repeat?Pt.rep1({size:18}):Pt.rep({size:18})}
+          ${"one"===r.repeat?Ee.rep1({size:18}):Ee.rep({size:18})}
         </button>
       </div>
       <div class="output">
-        <button class="output-main" type="button" @click=${()=>t.setTab("group")}>
-          ${Pt.speaker({size:16,stroke:wt})}
+        <button class="output-main" type="button" @click=${()=>e.setTab("group")}>
+          ${Ee.speaker({size:16,stroke:we})}
           <div style="flex:1; min-width:0">
             <div class="output-name">${a?.name??"No output"}</div>
             <div class="output-sub">
               ${(a?.members.length??0)>1?X`Grouped · ${a?.members.length} speakers · `:""}
-              Volume ${s.groupVolume}
+              Volume ${r.groupVolume}
               ${o>0?X` · ${o} other group${o>1?"s":""}
                   playing`:""}
             </div>
@@ -229,12 +229,12 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
         <button
           class="output-group-btn"
           type="button"
-          @click=${()=>t.openGroupingSheet(t.activeLeadId)}
+          @click=${()=>e.openGroupingSheet(e.activeLeadId)}
         >
-          ${Pt.group({size:13})} Group
+          ${Ee.group({size:13})} Group
         </button>
       </div>
-    `}};Nt.styles=l`
+    `}};Ne.styles=l`
     :host {
       display: block;
       height: 100%;
@@ -372,185 +372,245 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
       font-size: 11.5px;
       font-weight: 600;
     }
-  `,t([ut({attribute:!1})],Nt.prototype,"store",void 0),Nt=t([ct("hf-player-tab")],Nt);const Ft=[{id:"playlists",label:"Playlists"},{id:"albums",label:"Albums"},{id:"artists",label:"Artists"},{id:"tracks",label:"Tracks"},{id:"radio",label:"Radio"}];let Gt=class extends i{willUpdate(t){t.has("store")&&this.store&&!this._ctrl&&(this._ctrl=new StoreController(this,this.store))}render(){return this.store?X`${this._renderCrumbs()} ${this._renderBody()}`:X``}_renderCrumbs(){const t=this.store.browser.crumbs;return X`
+  `,e([ue({attribute:!1})],Ne.prototype,"store",void 0),Ne=e([ce("hf-player-tab")],Ne);const De=[{id:"playlists",label:"Playlists"},{id:"albums",label:"Albums"},{id:"artists",label:"Artists"},{id:"tracks",label:"Tracks"},{id:"radio",label:"Radio"}];let Fe=class extends i{constructor(){super(...arguments),this._kickedOffRoot=!1}willUpdate(e){e.has("store")&&this.store&&!this._ctrl&&(this._ctrl=new StoreController(this,this.store))}updated(){!this.store?.isHassMode||this._kickedOffRoot||0!==this.store.hassBrowseStack.length||this.store.hassBrowseLoading||(this._kickedOffRoot=!0,this.store.browseRoot())}render(){return this.store?this.store.isHassMode?this._renderHass():X`${this._renderCrumbs()} ${this._renderBody()}`:X``}_renderHass(){const e=this.store.hassBrowseStack,t=e[e.length-1];return X`
+      ${this._renderHassCrumbs(e)}
+      ${this.store.hassBrowseError?X`<div class="hass-error">${this.store.hassBrowseError}</div>`:this.store.hassBrowseLoading&&!t?X`<div class="hass-loading">Loading library…</div>`:t?this._renderHassNode(t):X`<div class="hass-empty">No library available</div>`}
+    `}_renderHassCrumbs(e){return 0===e.length?X``:X`
       <div class="crumbs">
-        ${t.map((e,r)=>{const s=r===t.length-1;return X`
+        ${e.map((t,s)=>{const r=s===e.length-1,a=0===s?"Sources":t.title;return X`
             <button
               class="crumb-btn"
-              data-current=${s}
-              @click=${()=>this.store.popToCrumb(r)}
+              data-current=${r}
+              @click=${()=>this.store.browsePop(s)}
             >
-              ${e.label}
+              ${a}
             </button>
-            ${r<t.length-1?X`<span aria-hidden="true">${Pt.chev({size:11})}</span>`:""}
+            ${s<e.length-1?X`<span aria-hidden="true">${Ee.chev({size:11})}</span>`:""}
           `})}
       </div>
-    `}_renderBody(){const{providerId:t,accountId:e,sub:r,detailId:s}=this.store.browser;if(!t)return this._renderProviders();const a=Ot.providerById(t);return a?e?s?this._renderDetail(s):this._renderTypeView(r):this._renderAccounts(a):X``}_renderProviders(){return X`
+    `}_renderHassNode(e){const t=e.children??[];if(0===t.length)return X`<div class="hass-empty">No items</div>`;const s=t.every(e=>"album"===e.media_class||"playlist"===e.media_class||"directory"===e.media_class)&&t.some(e=>e.thumbnail);return X`
       <div class="body">
-        <div class="section-label">Connected sources</div>
-        <div class="stack">
-          ${Ot.providers.map(t=>this._renderProviderTile(t))}
-        </div>
+        ${s?this._renderHassGrid(t):this._renderHassList(t)}
       </div>
-    `}_renderProviderTile(t){const e=`linear-gradient(135deg, oklch(72% 0.18 ${t.brandHue}), oklch(48% 0.16 ${(t.brandHue+30)%360}))`;return X`
-      <button
-        class="provider-tile"
-        @click=${()=>this.store.pushCrumb({kind:"provider",label:t.name},{providerId:t.id})}
-      >
-        <div class="provider-glyph" style=${`background:${e}`}>
-          ${t.glyph||t.name[0]}
-        </div>
-        <div class="provider-info">
-          <div class="provider-name">${t.name}</div>
-          <div class="provider-sub">
-            ${t.accounts.length} account${t.accounts.length>1?"s":""} · connected
-          </div>
-        </div>
-        ${Pt.chev({size:16})}
-      </button>
-    `}_renderAccounts(t){return X`
-      <div class="body">
-        <div class="section-label">${t.name} · choose an account</div>
-        <div class="stack">
-          ${t.accounts.map(t=>this._renderAccountTile(t))}
-        </div>
-      </div>
-    `}_renderAccountTile(t){const e=t.name.replace(/[^a-zA-Z]/g,"").slice(0,2).toUpperCase();return X`
-      <button
-        class="account-tile"
-        @click=${()=>this.store.pushCrumb({kind:"account",label:t.name},{accountId:t.id,sub:"playlists",detailId:null})}
-      >
-        <div class="account-avatar" style=${"background:conic-gradient(from 220deg, var(--hf-accent), oklch(70% 0.14 220))"}>${e}</div>
-        <div style="flex:1; min-width:0">
-          <div class="account-name">${t.name}</div>
-          <div class="account-sub">${t.tier}</div>
-        </div>
-        ${Pt.chev({size:16})}
-      </button>
-    `}_renderTypeView(t){return X`
-      <div class="subtabs">
-        ${Ft.map(e=>X`
-            <button
-              class="subtab"
-              data-active=${t===e.id}
-              @click=${()=>this.store.browserGo({sub:e.id})}
-            >
-              ${e.label}
+    `}_renderHassGrid(e){return X`
+      <div class="grid2">
+        ${e.map(e=>X`
+            <button class="art-tile" @click=${()=>this._onHassChildClick(e)}>
+              <hf-album-art
+                .obj=${null}
+                .imageUrl=${e.thumbnail??void 0}
+                size="100%"
+                radius="8"
+                style="aspect-ratio:1/1; width:100%"
+              ></hf-album-art>
+              <div>
+                <div class="art-tile-name">${e.title}</div>
+                <div class="art-tile-sub">${e.media_class}</div>
+              </div>
             </button>
           `)}
       </div>
-      <div class="body">${this._renderTypeBody(t)}</div>
-    `}_renderTypeBody(t){return"playlists"===t?X`
+    `}_renderHassList(e){return X`
+      <div>
+        ${e.map(e=>X`
+            <button class="track-row" @click=${()=>this._onHassChildClick(e)}>
+              ${e.thumbnail?X`<hf-album-art
+                    .obj=${null}
+                    .imageUrl=${e.thumbnail}
+                    size="36"
+                    radius="6"
+                  ></hf-album-art>`:X`<div
+                    style="width:36px;height:36px;border-radius:6px;background:var(--hf-input);display:grid;place-items:center;color:var(--hf-text-dim);flex:none"
+                  >
+                    ${this._iconForClass(e.media_class)}
+                  </div>`}
+              <div class="track-meta">
+                <div class="track-name">${e.title}</div>
+                <div class="track-sub">${e.media_class}</div>
+              </div>
+              ${e.can_expand?Ee.chev({size:14}):e.can_play?Ee.play({size:14}):""}
+            </button>
+          `)}
+      </div>
+    `}_onHassChildClick(e){e.can_expand?this.store.browseInto(e):e.can_play&&this.store.playBrowseNode(e,"replace")}_iconForClass(e){return"track"===e||"music"===e?Ee.note({size:16}):"album"===e?Ee.album({size:16}):"artist"===e?Ee.artist({size:16}):"playlist"===e?Ee.list({size:16}):"radio"===e?Ee.radio({size:16}):Ee.home({size:16})}_renderCrumbs(){const e=this.store.browser.crumbs;return X`
+      <div class="crumbs">
+        ${e.map((t,s)=>{const r=s===e.length-1;return X`
+            <button
+              class="crumb-btn"
+              data-current=${r}
+              @click=${()=>this.store.popToCrumb(s)}
+            >
+              ${t.label}
+            </button>
+            ${s<e.length-1?X`<span aria-hidden="true">${Ee.chev({size:11})}</span>`:""}
+          `})}
+      </div>
+    `}_renderBody(){const{providerId:e,accountId:t,sub:s,detailId:r}=this.store.browser;if(!e)return this._renderProviders();const a=Be.providerById(e);return a?t?r?this._renderDetail(r):this._renderTypeView(s):this._renderAccounts(a):X``}_renderProviders(){return X`
+      <div class="body">
+        <div class="section-label">Connected sources</div>
+        <div class="stack">
+          ${Be.providers.map(e=>this._renderProviderTile(e))}
+        </div>
+      </div>
+    `}_renderProviderTile(e){const t=`linear-gradient(135deg, oklch(72% 0.18 ${e.brandHue}), oklch(48% 0.16 ${(e.brandHue+30)%360}))`;return X`
+      <button
+        class="provider-tile"
+        @click=${()=>this.store.pushCrumb({kind:"provider",label:e.name},{providerId:e.id})}
+      >
+        <div class="provider-glyph" style=${`background:${t}`}>
+          ${e.glyph||e.name[0]}
+        </div>
+        <div class="provider-info">
+          <div class="provider-name">${e.name}</div>
+          <div class="provider-sub">
+            ${e.accounts.length} account${e.accounts.length>1?"s":""} · connected
+          </div>
+        </div>
+        ${Ee.chev({size:16})}
+      </button>
+    `}_renderAccounts(e){return X`
+      <div class="body">
+        <div class="section-label">${e.name} · choose an account</div>
+        <div class="stack">
+          ${e.accounts.map(e=>this._renderAccountTile(e))}
+        </div>
+      </div>
+    `}_renderAccountTile(e){const t=e.name.replace(/[^a-zA-Z]/g,"").slice(0,2).toUpperCase();return X`
+      <button
+        class="account-tile"
+        @click=${()=>this.store.pushCrumb({kind:"account",label:e.name},{accountId:e.id,sub:"playlists",detailId:null})}
+      >
+        <div class="account-avatar" style=${"background:conic-gradient(from 220deg, var(--hf-accent), oklch(70% 0.14 220))"}>${t}</div>
+        <div style="flex:1; min-width:0">
+          <div class="account-name">${e.name}</div>
+          <div class="account-sub">${e.tier}</div>
+        </div>
+        ${Ee.chev({size:16})}
+      </button>
+    `}_renderTypeView(e){return X`
+      <div class="subtabs">
+        ${De.map(t=>X`
+            <button
+              class="subtab"
+              data-active=${e===t.id}
+              @click=${()=>this.store.browserGo({sub:t.id})}
+            >
+              ${t.label}
+            </button>
+          `)}
+      </div>
+      <div class="body">${this._renderTypeBody(e)}</div>
+    `}_renderTypeBody(e){return"playlists"===e?X`
         <div class="grid2">
-          ${Ot.playlists.map(t=>X`
+          ${Be.playlists.map(e=>X`
               <button
                 class="art-tile"
-                @click=${()=>this.store.pushCrumb({kind:"detail",label:t.name},{detailId:t.id})}
+                @click=${()=>this.store.pushCrumb({kind:"detail",label:e.name},{detailId:e.id})}
               >
                 <hf-album-art
-                  .obj=${t}
+                  .obj=${e}
                   size="100%"
                   radius="8"
                   style="aspect-ratio:1/1; width:100%"
                 ></hf-album-art>
                 <div>
-                  <div class="art-tile-name">${t.name}</div>
-                  <div class="art-tile-sub">${t.trackCount} tracks</div>
+                  <div class="art-tile-name">${e.name}</div>
+                  <div class="art-tile-sub">${e.trackCount} tracks</div>
                 </div>
               </button>
             `)}
         </div>
-      `:"albums"===t?X`
+      `:"albums"===e?X`
         <div class="grid2">
-          ${Ot.albums.map(t=>X`
+          ${Be.albums.map(e=>X`
               <button
                 class="art-tile"
-                @click=${()=>this.store.pushCrumb({kind:"detail",label:t.name},{detailId:t.id})}
+                @click=${()=>this.store.pushCrumb({kind:"detail",label:e.name},{detailId:e.id})}
               >
                 <hf-album-art
-                  .obj=${t}
+                  .obj=${e}
                   size="100%"
                   radius="8"
                   style="aspect-ratio:1/1; width:100%"
                 ></hf-album-art>
                 <div>
-                  <div class="art-tile-name">${t.name}</div>
-                  <div class="art-tile-sub">${t.artist}</div>
+                  <div class="art-tile-name">${e.name}</div>
+                  <div class="art-tile-sub">${e.artist}</div>
                 </div>
               </button>
             `)}
         </div>
-      `:"artists"===t?X`
+      `:"artists"===e?X`
         <div>
-          ${Ot.artistList.slice(0,12).map((t,e)=>X`
+          ${Be.artistList.slice(0,12).map((e,t)=>X`
               <button class="artist-row">
                 <div
                   class="artist-avatar"
-                  style=${`background: conic-gradient(from ${40*e}deg, oklch(70% 0.18 ${30*e}), oklch(46% 0.16 ${(30*e+60)%360}))`}
+                  style=${`background: conic-gradient(from ${40*t}deg, oklch(70% 0.18 ${30*t}), oklch(46% 0.16 ${(30*t+60)%360}))`}
                 ></div>
-                <div class="artist-name">${t}</div>
+                <div class="artist-name">${e}</div>
                 <div class="artist-tag">Artist</div>
               </button>
             `)}
         </div>
-      `:"tracks"===t?X`
+      `:"tracks"===e?X`
         <div>
-          ${Ot.tracks.slice(0,12).map((t,e)=>this._renderTrackRow(t,e+1))}
+          ${Be.tracks.slice(0,12).map((e,t)=>this._renderTrackRow(e,t+1))}
         </div>
       `:X`
       <div class="stack">
-        ${Ot.radioStations.map(t=>X`
+        ${Be.radioStations.map(e=>X`
             <button class="radio-row">
               <hf-album-art
-                .obj=${t}
+                .obj=${e}
                 size="44"
                 radius="10"
-                .glyph=${Pt.radio({size:18,stroke:"#fff"})}
+                .glyph=${Ee.radio({size:18,stroke:"#fff"})}
               ></hf-album-art>
               <div style="flex:1; min-width:0">
-                <div class="track-name">${t.name}</div>
-                <div class="track-sub">${t.genre}</div>
+                <div class="track-name">${e.name}</div>
+                <div class="track-sub">${e.genre}</div>
               </div>
-              ${Pt.play({size:16})}
+              ${Ee.play({size:16})}
             </button>
           `)}
       </div>
-    `}_renderTrackRow(t,e){const r=Ot.albumById(t.albumId);return X`
+    `}_renderTrackRow(e,t){const s=Be.albumById(e.albumId);return X`
       <button class="track-row">
-        ${null!=e?X`<div class="track-index">${e}</div>`:""}
-        <hf-album-art .obj=${r} size="36" radius="6"></hf-album-art>
+        ${null!=t?X`<div class="track-index">${t}</div>`:""}
+        <hf-album-art .obj=${s} size="36" radius="6"></hf-album-art>
         <div class="track-meta">
-          <div class="track-name">${t.name}</div>
-          <div class="track-sub">${t.artist} · ${t.album}</div>
+          <div class="track-name">${e.name}</div>
+          <div class="track-sub">${e.artist} · ${e.album}</div>
         </div>
-        <div class="track-time">${Lt(t.durationSec)}</div>
+        <div class="track-time">${Te(e.durationSec)}</div>
       </button>
-    `}_renderDetail(t){const e=Ot.playlists.find(e=>e.id===t),r=Ot.albums.find(e=>e.id===t),s=e??r;if(!s)return X``;const a=!!e;return X`
+    `}_renderDetail(e){const t=Be.playlists.find(t=>t.id===e),s=Be.albums.find(t=>t.id===e),r=t??s;if(!r)return X``;const a=!!t;return X`
       <div>
         <div class="detail-header">
           <hf-album-art
-            .obj=${s}
+            .obj=${r}
             size="112"
             radius="14"
             boxShadow="0 12px 24px rgba(0,0,0,0.28)"
           ></hf-album-art>
           <div class="detail-meta">
             <div class="detail-kind">${a?"Playlist":"Album"}</div>
-            <div class="detail-title">${s.name}</div>
+            <div class="detail-title">${r.name}</div>
             <div class="detail-sub">
-              ${a?`${s.owner} · ${s.trackCount} tracks`:`${s.artist} · ${s.year}`}
+              ${a?`${r.owner} · ${r.trackCount} tracks`:`${r.artist} · ${r.year}`}
             </div>
             <div class="detail-actions">
-              <button class="pill-btn primary">${Pt.play({size:13})} Play</button>
-              <button class="pill-btn">${Pt.plus({size:13})} Queue</button>
+              <button class="pill-btn primary">${Ee.play({size:13})} Play</button>
+              <button class="pill-btn">${Ee.plus({size:13})} Queue</button>
             </div>
           </div>
         </div>
         <div class="body">
-          ${Ot.tracks.slice(0,10).map((t,e)=>this._renderTrackRow(t,e+1))}
+          ${Be.tracks.slice(0,10).map((e,t)=>this._renderTrackRow(e,t+1))}
         </div>
       </div>
-    `}};Gt.styles=l`
+    `}};Fe.styles=l`
     :host {
       display: block;
       height: 100%;
@@ -870,68 +930,79 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
       color: var(--hf-accent-text);
       border: 0;
     }
-  `,t([ut({attribute:!1})],Gt.prototype,"store",void 0),Gt=t([ct("hf-browse-tab")],Gt);const Wt=[{id:"all",label:"All"},{id:"tracks",label:"Tracks"},{id:"albums",label:"Albums"},{id:"artists",label:"Artists"},{id:"playlists",label:"Playlists"}],Qt=["khruangbin","jazz","deep focus","ambient","tycho","discover weekly"];let Vt=class extends i{willUpdate(t){t.has("store")&&this.store&&!this._ctrl&&(this._ctrl=new StoreController(this,this.store))}render(){if(!this.store)return X``;const t=this.store,e=t.search.query.trim().toLowerCase(),r=t.search.filter,s=e?this._matchesFor(e):null;return X`
+    .hass-loading,
+    .hass-error,
+    .hass-empty {
+      padding: 40px 14px;
+      text-align: center;
+      color: var(--hf-text-dim);
+      font-size: 13px;
+    }
+    .hass-error {
+      color: #e0413a;
+    }
+  `,e([ue({attribute:!1})],Fe.prototype,"store",void 0),Fe=e([ce("hf-browse-tab")],Fe);const We=[{id:"all",label:"All"},{id:"tracks",label:"Tracks"},{id:"albums",label:"Albums"},{id:"artists",label:"Artists"},{id:"playlists",label:"Playlists"}],Ge=["khruangbin","jazz","deep focus","ambient","tycho","discover weekly"];let Ve=class extends i{willUpdate(e){e.has("store")&&this.store&&!this._ctrl&&(this._ctrl=new StoreController(this,this.store))}render(){if(!this.store)return X``;const e=this.store,t=e.search.query.trim().toLowerCase(),s=e.search.filter,r=t?this._matchesFor(t):null;return X`
       <div class="top">
         <div class="input-wrap">
-          ${Pt.search({size:16})}
+          ${Ee.search({size:16})}
           <input
-            .value=${t.search.query}
+            .value=${e.search.query}
             placeholder="Search Spotify, Apple Music, SoundCloud…"
-            @input=${e=>t.setSearch({query:e.target.value})}
+            @input=${t=>e.setSearch({query:t.target.value})}
           />
-          ${t.search.query?X`
+          ${e.search.query?X`
                 <button
                   class="clear-btn"
                   aria-label="Clear search"
-                  @click=${()=>t.setSearch({query:""})}
+                  @click=${()=>e.setSearch({query:""})}
                 >
-                  ${Pt.x({size:14})}
+                  ${Ee.x({size:14})}
                 </button>
               `:""}
         </div>
         <div class="filters">
-          ${Wt.map(e=>X`
+          ${We.map(t=>X`
               <button
                 class="filter"
-                data-active=${r===e.id}
-                @click=${()=>t.setSearch({filter:e.id})}
+                data-active=${s===t.id}
+                @click=${()=>e.setSearch({filter:t.id})}
               >
-                ${e.label}
+                ${t.label}
               </button>
             `)}
         </div>
       </div>
 
       <div class="scroll">
-        ${s?this._renderResults(s,r):this._renderSuggestions()}
+        ${r?this._renderResults(r,s):this._renderSuggestions()}
       </div>
-    `}_matchesFor(t){const e=e=>e.toLowerCase().includes(t);return{tracks:Ot.tracks.filter(t=>e(t.name)||e(t.artist)),albums:Ot.albums.filter(t=>e(t.name)||e(t.artist)),artists:Ot.artistList.filter(e),playlists:Ot.playlists.filter(t=>e(t.name))}}_renderResults(t,e){return X`
+    `}_matchesFor(e){const t=t=>t.toLowerCase().includes(e);return{tracks:Be.tracks.filter(e=>t(e.name)||t(e.artist)),albums:Be.albums.filter(e=>t(e.name)||t(e.artist)),artists:Be.artistList.filter(t),playlists:Be.playlists.filter(e=>t(e.name))}}_renderResults(e,t){return X`
       <div class="body">
-        ${Ot.providers.map(r=>this._renderProviderSection(r,t,e))}
+        ${Be.providers.map(s=>this._renderProviderSection(s,e,t))}
       </div>
-    `}_renderProviderSection(t,e,r){let s=e.tracks.slice(0,4),a=e.albums.slice(0,2),o=e.artists.slice(0,2),n=e.playlists.slice(0,2);"apple"===t.id?(s=e.tracks.slice(1,4),a=e.albums.slice(2,4)):"soundcloud"===t.id&&(s=e.tracks.slice(2,5),a=[]),"tracks"===r?(a=[],o=[],n=[]):"albums"===r?(s=[],o=[],n=[]):"artists"===r?(s=[],a=[],n=[]):"playlists"===r&&(s=[],a=[],o=[]);const l=s.length+a.length+o.length+n.length;if(0===l)return X``;const d=`linear-gradient(135deg, oklch(70% 0.18 ${t.brandHue}), oklch(46% 0.16 ${(t.brandHue+30)%360}))`;return X`
+    `}_renderProviderSection(e,t,s){let r=t.tracks.slice(0,4),a=t.albums.slice(0,2),o=t.artists.slice(0,2),n=t.playlists.slice(0,2);"apple"===e.id?(r=t.tracks.slice(1,4),a=t.albums.slice(2,4)):"soundcloud"===e.id&&(r=t.tracks.slice(2,5),a=[]),"tracks"===s?(a=[],o=[],n=[]):"albums"===s?(r=[],o=[],n=[]):"artists"===s?(r=[],a=[],n=[]):"playlists"===s&&(r=[],a=[],o=[]);const l=r.length+a.length+o.length+n.length;if(0===l)return X``;const d=`linear-gradient(135deg, oklch(70% 0.18 ${e.brandHue}), oklch(46% 0.16 ${(e.brandHue+30)%360}))`;return X`
       <div class="section">
         <div class="section-head">
           <div class="provider-glyph-sm" style=${`background:${d}`}>
-            ${t.glyph||t.name[0]}
+            ${e.glyph||e.name[0]}
           </div>
-          <div class="provider-name">${t.name}</div>
+          <div class="provider-name">${e.name}</div>
           <div class="result-count">
             ${l} result${l>1?"s":""}
           </div>
         </div>
 
-        ${s.length>0?X`
+        ${r.length>0?X`
               <div style="margin-bottom:6px">
                 <div class="small-label">Tracks</div>
-                ${s.map(t=>{const e=Ot.albumById(t.albumId);return X`
+                ${r.map(e=>{const t=Be.albumById(e.albumId);return X`
                     <div class="track-row">
-                      <hf-album-art .obj=${e} size="36" radius="6"></hf-album-art>
+                      <hf-album-art .obj=${t} size="36" radius="6"></hf-album-art>
                       <div class="row-meta">
-                        <div class="row-name">${t.name}</div>
-                        <div class="row-sub">${t.artist} · ${t.album}</div>
+                        <div class="row-name">${e.name}</div>
+                        <div class="row-sub">${e.artist} · ${e.album}</div>
                       </div>
-                      <div class="row-time">${Lt(t.durationSec)}</div>
+                      <div class="row-time">${Te(e.durationSec)}</div>
                     </div>
                   `})}
               </div>
@@ -941,11 +1012,11 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
               <div style="margin-bottom:6px">
                 <div class="small-label">Albums</div>
                 <div class="album-row">
-                  ${a.map(t=>X`
+                  ${a.map(e=>X`
                       <div class="album-card">
-                        <hf-album-art .obj=${t} size="96" radius="8"></hf-album-art>
-                        <div class="album-name">${t.name}</div>
-                        <div class="album-artist">${t.artist}</div>
+                        <hf-album-art .obj=${e} size="96" radius="8"></hf-album-art>
+                        <div class="album-name">${e.name}</div>
+                        <div class="album-artist">${e.artist}</div>
                       </div>
                     `)}
                 </div>
@@ -955,13 +1026,13 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
         ${o.length>0?X`
               <div style="margin-bottom:6px">
                 <div class="small-label">Artists</div>
-                ${o.map((t,e)=>X`
+                ${o.map((e,t)=>X`
                     <div class="artist-row">
                       <div
                         class="artist-avatar"
-                        style=${`background: conic-gradient(from ${60*e}deg, oklch(70% 0.18 ${40*e}), oklch(46% 0.16 ${(40*e+60)%360}))`}
+                        style=${`background: conic-gradient(from ${60*t}deg, oklch(70% 0.18 ${40*t}), oklch(46% 0.16 ${(40*t+60)%360}))`}
                       ></div>
-                      <div class="row-name">${t}</div>
+                      <div class="row-name">${e}</div>
                       <div class="row-time">Artist</div>
                     </div>
                   `)}
@@ -971,12 +1042,12 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
         ${n.length>0?X`
               <div>
                 <div class="small-label">Playlists</div>
-                ${n.map(t=>X`
+                ${n.map(e=>X`
                     <div class="playlist-row">
-                      <hf-album-art .obj=${t} size="36" radius="6"></hf-album-art>
+                      <hf-album-art .obj=${e} size="36" radius="6"></hf-album-art>
                       <div class="row-meta">
-                        <div class="row-name">${t.name}</div>
-                        <div class="row-sub">${t.trackCount} tracks</div>
+                        <div class="row-name">${e.name}</div>
+                        <div class="row-sub">${e.trackCount} tracks</div>
                       </div>
                     </div>
                   `)}
@@ -987,28 +1058,28 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
       <div class="suggestions">
         <div class="small-label">Try searching</div>
         <div class="suggest-row">
-          ${Qt.map(t=>X`
+          ${Ge.map(e=>X`
               <button
                 class="suggest-pill"
-                @click=${()=>this.store.setSearch({query:t})}
+                @click=${()=>this.store.setSearch({query:e})}
               >
-                ${t}
+                ${e}
               </button>
             `)}
         </div>
         <div class="small-label">Recent</div>
-        ${Ot.tracks.slice(0,4).map(t=>{const e=Ot.albumById(t.albumId);return X`
+        ${Be.tracks.slice(0,4).map(e=>{const t=Be.albumById(e.albumId);return X`
             <div class="track-row">
-              <hf-album-art .obj=${e} size="36" radius="6"></hf-album-art>
+              <hf-album-art .obj=${t} size="36" radius="6"></hf-album-art>
               <div class="row-meta">
-                <div class="row-name">${t.name}</div>
-                <div class="row-sub">${t.artist} · ${t.album}</div>
+                <div class="row-name">${e.name}</div>
+                <div class="row-sub">${e.artist} · ${e.album}</div>
               </div>
-              <div class="row-time">${Lt(t.durationSec)}</div>
+              <div class="row-time">${Te(e.durationSec)}</div>
             </div>
           `})}
       </div>
-    `}};Vt.styles=l`
+    `}};Ve.styles=l`
     :host {
       display: flex;
       flex-direction: column;
@@ -1215,7 +1286,7 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
       gap: 6px;
       margin-bottom: 16px;
     }
-  `,t([ut({attribute:!1})],Vt.prototype,"store",void 0),Vt=t([ct("hf-search-tab")],Vt);let Yt=class extends i{constructor(){super(...arguments),this.rowHeight=56,this.actionBg="#e0413a",this._dx=0,this._dragging=!1,this._startX=null,this._startDx=0,this._onDown=t=>{const e="touches"in t?t.touches[0].clientX:t.clientX;this._startX=e,this._startDx=this._dx,this._dragging=!0},this._onMove=t=>{if(null===this._startX)return;const e="touches"in t?t.touches[0].clientX:t.clientX;let r=this._startDx+(e-this._startX);r>0&&(r=0),r<-110&&(r=-110),this._dx=r},this._onUp=()=>{this._startX=null,this._dragging=!1,this._dx=this._dx<-64?-92:0},this._fireDelete=()=>{this.dispatchEvent(new CustomEvent("hf-delete",{bubbles:!0,composed:!0})),this._dx=0}}render(){return X`
+  `,e([ue({attribute:!1})],Ve.prototype,"store",void 0),Ve=e([ce("hf-search-tab")],Ve);let Ke=class extends i{constructor(){super(...arguments),this.rowHeight=56,this.actionBg="#e0413a",this._dx=0,this._dragging=!1,this._startX=null,this._startDx=0,this._onDown=e=>{const t="touches"in e?e.touches[0].clientX:e.clientX;this._startX=t,this._startDx=this._dx,this._dragging=!0},this._onMove=e=>{if(null===this._startX)return;const t="touches"in e?e.touches[0].clientX:e.clientX;let s=this._startDx+(t-this._startX);s>0&&(s=0),s<-110&&(s=-110),this._dx=s},this._onUp=()=>{this._startX=null,this._dragging=!1,this._dx=this._dx<-64?-92:0},this._fireDelete=()=>{this.dispatchEvent(new CustomEvent("hf-delete",{bubbles:!0,composed:!0})),this._dx=0}}render(){return X`
       <div
         class="action"
         style=${`background:${this.actionBg}`}
@@ -1236,7 +1307,7 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
       >
         <slot></slot>
       </div>
-    `}};Yt.styles=l`
+    `}};Ke.styles=l`
     :host {
       display: block;
       position: relative;
@@ -1262,31 +1333,31 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
     .row.dragging {
       cursor: grabbing;
     }
-  `,t([ut({type:Number})],Yt.prototype,"rowHeight",void 0),t([ut()],Yt.prototype,"actionBg",void 0),t([ut({attribute:!1})],Yt.prototype,"icon",void 0),t([ft()],Yt.prototype,"_dx",void 0),t([ft()],Yt.prototype,"_dragging",void 0),Yt=t([ct("hf-swipe-row")],Yt);let Kt=class extends i{constructor(){super(...arguments),this.items=[],this.rowHeight=56,this.renderRow=()=>X``,this._dragIdx=null,this._hoverIdx=null,this._startY=0,this._onMove=t=>{if(null===this._dragIdx)return;const e=("touches"in t?t.touches[0].clientY:t.clientY)-this._startY,r=Math.round(this._dragIdx+e/this.rowHeight);this._hoverIdx=Math.max(0,Math.min(this.items.length-1,r))},this._onUp=()=>{null!==this._dragIdx&&null!==this._hoverIdx&&this._hoverIdx!==this._dragIdx&&this.dispatchEvent(new CustomEvent("hf-reorder",{detail:{from:this._dragIdx,to:this._hoverIdx},bubbles:!0,composed:!0})),this._dragIdx=null,this._hoverIdx=null,window.removeEventListener("mousemove",this._onMove),window.removeEventListener("mouseup",this._onUp),window.removeEventListener("touchmove",this._onMove),window.removeEventListener("touchend",this._onUp)}}createRenderRoot(){return this}render(){const t=this._positions();return X`
+  `,e([ue({type:Number})],Ke.prototype,"rowHeight",void 0),e([ue()],Ke.prototype,"actionBg",void 0),e([ue({attribute:!1})],Ke.prototype,"icon",void 0),e([me()],Ke.prototype,"_dx",void 0),e([me()],Ke.prototype,"_dragging",void 0),Ke=e([ce("hf-swipe-row")],Ke);let Ye=class extends i{constructor(){super(...arguments),this.items=[],this.rowHeight=56,this.renderRow=()=>X``,this._dragIdx=null,this._hoverIdx=null,this._startY=0,this._onMove=e=>{if(null===this._dragIdx)return;const t=("touches"in e?e.touches[0].clientY:e.clientY)-this._startY,s=Math.round(this._dragIdx+t/this.rowHeight);this._hoverIdx=Math.max(0,Math.min(this.items.length-1,s))},this._onUp=()=>{null!==this._dragIdx&&null!==this._hoverIdx&&this._hoverIdx!==this._dragIdx&&this.dispatchEvent(new CustomEvent("hf-reorder",{detail:{from:this._dragIdx,to:this._hoverIdx},bubbles:!0,composed:!0})),this._dragIdx=null,this._hoverIdx=null,window.removeEventListener("mousemove",this._onMove),window.removeEventListener("mouseup",this._onUp),window.removeEventListener("touchmove",this._onMove),window.removeEventListener("touchend",this._onUp)}}createRenderRoot(){return this}render(){const e=this._positions();return X`
       <div
         style=${`position:relative;height:${this.items.length*this.rowHeight}px`}
       >
-        ${this.items.map((e,r)=>{const s=r===this._dragIdx,a=t[r]??0;return X`
-            <div style=${`position:absolute;left:0;right:0;top:0;transform:translateY(${a}px);${s?"transition:none;z-index:10;opacity:0.92;filter:drop-shadow(0 8px 22px rgba(0,0,0,0.4))":"transition:transform 0.18s cubic-bezier(0.2,0.7,0.3,1)"}`} .key=${e.key}>
-              ${this.renderRow(e,r,{onGripDown:this._gripDownFor(r),isDragging:s})}
+        ${this.items.map((t,s)=>{const r=s===this._dragIdx,a=e[s]??0;return X`
+            <div style=${`position:absolute;left:0;right:0;top:0;transform:translateY(${a}px);${r?"transition:none;z-index:10;opacity:0.92;filter:drop-shadow(0 8px 22px rgba(0,0,0,0.4))":"transition:transform 0.18s cubic-bezier(0.2,0.7,0.3,1)"}`} .key=${t.key}>
+              ${this.renderRow(t,s,{onGripDown:this._gripDownFor(s),isDragging:r})}
             </div>
           `})}
       </div>
-    `}_positions(){const t=this.items.map((t,e)=>e);if(null!==this._dragIdx&&null!==this._hoverIdx){const[e]=t.splice(this._dragIdx,1);void 0!==e&&t.splice(this._hoverIdx,0,e)}const e=new Array(this.items.length).fill(0);return t.forEach((t,r)=>{e[t]=r*this.rowHeight}),e}_gripDownFor(t){return e=>{e.preventDefault(),this._dragIdx=t,this._hoverIdx=t,this._startY="touches"in e?e.touches[0].clientY:e.clientY,window.addEventListener("mousemove",this._onMove),window.addEventListener("mouseup",this._onUp),window.addEventListener("touchmove",this._onMove,{passive:!1}),window.addEventListener("touchend",this._onUp)}}disconnectedCallback(){super.disconnectedCallback(),window.removeEventListener("mousemove",this._onMove),window.removeEventListener("mouseup",this._onUp),window.removeEventListener("touchmove",this._onMove),window.removeEventListener("touchend",this._onUp)}};t([ut({attribute:!1})],Kt.prototype,"items",void 0),t([ut({type:Number})],Kt.prototype,"rowHeight",void 0),t([ut({attribute:!1})],Kt.prototype,"renderRow",void 0),t([ft()],Kt.prototype,"_dragIdx",void 0),t([ft()],Kt.prototype,"_hoverIdx",void 0),Kt=t([ct("hf-draggable-queue")],Kt);let Jt=class extends i{willUpdate(t){t.has("store")&&this.store&&!this._ctrl&&(this._ctrl=new StoreController(this,this.store))}render(){if(!this.store)return X``;const t=this.store,e=t.activePlayer,r=e.queue.slice(e.currentIdx+1),s=Ot.trackById(e.queue[e.currentIdx]??""),a=r.map((t,r)=>{const s=e.currentIdx+1+r;return{key:`${t}@${s}`,id:t,idxInQueue:s}}),o=t.selectedTracks.size;return X`
-      ${t.multiMode?X`
+    `}_positions(){const e=this.items.map((e,t)=>t);if(null!==this._dragIdx&&null!==this._hoverIdx){const[t]=e.splice(this._dragIdx,1);void 0!==t&&e.splice(this._hoverIdx,0,t)}const t=new Array(this.items.length).fill(0);return e.forEach((e,s)=>{t[e]=s*this.rowHeight}),t}_gripDownFor(e){return t=>{t.preventDefault(),this._dragIdx=e,this._hoverIdx=e,this._startY="touches"in t?t.touches[0].clientY:t.clientY,window.addEventListener("mousemove",this._onMove),window.addEventListener("mouseup",this._onUp),window.addEventListener("touchmove",this._onMove,{passive:!1}),window.addEventListener("touchend",this._onUp)}}disconnectedCallback(){super.disconnectedCallback(),window.removeEventListener("mousemove",this._onMove),window.removeEventListener("mouseup",this._onUp),window.removeEventListener("touchmove",this._onMove),window.removeEventListener("touchend",this._onUp)}};e([ue({attribute:!1})],Ye.prototype,"items",void 0),e([ue({type:Number})],Ye.prototype,"rowHeight",void 0),e([ue({attribute:!1})],Ye.prototype,"renderRow",void 0),e([me()],Ye.prototype,"_dragIdx",void 0),e([me()],Ye.prototype,"_hoverIdx",void 0),Ye=e([ce("hf-draggable-queue")],Ye);let Je=class extends i{constructor(){super(...arguments),this._queueLoadKickedOff=!1}willUpdate(e){e.has("store")&&this.store&&!this._ctrl&&(this._ctrl=new StoreController(this,this.store))}updated(){!this.store?.isHassMode||this.store.hassQueueLoading||this.store.hassQueueIsFresh||this._queueLoadKickedOff||(this._queueLoadKickedOff=!0,this.store.loadQueue().finally(()=>{this._queueLoadKickedOff=!1}))}render(){if(!this.store)return X``;if(this.store.isHassMode)return this._renderHass();const e=this.store,t=e.activePlayer,s=t.queue.slice(t.currentIdx+1),r=Be.trackById(t.queue[t.currentIdx]??""),a=s.map((e,s)=>{const r=t.currentIdx+1+s;return{key:`${e}@${r}`,id:e,idxInQueue:r}}),o=e.selectedTracks.size;return X`
+      ${e.multiMode?X`
             <div class="toolbar multi">
               <button
                 class="icon-btn-sq"
-                @click=${()=>t.setMultiMode(!1)}
+                @click=${()=>e.setMultiMode(!1)}
                 aria-label="Cancel selection"
               >
-                ${Pt.x({size:16})}
+                ${Ee.x({size:16})}
               </button>
               <div class="multi-count">${o} selected</div>
               <div class="multi-actions">
                 <button
                   class="pill-primary"
-                  @click=${()=>t.removeBulk(t.selectedTracks)}
+                  @click=${()=>e.removeBulk(e.selectedTracks)}
                 >
                   Remove
                 </button>
@@ -1296,103 +1367,223 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
             <div class="toolbar">
               <div>
                 <div class="title">Queue</div>
-                <div class="sub">${r.length} upcoming · drag to reorder</div>
+                <div class="sub">${s.length} upcoming · drag to reorder</div>
               </div>
               <div style="display:flex;gap:6px">
                 <button
                   class="icon-btn-sq"
                   aria-label="Multi-select"
-                  @click=${()=>t.setMultiMode(!0)}
+                  @click=${()=>e.setMultiMode(!0)}
                 >
-                  ${Pt.check({size:16})}
+                  ${Ee.check({size:16})}
                 </button>
                 <button
                   class="icon-btn-sq"
                   aria-label="Clear queue"
-                  @click=${()=>t.clearQueue()}
+                  @click=${()=>e.clearQueue()}
                 >
-                  ${Pt.trash({size:16})}
+                  ${Ee.trash({size:16})}
                 </button>
               </div>
             </div>
           `}
 
-      ${s?X`
+      ${r?X`
             <div class="now-playing">
               <div class="small-label">Now playing</div>
               <div class="now-playing-card">
                 <hf-album-art
-                  .obj=${Ot.albumById(s.albumId)}
+                  .obj=${Be.albumById(r.albumId)}
                   size="44"
                   radius="8"
                 ></hf-album-art>
                 <div class="np-meta">
                   <div class="np-line">
                     <div class="np-pulse"></div>
-                    <div class="np-name">${s.name}</div>
+                    <div class="np-name">${r.name}</div>
                   </div>
-                  <div class="np-artist">${s.artist}</div>
+                  <div class="np-artist">${r.artist}</div>
                 </div>
               </div>
             </div>
           `:""}
 
       <div class="scroll">
-        <div class="small-label">Up next · ${r.length}</div>
+        <div class="small-label">Up next · ${s.length}</div>
         ${0===a.length?X`<div class="empty">Queue is empty</div>`:X`
               <hf-draggable-queue
                 .items=${a}
                 .rowHeight=${56}
-                .renderRow=${(t,e,r)=>this._renderRow(t,r)}
-                @hf-reorder=${e=>{const r=t.activePlayer.currentIdx;t.moveQueue(r+1+e.detail.from,r+1+e.detail.to)}}
+                .renderRow=${(e,t,s)=>this._renderRow(e,s)}
+                @hf-reorder=${t=>{const s=e.activePlayer.currentIdx;e.moveQueue(s+1+t.detail.from,s+1+t.detail.to)}}
               ></hf-draggable-queue>
             `}
       </div>
-    `}_renderRow(t,e){const r=this.store,s=Ot.trackById(t.id);if(!s)return X``;const a=Ot.albumById(s.albumId),o=r.selectedTracks.has(t.idxInQueue);return X`
+    `}_renderRow(e,t){const s=this.store,r=Be.trackById(e.id);if(!r)return X``;const a=Be.albumById(r.albumId),o=s.selectedTracks.has(e.idxInQueue);return X`
       <hf-swipe-row
         .rowHeight=${56}
-        @hf-delete=${()=>r.removeFromQueue(t.idxInQueue)}
+        @hf-delete=${()=>s.removeFromQueue(e.idxInQueue)}
       >
         <div class="row-inner" data-selected=${o}>
-          ${r.multiMode?X`
+          ${s.multiMode?X`
                 <button
                   class="checkbox"
                   data-checked=${o}
-                  @click=${e=>{e.stopPropagation();const s=new Set(r.selectedTracks);s.has(t.idxInQueue)?s.delete(t.idxInQueue):s.add(t.idxInQueue),r.setSelectedTracks(s)}}
+                  @click=${t=>{t.stopPropagation();const r=new Set(s.selectedTracks);r.has(e.idxInQueue)?r.delete(e.idxInQueue):r.add(e.idxInQueue),s.setSelectedTracks(r)}}
                 >
-                  ${o?Pt.check({size:12,sw:3}):""}
+                  ${o?Ee.check({size:12,sw:3}):""}
                 </button>
               `:X`
                 <div
                   class="grip"
                   aria-label="Drag handle"
-                  @mousedown=${e.onGripDown}
-                  @touchstart=${e.onGripDown}
+                  @mousedown=${t.onGripDown}
+                  @touchstart=${t.onGripDown}
                 >
-                  ${Pt.drag({size:14})}
+                  ${Ee.drag({size:14})}
                 </div>
               `}
           <hf-album-art .obj=${a} size="40" radius="6"></hf-album-art>
           <div
             class="row-track"
-            @click=${()=>r.multiMode?null:r.playTrackAt(t.idxInQueue)}
+            @click=${()=>s.multiMode?null:s.playTrackAt(e.idxInQueue)}
           >
-            <div class="row-name">${s.name}</div>
-            <div class="row-artist">${s.artist}</div>
+            <div class="row-name">${r.name}</div>
+            <div class="row-artist">${r.artist}</div>
           </div>
-          <div class="row-time">${Lt(s.durationSec)}</div>
-          ${r.multiMode?"":X`
+          <div class="row-time">${Te(r.durationSec)}</div>
+          ${s.multiMode?"":X`
                 <button
                   class="row-next"
                   aria-label="Play next"
-                  @click=${e=>{e.stopPropagation(),r.moveToTop(t.idxInQueue)}}
+                  @click=${t=>{t.stopPropagation(),s.moveToTop(e.idxInQueue)}}
                 >
-                  ${Pt.playNext({size:14})}
+                  ${Ee.playNext({size:14})}
                 </button>
               `}
         </div>
       </hf-swipe-row>
-    `}};Jt.styles=l`
+    `}_renderHass(){const e=this.store,t=e.hassQueue,s=e.currentTrack.name,r=e.currentTrack.artist,a=e.currentAlbum.imageUrl,o=e.selectedTracks.size;return X`
+      ${e.multiMode?X`
+            <div class="toolbar multi">
+              <button
+                class="icon-btn-sq"
+                @click=${()=>e.setMultiMode(!1)}
+                aria-label="Cancel selection"
+              >
+                ${Ee.x({size:16})}
+              </button>
+              <div class="multi-count">${o} selected</div>
+              <div class="multi-actions">
+                <button
+                  class="pill-primary"
+                  @click=${()=>this._bulkRemoveHass()}
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          `:X`
+            <div class="toolbar">
+              <div>
+                <div class="title">Queue</div>
+                <div class="sub">
+                  ${t.length} item${1===t.length?"":"s"} ·
+                  drag-reorder coming soon
+                </div>
+              </div>
+              <div style="display:flex;gap:6px">
+                <button
+                  class="icon-btn-sq"
+                  aria-label="Reload queue"
+                  @click=${()=>{e.loadQueue()}}
+                >
+                  ${Ee.search({size:16})}
+                </button>
+                <button
+                  class="icon-btn-sq"
+                  aria-label="Multi-select"
+                  @click=${()=>e.setMultiMode(!0)}
+                >
+                  ${Ee.check({size:16})}
+                </button>
+                <button
+                  class="icon-btn-sq"
+                  aria-label="Clear queue from here"
+                  @click=${()=>e.clearQueueFromHere()}
+                >
+                  ${Ee.trash({size:16})}
+                </button>
+              </div>
+            </div>
+          `}
+
+      ${s&&"Nothing playing"!==s?X`
+            <div class="now-playing">
+              <div class="small-label">Now playing</div>
+              <div class="now-playing-card">
+                <hf-album-art
+                  .obj=${null}
+                  .imageUrl=${a}
+                  size="44"
+                  radius="8"
+                ></hf-album-art>
+                <div class="np-meta">
+                  <div class="np-line">
+                    <div class="np-pulse"></div>
+                    <div class="np-name">${s}</div>
+                  </div>
+                  <div class="np-artist">${r}</div>
+                </div>
+              </div>
+            </div>
+          `:""}
+
+      <div class="scroll">
+        <div class="small-label">Up next · ${t.length}</div>
+        ${e.hassQueueLoading?X`<div class="hass-loading">Loading queue…</div>`:e.hassQueueError?X`<div class="hass-error">${e.hassQueueError}</div>`:0===t.length?X`<div class="empty">Queue is empty</div>`:X`<div>${t.map(e=>this._renderHassRow(e))}</div>`}
+      </div>
+    `}_renderHassRow(e){const t=this.store,s=e.title??e.name??"(untitled)",r=e.artist??"",a=e.duration??e.duration_seconds??0,o=e.image_url??e.thumbnail,n=t.selectedTracks.has(e.queue_item_id);return X`
+      <hf-swipe-row
+        .rowHeight=${56}
+        @hf-delete=${()=>t.removeQueueItem(e.queue_item_id)}
+      >
+        <div class="row-inner" data-selected=${n}>
+          ${t.multiMode?X`
+                <button
+                  class="checkbox"
+                  data-checked=${n}
+                  @click=${t=>{t.stopPropagation(),this._toggleSelectHass(e.queue_item_id)}}
+                >
+                  ${n?Ee.check({size:12,sw:3}):""}
+                </button>
+              `:""}
+          <hf-album-art
+            .obj=${null}
+            .imageUrl=${o}
+            size="40"
+            radius="6"
+          ></hf-album-art>
+          <div
+            class="row-track"
+            @click=${()=>t.multiMode?null:t.playQueueItem(e.queue_item_id)}
+          >
+            <div class="row-name">${s}</div>
+            <div class="row-artist">${r}</div>
+          </div>
+          <div class="row-time">${a?Te(a):""}</div>
+          ${t.multiMode?"":X`
+                <button
+                  class="row-next"
+                  aria-label="Play next"
+                  @click=${s=>{s.stopPropagation(),t.moveQueueItemToTop(e.queue_item_id)}}
+                >
+                  ${Ee.playNext({size:14})}
+                </button>
+              `}
+        </div>
+      </hf-swipe-row>
+    `}_toggleSelectHass(e){const t=this.store.selectedTracks,s=new Set(t);s.has(e)?s.delete(e):s.add(e),this.store.setSelectedTracks(s)}_bulkRemoveHass(){const e=this.store.selectedTracks;this.store.removeQueueItems(new Set(e))}};Je.styles=l`
     :host {
       display: flex;
       flex-direction: column;
@@ -1588,27 +1779,38 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
       color: var(--hf-accent-text);
       border-color: var(--hf-accent);
     }
-  `,t([ut({attribute:!1})],Jt.prototype,"store",void 0),Jt=t([ct("hf-queue-tab")],Jt);let Xt=class extends i{willUpdate(t){t.has("store")&&this.store&&!this._ctrl&&(this._ctrl=new StoreController(this,this.store))}render(){if(!this.store)return X``;const t=this.store.groups,e=t.filter(t=>!t.isIdle),r=t.filter(t=>t.isIdle);return X`
+    .hass-loading,
+    .hass-error,
+    .hass-empty {
+      padding: 40px 14px;
+      text-align: center;
+      color: var(--hf-text-dim);
+      font-size: 13px;
+    }
+    .hass-error {
+      color: #e0413a;
+    }
+  `,e([ue({attribute:!1})],Je.prototype,"store",void 0),Je=e([ce("hf-queue-tab")],Je);let Xe=class extends i{willUpdate(e){e.has("store")&&this.store&&!this._ctrl&&(this._ctrl=new StoreController(this,this.store))}render(){if(!this.store)return X``;const e=this.store.groups,t=e.filter(e=>!e.isIdle),s=e.filter(e=>e.isIdle);return X`
       <div class="header">
         <div class="header-title">Speakers & groups</div>
         <div class="header-sub">
-          ${e.length} group${1===e.length?"":"s"} ·
+          ${t.length} group${1===t.length?"":"s"} ·
           ${this.store.speakers.length} speakers total
         </div>
       </div>
 
       <div class="groups">
-        ${e.map(t=>this._renderGroupCard(t))}
+        ${t.map(e=>this._renderGroupCard(e))}
       </div>
 
-      ${r.length>0?X`
+      ${s.length>0?X`
             <div class="idle-section">
               Idle
               <div class="rule"></div>
-              ${r.length}
+              ${s.length}
             </div>
             <div class="idle-rows">
-              ${r.map(t=>this._renderIdleRow(t))}
+              ${s.map(e=>this._renderIdleRow(e))}
             </div>
           `:""}
 
@@ -1616,109 +1818,109 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
         Tap a group's name to control it from the Player tab. Use Group on
         any row to add/remove rooms; ▶ on an idle row starts solo playback.
       </div>
-    `}_renderGroupCard(t){const e=t.player?Ot.trackById(t.player.queue[t.player.currentIdx]??""):void 0,r=e?Ot.albumById(e.albumId):void 0,s=t.player?.groupVolume??t.lead.volume;return X`
-      <div class="group-card" data-active=${t.isActive}>
+    `}_renderGroupCard(e){const t=e.player?Be.trackById(e.player.queue[e.player.currentIdx]??""):void 0,s=t?Be.albumById(t.albumId):void 0,r=e.player?.groupVolume??e.lead.volume;return X`
+      <div class="group-card" data-active=${e.isActive}>
         <div class="group-head">
-          ${r?X`<hf-album-art .obj=${r} size="46" radius="9"></hf-album-art>`:X`<div class="group-art">${Pt.speaker({size:18})}</div>`}
+          ${s?X`<hf-album-art .obj=${s} size="46" radius="9"></hf-album-art>`:X`<div class="group-art">${Ee.speaker({size:18})}</div>`}
           <div class="group-meta">
-            <button class="group-name-btn" @click=${()=>this.store.setActiveLead(t.leadId)}>
-              <span class="group-name">${t.name}</span>
-              ${t.isActive?X`<span class="active-badge">Active</span>`:""}
+            <button class="group-name-btn" @click=${()=>this.store.setActiveLead(e.leadId)}>
+              <span class="group-name">${e.name}</span>
+              ${e.isActive?X`<span class="active-badge">Active</span>`:""}
             </button>
             <div class="group-track">
-              ${e?X`<strong>${e.name}</strong> · ${e.artist}`:"Idle"}
+              ${t?X`<strong>${t.name}</strong> · ${t.artist}`:"Idle"}
             </div>
           </div>
           <div class="group-actions">
             <button
               class="pill-btn"
               title="Group rooms"
-              @click=${()=>this.store.openGroupingSheet(t.leadId)}
+              @click=${()=>this.store.openGroupingSheet(e.leadId)}
             >
-              ${Pt.group({size:13})} Group
+              ${Ee.group({size:13})} Group
             </button>
             <button
               class="play-btn"
-              data-playing=${t.playing}
-              aria-label=${t.playing?"Pause group":"Play group"}
-              @click=${()=>this.store.toggleGroupPlay(t.leadId)}
+              data-playing=${e.playing}
+              aria-label=${e.playing?"Pause group":"Play group"}
+              @click=${()=>this.store.toggleGroupPlay(e.leadId)}
             >
-              ${t.playing?Pt.pause({size:14}):Pt.play({size:14})}
+              ${e.playing?Ee.pause({size:14}):Ee.play({size:14})}
             </button>
           </div>
         </div>
 
         <div class="group-volume">
           <div class="group-volume-head">
-            ${Pt.group({size:13,stroke:bt})}
+            ${Ee.group({size:13,stroke:be})}
             <div class="group-volume-label">
-              Group · ${t.members.length} speaker${1===t.members.length?"":"s"}
+              Group · ${e.members.length} speaker${1===e.members.length?"":"s"}
             </div>
-            <div class="group-volume-value">${s}</div>
+            <div class="group-volume-value">${r}</div>
           </div>
           <hf-slider
-            .value=${s}
-            .color=${wt}
-            .track=${kt}
-            @hf-input=${e=>this.store.setGroupVolumeFor(t.leadId,e.detail)}
+            .value=${r}
+            .color=${we}
+            .track=${ke}
+            @hf-input=${t=>this.store.setGroupVolumeFor(e.leadId,t.detail)}
           ></hf-slider>
         </div>
 
         <div class="members">
-          ${t.members.map(e=>this._renderMemberRow(e,t))}
+          ${e.members.map(t=>this._renderMemberRow(t,e))}
         </div>
       </div>
-    `}_renderMemberRow(t,e){const r=t.id===e.leadId,s=e.members.length>1;return X`
+    `}_renderMemberRow(e,t){const s=e.id===t.leadId,r=t.members.length>1;return X`
       <div class="member-row">
         <div class="member-info">
           <div class="member-name-row">
-            <div class="member-name">${t.name}</div>
-            ${r&&e.members.length>1?X`<span class="lead-tag">Lead</span>`:""}
+            <div class="member-name">${e.name}</div>
+            ${s&&t.members.length>1?X`<span class="lead-tag">Lead</span>`:""}
           </div>
           <hf-slider
-            .value=${t.volume}
-            .color=${bt}
-            .track=${kt}
+            .value=${e.volume}
+            .color=${be}
+            .track=${ke}
             .trackHeight=${3}
             .thumb=${10}
-            @hf-input=${e=>this.store.setSpeakerVol(t.id,e.detail)}
+            @hf-input=${t=>this.store.setSpeakerVol(e.id,t.detail)}
           ></hf-slider>
         </div>
-        <div class="member-vol-value">${t.volume}</div>
-        ${s?X`
+        <div class="member-vol-value">${e.volume}</div>
+        ${r?X`
               <button
                 class="member-leave"
                 title="Leave group"
-                @click=${()=>this.store.ungroupSpeaker(t.id)}
+                @click=${()=>this.store.ungroupSpeaker(e.id)}
               >
-                ${Pt.x({size:13})}
+                ${Ee.x({size:13})}
               </button>
             `:""}
       </div>
-    `}_renderIdleRow(t){const e=t.lead;return X`
+    `}_renderIdleRow(e){const t=e.lead;return X`
       <div class="idle-row">
-        <div class="idle-icon">${Pt.speaker({size:14})}</div>
+        <div class="idle-icon">${Ee.speaker({size:14})}</div>
         <div class="idle-info">
-          <div class="idle-name">${e.name}</div>
-          <div class="idle-sub">${e.model} · idle</div>
+          <div class="idle-name">${t.name}</div>
+          <div class="idle-sub">${t.model} · idle</div>
         </div>
         <button
           class="idle-group-btn"
           title="Group with other rooms"
-          @click=${()=>this.store.openGroupingSheet(e.id)}
+          @click=${()=>this.store.openGroupingSheet(t.id)}
         >
-          ${Pt.group({size:11})} Group
+          ${Ee.group({size:11})} Group
         </button>
         <button
           class="idle-play-btn"
           title="Play solo here"
           aria-label="Play solo"
-          @click=${()=>this.store.startSoloPlayback(e.id)}
+          @click=${()=>this.store.startSoloPlayback(t.id)}
         >
-          ${Pt.play({size:11})}
+          ${Ee.play({size:11})}
         </button>
       </div>
-    `}};Xt.styles=l`
+    `}};Xe.styles=l`
     :host {
       display: block;
       height: 100%;
@@ -2026,7 +2228,7 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
       color: var(--hf-text-dim);
       line-height: 1.5;
     }
-  `,t([ut({attribute:!1})],Xt.prototype,"store",void 0),Xt=t([ct("hf-output-tab")],Xt);const Zt=l`
+  `,e([ue({attribute:!1})],Xe.prototype,"store",void 0),Xe=e([ce("hf-output-tab")],Xe);const Ze=l`
   .hf-pip {
     display: inline-flex;
     align-items: flex-end;
@@ -2062,24 +2264,24 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
     0%, 100% { transform: scaleY(0.75); }
     50% { transform: scaleY(1.15); }
   }
-`;let te=class extends i{willUpdate(t){t.has("store")&&this.store&&!this._ctrl&&(this._ctrl=new StoreController(this,this.store))}render(){if(!this.store)return X``;const t=this.store.groups;return X`
+`;let et=class extends i{willUpdate(e){e.has("store")&&this.store&&!this._ctrl&&(this._ctrl=new StoreController(this,this.store))}render(){if(!this.store)return X``;const e=this.store.groups;return X`
       <div class="rail">
-        ${t.map(t=>{const e=t.isActive?_t:wt;return X`
+        ${e.map(e=>{const t=e.isActive?$e:we;return X`
             <button
               class="chip"
-              data-active=${t.isActive}
-              data-idle=${t.isIdle}
-              @click=${()=>this.store.setActiveLead(t.leadId)}
+              data-active=${e.isActive}
+              data-idle=${e.isIdle}
+              @click=${()=>this.store.setActiveLead(e.leadId)}
             >
-              ${t.playing?function(t){const e=`background:${t}`;return X`
+              ${e.playing?function(e){const t=`background:${e}`;return X`
     <span class="hf-pip" aria-hidden="true">
-      <span style=${e}></span>
-      <span style=${e}></span>
-      <span style=${e}></span>
+      <span style=${t}></span>
+      <span style=${t}></span>
+      <span style=${t}></span>
     </span>
-  `}(e):Pt.speaker({size:11,stroke:"currentColor"})}
-              <span class="chip-name">${t.name}</span>
-              ${t.members.length>1?X`<span class="badge">${t.members.length}</span>`:""}
+  `}(t):Ee.speaker({size:11,stroke:"currentColor"})}
+              <span class="chip-name">${e.name}</span>
+              ${e.members.length>1?X`<span class="badge">${e.members.length}</span>`:""}
             </button>
           `})}
         <button
@@ -2088,10 +2290,10 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
           title="Manage groups"
           @click=${()=>this.store.setTab("group")}
         >
-          ${Pt.group({size:13})}
+          ${Ee.group({size:13})}
         </button>
       </div>
-    `}};te.styles=[Zt,l`
+    `}};et.styles=[Ze,l`
       :host {
         display: block;
         border-bottom: 1px solid var(--hf-divider);
@@ -2164,37 +2366,37 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
         cursor: pointer;
         padding: 0;
       }
-    `],t([ut({attribute:!1})],te.prototype,"store",void 0),te=t([ct("hf-group-chip-rail")],te);let ee=class extends i{constructor(){super(...arguments),this._draft=new Set,this._initialDraft=new Set,this._wasOpen=!1,this._apply=()=>{const t=this.store.groupingSheet;t.leadId&&this.store.commitGroupMembers(t.leadId,Array.from(this._draft))}}willUpdate(t){if(t.has("store")&&this.store&&!this._ctrl&&(this._ctrl=new StoreController(this,this.store)),this.store){const t=this.store.groupingSheet.open;t&&!this._wasOpen&&this._seedDraft(),this._wasOpen=t}}_seedDraft(){const t=this.store.groupingSheet.leadId;if(!t)return;const e=this.store.speakers.filter(e=>e.leadId===t).map(t=>t.id);e.push(t);const r=new Set(e);this._draft=r,this._initialDraft=new Set(r)}render(){const t=this.store?.groupingSheet;if(!t?.open)return this.toggleAttribute("data-open",!1),X``;this.toggleAttribute("data-open",!0);const e=t.leadId,r=this.store.speakers.find(t=>t.id===e);if(!r)return X``;const s=this._draft.size,a=this._diffChanged(),o=0===s?"Group will be dissolved":1===s?"Will play solo":`${s} rooms grouped`;return X`
+    `],e([ue({attribute:!1})],et.prototype,"store",void 0),et=e([ce("hf-group-chip-rail")],et);let tt=class extends i{constructor(){super(...arguments),this._draft=new Set,this._initialDraft=new Set,this._wasOpen=!1,this._apply=()=>{const e=this.store.groupingSheet;e.leadId&&this.store.commitGroupMembers(e.leadId,Array.from(this._draft))}}willUpdate(e){if(e.has("store")&&this.store&&!this._ctrl&&(this._ctrl=new StoreController(this,this.store)),this.store){const e=this.store.groupingSheet.open;e&&!this._wasOpen&&this._seedDraft(),this._wasOpen=e}}_seedDraft(){const e=this.store.groupingSheet.leadId;if(!e)return;const t=this.store.speakers.filter(t=>t.leadId===e).map(e=>e.id);t.push(e);const s=new Set(t);this._draft=s,this._initialDraft=new Set(s)}render(){const e=this.store?.groupingSheet;if(!e?.open)return this.toggleAttribute("data-open",!1),X``;this.toggleAttribute("data-open",!0);const t=e.leadId,s=this.store.speakers.find(e=>e.id===t);if(!s)return X``;const r=this._draft.size,a=this._diffChanged(),o=0===r?"Group will be dissolved":1===r?"Will play solo":`${r} rooms grouped`;return X`
       <div class="scrim" @click=${()=>this.store.closeGroupingSheet()}></div>
-      <div class="sheet" @click=${t=>t.stopPropagation()}>
+      <div class="sheet" @click=${e=>e.stopPropagation()}>
         <div class="grip"><div></div></div>
         <div class="header">
           <div class="header-title">Group rooms</div>
           <div class="header-sub">
             Choose rooms to play in sync with
-            <strong>${r.name}</strong>.
+            <strong>${s.name}</strong>.
           </div>
         </div>
         <div class="list">
-          ${this.store.speakers.map(t=>{const r=this._draft.has(t.id),s=t.id===e;return X`
+          ${this.store.speakers.map(e=>{const s=this._draft.has(e.id),r=e.id===t;return X`
               <button
                 class="row"
-                data-checked=${r}
-                @click=${()=>this._toggle(t.id)}
+                data-checked=${s}
+                @click=${()=>this._toggle(e.id)}
               >
                 <div class="check">
-                  ${r?Pt.check({size:15,sw:2.6}):""}
+                  ${s?Ee.check({size:15,sw:2.6}):""}
                 </div>
                 <div class="row-info">
                   <div class="row-name-line">
-                    <div class="row-name">${t.name}</div>
-                    ${s?X`<span class="anchor-tag">Anchor</span>`:""}
+                    <div class="row-name">${e.name}</div>
+                    ${r?X`<span class="anchor-tag">Anchor</span>`:""}
                   </div>
                   <div class="row-sub">
-                    ${t.model}${this._contextFor(t.id,e)?` · ${this._contextFor(t.id,e)}`:""}
+                    ${e.model}${this._contextFor(e.id,t)?` · ${this._contextFor(e.id,t)}`:""}
                   </div>
                 </div>
-                <div class="row-vol">vol ${t.volume}</div>
+                <div class="row-vol">vol ${e.volume}</div>
               </button>
             `})}
         </div>
@@ -2212,7 +2414,7 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
           </button>
         </div>
       </div>
-    `}_toggle(t){const e=this.store.groupingSheet,r=new Set(this._draft);if(r.has(t)){if(t===e.leadId&&r.size>1)return;r.delete(t)}else r.add(t);this._draft=r}_diffChanged(){if(this._initialDraft.size!==this._draft.size)return!0;for(const t of this._initialDraft)if(!this._draft.has(t))return!0;return!1}_contextFor(t,e){const r=this.store.speakers.find(e=>e.id===t);if(!r)return null;if(r.leadId===e)return null;const s=this.store.groups.find(t=>t.leadId===r.leadId);return s?1===s.members.length?s.player?"Playing solo":"Idle":`In ${s.name}`:null}};ee.styles=l`
+    `}_toggle(e){const t=this.store.groupingSheet,s=new Set(this._draft);if(s.has(e)){if(e===t.leadId&&s.size>1)return;s.delete(e)}else s.add(e);this._draft=s}_diffChanged(){if(this._initialDraft.size!==this._draft.size)return!0;for(const e of this._initialDraft)if(!this._draft.has(e))return!0;return!1}_contextFor(e,t){const s=this.store.speakers.find(t=>t.id===e);if(!s)return null;if(s.leadId===t)return null;const r=this.store.groups.find(e=>e.leadId===s.leadId);return r?1===r.members.length?r.player?"Playing solo":"Idle":`In ${r.name}`:null}};tt.styles=l`
     :host {
       position: absolute;
       inset: 0;
@@ -2386,14 +2588,14 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
       cursor: default;
       opacity: 0.7;
     }
-  `,t([ut({attribute:!1})],ee.prototype,"store",void 0),t([ft()],ee.prototype,"_draft",void 0),ee=t([ct("hf-group-sheet")],ee);const ie=[{key:"hasMA",name:"Music Assistant",why:"Browses libraries (Spotify, Apple Music, Tidal, …), drives playback, and surfaces now-playing metadata.",hint:"Install the Music Assistant add-on, then add the integration under Settings → Devices & Services.",link:"https://music-assistant.io"},{key:"hasQueueActions",name:"Music Assistant Queue Actions (mass_queue)",why:"Adds queue manipulation services (reorder, remove, clear) the card uses on the Queue tab. Registers services under the mass_queue domain.",hint:'Install via HACS — "Music Assistant Queue Actions" by droans — then add it under Settings → Devices & Services.',link:"https://github.com/droans/mass_queue"},{key:"hasWiim",name:"WiiM Audio (LinkPlay)",why:"Provides WiiM-native Linkplay grouping. The card uses this for all multi-room sync, never MA grouping.",hint:'Install via HACS — "WiiM Audio Integration for Home Assistant" by mjcumming — then add each device under Settings → Devices & Services.',link:"https://github.com/mjcumming/wiim"}];let re=class extends i{render(){if(!this.status)return X``;const t=ie.filter(t=>!this.status[t.key]),e=t.length;return X`
+  `,e([ue({attribute:!1})],tt.prototype,"store",void 0),e([me()],tt.prototype,"_draft",void 0),tt=e([ce("hf-group-sheet")],tt);const it=[{key:"hasMA",name:"Music Assistant",why:"Browses libraries (Spotify, Apple Music, Tidal, …), drives playback, and surfaces now-playing metadata.",hint:"Install the Music Assistant add-on, then add the integration under Settings → Devices & Services.",link:"https://music-assistant.io"},{key:"hasQueueActions",name:"Music Assistant Queue Actions (mass_queue)",why:"Adds queue manipulation services (reorder, remove, clear) the card uses on the Queue tab. Registers services under the mass_queue domain.",hint:'Install via HACS — "Music Assistant Queue Actions" by droans — then add it under Settings → Devices & Services.',link:"https://github.com/droans/mass_queue"},{key:"hasWiim",name:"WiiM Audio (LinkPlay)",why:"Provides WiiM-native Linkplay grouping. The card uses this for all multi-room sync, never MA grouping.",hint:'Install via HACS — "WiiM Audio Integration for Home Assistant" by mjcumming — then add each device under Settings → Devices & Services.',link:"https://github.com/mjcumming/wiim"}];let st=class extends i{render(){if(!this.status)return X``;const e=it.filter(e=>!this.status[e.key]),t=e.length;return X`
       <div class="head">
-        <div class="head-icon">${Pt.note({size:16})}</div>
+        <div class="head-icon">${Ee.note({size:16})}</div>
         <div class="head-text">
           <div class="head-title">Setup incomplete</div>
           <div class="head-sub">
-            ${e} of ${ie.length} required
-            integration${1===e?"":"s"} missing
+            ${t} of ${it.length} required
+            integration${1===t?"":"s"} missing
           </div>
         </div>
       </div>
@@ -2406,45 +2608,45 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
       </div>
 
       <div class="list">
-        ${ie.map(t=>this._renderRow(t))}
+        ${it.map(e=>this._renderRow(e))}
       </div>
 
       <div class="footer">
-        After installing the missing piece${1===e?"":"s"},
+        After installing the missing piece${1===t?"":"s"},
         reload Home Assistant (or restart). This card will pick up the
         changes automatically.
       </div>
 
       <div class="diagnostics">
         <div class="diagnostics-title">Detection diagnostics</div>
-        ${this.status.diagnostics.map(t=>X`
+        ${this.status.diagnostics.map(e=>X`
             <div class="diag-line">
-              <span class=${"diag-mark "+(t.matched?"ok":"miss")}>
-                ${t.matched?"✓":"✗"}
+              <span class=${"diag-mark "+(e.matched?"ok":"miss")}>
+                ${e.matched?"✓":"✗"}
               </span>
-              <span class="diag-text">[${t.target}] ${t.label}</span>
+              <span class="diag-text">[${e.target}] ${e.label}</span>
             </div>
           `)}
       </div>
-    `}_renderRow(t){const e=this.status[t.key];return X`
-      <div class="row" data-state=${e?"ok":"missing"}>
+    `}_renderRow(e){const t=this.status[e.key];return X`
+      <div class="row" data-state=${t?"ok":"missing"}>
         <div class="row-status">
-          ${e?Pt.check({size:14,sw:2.4}):Pt.plus({size:14,sw:2.4})}
+          ${t?Ee.check({size:14,sw:2.4}):Ee.plus({size:14,sw:2.4})}
         </div>
         <div class="row-body">
-          <div class="row-name">${t.name}</div>
-          <div class="row-why">${t.why}</div>
-          ${e?X`<div class="row-hint">Detected ✓</div>`:X`
+          <div class="row-name">${e.name}</div>
+          <div class="row-why">${e.why}</div>
+          ${t?X`<div class="row-hint">Detected ✓</div>`:X`
                 <div class="row-hint">
-                  ${t.hint}
-                  ${t.link?X` <a href=${t.link} target="_blank" rel="noopener">
+                  ${e.hint}
+                  ${e.link?X` <a href=${e.link} target="_blank" rel="noopener">
                         Open repo →
                       </a>`:""}
                 </div>
               `}
         </div>
       </div>
-    `}};re.styles=[Mt,l`
+    `}};st.styles=[Me,l`
       :host {
         display: block;
         background: var(--hf-bg);
@@ -2599,7 +2801,7 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
         flex: 1;
         word-break: break-word;
       }
-    `],t([ut({attribute:!1})],re.prototype,"status",void 0),re=t([ct("hf-setup-help")],re),window.customCards=window.customCards||[],window.customCards.push({type:"homefront-music-card",name:"Homefront Music Card",description:"Music Assistant + WiiM multi-room controller",preview:!1});const se=[{id:"player",label:"Player",icon:"play"},{id:"browser",label:"Browse",icon:"home"},{id:"search",label:"Search",icon:"search"},{id:"queue",label:"Queue",icon:"queue"},{id:"group",label:"Output",icon:"speaker"}];let ae=class extends i{constructor(){super(),this._store=new Store,new StoreController(this,this._store)}setConfig(t){if(!t)throw new Error("Invalid configuration");this._config=t,this._store.setConfig(t)}willUpdate(t){t.has("hass")&&this.hass&&(this._integrationStatus=function(t){const e=t.services??{},r=t.states??{},s=[],a=e.music_assistant??{},o=e.mass_queue??{},n=e.wiim??{},l=!!a.play_media;s.push({target:"MA",label:"service music_assistant.play_media",matched:l});const d=["get_queue_items","remove_queue_item","move_queue_item_up","play_queue_item","clear_queue_from_here"],c=d.find(t=>!!o[t]),h=!!c;s.push({target:"QueueActions",label:`mass_queue domain has any of ${d.join(", ")}`,matched:h});const p=Object.keys(o);p.length>0&&s.push({target:"QueueActions",label:`mass_queue domain services found: ${p.slice(0,6).join(", ")}${p.length>6?"…":""}`,matched:!0});const u=["play_preset","play_url","set_eq","get_queue"],f=u.find(t=>!!n[t]),m=!!f;s.push({target:"WiiM",label:`wiim domain has any of ${u.join(", ")}`,matched:m});const v=Object.keys(n);v.length>0&&s.push({target:"WiiM",label:`wiim domain services found: ${v.slice(0,6).join(", ")}${v.length>6?"…":""}`,matched:!0});const g=Object.values(r).some(t=>{if(!t.entity_id.startsWith("media_player."))return!1;const e=t.attributes.group_role;return"master"===e||"slave"===e||"solo"===e});s.push({target:"WiiM",label:"any media_player.* attribute group_role is master/slave/solo",matched:g});const b=m||g;return{hasMA:l,hasQueueActions:h,hasWiim:b,allPresent:l&&h&&b,diagnostics:s}}(this.hass),this._integrationStatus.allPresent&&this._store.setHass(this.hass))}getCardSize(){return 12}disconnectedCallback(){super.disconnectedCallback(),this._store.dispose()}render(){return this._integrationStatus&&!this._integrationStatus.allPresent?X`<hf-setup-help .status=${this._integrationStatus}></hf-setup-help>`:X`
+    `],e([ue({attribute:!1})],st.prototype,"status",void 0),st=e([ce("hf-setup-help")],st),window.customCards=window.customCards||[],window.customCards.push({type:"homefront-music-card",name:"Homefront Music Card",description:"Music Assistant + WiiM multi-room controller",preview:!1});const rt=[{id:"player",label:"Player",icon:"play"},{id:"browser",label:"Browse",icon:"home"},{id:"search",label:"Search",icon:"search"},{id:"queue",label:"Queue",icon:"queue"},{id:"group",label:"Output",icon:"speaker"}];let at=class extends i{constructor(){super(),this._store=new Store,new StoreController(this,this._store)}setConfig(e){if(!e)throw new Error("Invalid configuration");this._config=e,this._store.setConfig(e)}willUpdate(e){e.has("hass")&&this.hass&&(this._integrationStatus=function(e){const t=e.services??{},s=e.states??{},r=[],a=t.music_assistant??{},o=t.mass_queue??{},n=t.wiim??{},l=!!a.play_media;r.push({target:"MA",label:"service music_assistant.play_media",matched:l});const d=["get_queue_items","remove_queue_item","move_queue_item_up","play_queue_item","clear_queue_from_here"],c=d.find(e=>!!o[e]),h=!!c;r.push({target:"QueueActions",label:`mass_queue domain has any of ${d.join(", ")}`,matched:h});const p=Object.keys(o);p.length>0&&r.push({target:"QueueActions",label:`mass_queue domain services found: ${p.slice(0,6).join(", ")}${p.length>6?"…":""}`,matched:!0});const u=["play_preset","play_url","set_eq","get_queue"],m=u.find(e=>!!n[e]),f=!!m;r.push({target:"WiiM",label:`wiim domain has any of ${u.join(", ")}`,matched:f});const v=Object.keys(n);v.length>0&&r.push({target:"WiiM",label:`wiim domain services found: ${v.slice(0,6).join(", ")}${v.length>6?"…":""}`,matched:!0});const g=Object.values(s).some(e=>{if(!e.entity_id.startsWith("media_player."))return!1;const t=e.attributes.group_role;return"master"===t||"slave"===t||"solo"===t});r.push({target:"WiiM",label:"any media_player.* attribute group_role is master/slave/solo",matched:g});const b=f||g;return{hasMA:l,hasQueueActions:h,hasWiim:b,allPresent:l&&h&&b,diagnostics:r}}(this.hass),this._integrationStatus.allPresent&&this._store.setHass(this.hass))}getCardSize(){return 12}disconnectedCallback(){super.disconnectedCallback(),this._store.dispose()}render(){return this._integrationStatus&&!this._integrationStatus.allPresent?X`<hf-setup-help .status=${this._integrationStatus}></hf-setup-help>`:X`
       <div class="frame">
         ${this._renderTitle()}
         <hf-group-chip-rail .store=${this._store}></hf-group-chip-rail>
@@ -2608,36 +2810,36 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
       </div>
       <hf-group-sheet .store=${this._store}></hf-group-sheet>
       ${this._config?.debug?this._renderDebugOverlay():""}
-    `}_renderDebugOverlay(){const t=this._store.diagnosticNotes;return X`
+    `}_renderDebugOverlay(){const e=this._store.diagnosticNotes;return X`
       <div class="debug-overlay">
         <div class="debug-overlay-title">
           ${this._store.isHassMode?"HASS MODE":"MOCK MODE"} · zone discovery
         </div>
-        ${t.length>0?t.map(t=>X`<div class="debug-overlay-line">${t}</div>`):X`<div class="debug-overlay-line">(no diagnostics yet)</div>`}
+        ${e.length>0?e.map(e=>X`<div class="debug-overlay-line">${e}</div>`):X`<div class="debug-overlay-line">(no diagnostics yet)</div>`}
       </div>
-    `}_renderTitle(){const t=this._config?.zones?.length??0,e=this._store.groups.filter(t=>t.playing).length,r=t>0?` · ${t} zone${1===t?"":"s"}`:" · mock";return X`
+    `}_renderTitle(){const e=this._config?.zones?.length??0,t=this._store.groups.filter(e=>e.playing).length,s=e>0?` · ${e} zone${1===e?"":"s"}`:" · mock";return X`
       <div class="title-row">
-        <span class="title-icon">${Pt.note({size:14})}</span>
+        <span class="title-icon">${Ee.note({size:14})}</span>
         <span class="title-label">Music Assistant</span>
         <span class="title-sub">
-          ${e} group${1===e?"":"s"} playing${r}
+          ${t} group${1===t?"":"s"} playing${s}
         </span>
       </div>
     `}_renderActiveTab(){switch(this._store.tab){case"player":return X`<hf-player-tab .store=${this._store}></hf-player-tab>`;case"browser":return X`<hf-browse-tab .store=${this._store}></hf-browse-tab>`;case"search":return X`<hf-search-tab .store=${this._store}></hf-search-tab>`;case"queue":return X`<hf-queue-tab .store=${this._store}></hf-queue-tab>`;case"group":return X`<hf-output-tab .store=${this._store}></hf-output-tab>`}}_renderTabBar(){return X`
       <div class="tab-bar" role="tablist">
-        ${se.map(t=>{const e=this._store.tab===t.id;return X`
+        ${rt.map(e=>{const t=this._store.tab===e.id;return X`
             <button
               class="tab"
               role="tab"
-              aria-selected=${e}
-              @click=${()=>this._store.setTab(t.id)}
+              aria-selected=${t}
+              @click=${()=>this._store.setTab(e.id)}
             >
-              ${Pt[t.icon]({size:18})}
-              <span class="tab-label">${t.label}</span>
+              ${Ee[e.icon]({size:18})}
+              <span class="tab-label">${e.label}</span>
             </button>
           `})}
       </div>
-    `}};ae.styles=[Mt,l`
+    `}};at.styles=[Me,l`
       :host {
         display: block;
         position: relative;
@@ -2751,4 +2953,4 @@ function t(t,e,r,s){var a,o=arguments.length,n=o<3?e:null===s?s=Object.getOwnPro
         white-space: pre-wrap;
         word-break: break-word;
       }
-    `],t([ut({attribute:!1})],ae.prototype,"hass",void 0),t([ft()],ae.prototype,"_config",void 0),t([ft()],ae.prototype,"_integrationStatus",void 0),ae=t([ct("homefront-music-card")],ae);export{ae as HomefrontMusicCard};
+    `],e([ue({attribute:!1})],at.prototype,"hass",void 0),e([me()],at.prototype,"_config",void 0),e([me()],at.prototype,"_integrationStatus",void 0),at=e([ce("homefront-music-card")],at);export{at as HomefrontMusicCard};
