@@ -6,6 +6,17 @@ import type {
   ZoneConfig,
 } from '../types.js';
 
+declare global {
+  interface Window {
+    /**
+     * HA-exposed helper that lazy-loads the dashboard-editor bundle
+     * (entity pickers, form widgets, etc.). Available on the dashboard
+     * but not always registered immediately when a custom editor opens.
+     */
+    loadCardHelpers?: () => Promise<unknown>;
+  }
+}
+
 /**
  * Visual editor for the Homefront Music Card.
  *
@@ -29,6 +40,27 @@ export class CardEditor extends LitElement {
 
   public setConfig(config: HomefrontCardConfig): void {
     this._config = { ...config };
+  }
+
+  /**
+   * Force HA to load its dashboard-editor bundle so `<ha-entity-picker>`
+   * (and friends) actually register as custom elements. Without this,
+   * the picker silently renders as an unknown element — a blank space.
+   * After the helpers load we request another update so the elements
+   * upgrade in place.
+   */
+  override async firstUpdated(): Promise<void> {
+    if (
+      typeof window.loadCardHelpers === 'function' &&
+      !customElements.get('ha-entity-picker')
+    ) {
+      try {
+        await window.loadCardHelpers();
+      } catch {
+        /* non-fatal — we'll fall through to a plain text input */
+      }
+      this.requestUpdate();
+    }
   }
 
   static styles = css`
@@ -238,21 +270,31 @@ export class CardEditor extends LitElement {
   }
 
   /**
-   * Render HA's `<ha-entity-picker>` directly. It's globally registered
-   * by the frontend bundle in any dashboard-editor context, so we don't
-   * need to gate on its presence — the prior conditional fallback was
-   * over-defensive and meant most installs got plain text inputs.
+   * Render HA's `<ha-entity-picker>` when it's registered (we trigger
+   * registration in `firstUpdated`); fall back to a plain text input
+   * if HA's editor bundle is unavailable (e.g., dev preview outside HA
+   * proper, or `loadCardHelpers` is missing).
    */
   private _renderEntityField(value: string, onChange: (v: string) => void) {
+    if (customElements.get('ha-entity-picker')) {
+      return html`
+        <ha-entity-picker
+          .hass=${this.hass}
+          .value=${value ?? ''}
+          .includeDomains=${['media_player']}
+          allow-custom-entity
+          @value-changed=${(e: CustomEvent<{ value: string }>) =>
+            onChange(e.detail.value)}
+        ></ha-entity-picker>
+      `;
+    }
     return html`
-      <ha-entity-picker
-        .hass=${this.hass}
+      <input
+        type="text"
         .value=${value ?? ''}
-        .includeDomains=${['media_player']}
-        allow-custom-entity
-        @value-changed=${(e: CustomEvent<{ value: string }>) =>
-          onChange(e.detail.value)}
-      ></ha-entity-picker>
+        placeholder="media_player.…"
+        @input=${(e: Event) => onChange((e.target as HTMLInputElement).value)}
+      />
     `;
   }
 

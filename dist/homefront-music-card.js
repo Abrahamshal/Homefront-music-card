@@ -3021,7 +3021,7 @@ function e(e,t,s,r){var a,o=arguments.length,n=o<3?t:null===r?r=Object.getOwnPro
         flex: 1;
         word-break: break-word;
       }
-    `],e([ue({attribute:!1})],lt.prototype,"status",void 0),lt=e([ce("hf-setup-help")],lt);let dt=class extends i{setConfig(e){this._config={...e}}render(){return this._config?X`
+    `],e([ue({attribute:!1})],lt.prototype,"status",void 0),lt=e([ce("hf-setup-help")],lt);let dt=class extends i{setConfig(e){this._config={...e}}async firstUpdated(){if("function"==typeof window.loadCardHelpers&&!customElements.get("ha-entity-picker")){try{await window.loadCardHelpers()}catch{}this.requestUpdate()}}render(){return this._config?X`
       ${this._renderLayoutSection()}
       ${this._renderZonesSection()}
       ${this._renderDisplaySection()}
@@ -3092,14 +3092,21 @@ function e(e,t,s,r){var a,o=arguments.length,n=o<3?t:null===r?r=Object.getOwnPro
           ${this._renderEntityField(e.ma,e=>this._updateZone(t,"ma",e))}
         </div>
       </div>
-    `}_renderEntityField(e,t){return X`
-      <ha-entity-picker
-        .hass=${this.hass}
+    `}_renderEntityField(e,t){return customElements.get("ha-entity-picker")?X`
+        <ha-entity-picker
+          .hass=${this.hass}
+          .value=${e??""}
+          .includeDomains=${["media_player"]}
+          allow-custom-entity
+          @value-changed=${e=>t(e.detail.value)}
+        ></ha-entity-picker>
+      `:X`
+      <input
+        type="text"
         .value=${e??""}
-        .includeDomains=${["media_player"]}
-        allow-custom-entity
-        @value-changed=${e=>t(e.detail.value)}
-      ></ha-entity-picker>
+        placeholder="media_player.…"
+        @input=${e=>t(e.target.value)}
+      />
     `}_renderDisplaySection(){const e=this._config;return X`
       <div class="section">
         <div class="section-title">Display</div>
