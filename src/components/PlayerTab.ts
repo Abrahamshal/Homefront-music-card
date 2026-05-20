@@ -29,6 +29,8 @@ export class PlayerTab extends LitElement {
       display: block;
       height: 100%;
       overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
       padding: 8px 16px 16px;
       color: var(--hf-text, #ecedef);
       font-family: var(--hf-font, sans-serif);

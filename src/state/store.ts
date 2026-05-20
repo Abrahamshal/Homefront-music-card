@@ -757,6 +757,44 @@ export class Store extends EventTarget {
     return this._hassQueueLeadId === this.activeLeadId;
   }
 
+  /**
+   * Fallback lookup for MA's config_entry_id when registry discovery
+   * didn't capture it (some HA versions don't return that field on
+   * `config/entity_registry/list`). Caches the result.
+   */
+  private async _fetchMaConfigEntryId(): Promise<string | null> {
+    if (this._maConfigEntryId) return this._maConfigEntryId;
+    if (!this._hass) return null;
+    try {
+      const entries = await this._hass.callWS<
+        Array<{ domain: string; entry_id: string; title?: string }>
+      >({ type: 'config_entries/get' });
+      const ma = entries?.find((e) => e.domain === 'music_assistant');
+      if (ma) {
+        this._maConfigEntryId = ma.entry_id;
+        // eslint-disable-next-line no-console
+        console.debug(
+          '[homefront-music-card] MA config_entry_id captured via config_entries/get:',
+          ma.entry_id,
+          ma.title,
+        );
+        return ma.entry_id;
+      }
+      // eslint-disable-next-line no-console
+      console.warn(
+        '[homefront-music-card] config_entries/get returned no music_assistant entry. Entries:',
+        entries?.map((e) => e.domain),
+      );
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        '[homefront-music-card] config_entries/get failed:',
+        err,
+      );
+    }
+    return null;
+  }
+
   /** Play a queue item by ID. */
   playQueueItem(queueItemId: string): void {
     const ma = this._maFor(this.activeLeadId);
@@ -854,11 +892,17 @@ export class Store extends EventTarget {
       this._emit();
       return;
     }
+    // Make sure we have MA's config_entry_id. Registry discovery
+    // captures it if the WS response includes it; otherwise this
+    // fallback looks it up via config_entries/get.
     if (!this._maConfigEntryId) {
-      this.hassSearchError =
-        'MA config entry not yet discovered — try again in a moment.';
-      this._emit();
-      return;
+      const found = await this._fetchMaConfigEntryId();
+      if (!found) {
+        this.hassSearchError =
+          'Could not find Music Assistant config entry. Is the integration loaded?';
+        this._emit();
+        return;
+      }
     }
     this.hassSearchLoading = true;
     this.hassSearchError = null;

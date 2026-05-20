@@ -133,6 +133,8 @@ export class SearchTab extends LitElement {
     .scroll {
       flex: 1;
       overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
     }
     .body {
       padding: 10px 14px 16px;

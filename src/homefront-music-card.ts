@@ -182,12 +182,15 @@ export class HomefrontMusicCard extends LitElement {
            height:100% propagating through HA's container chain, which
            breaks in some HA versions / themes. dvh adjusts for mobile
            browser chrome; --header-height is the HA app bar (fallback
-           56px if the theme doesn't set it). */
+           56px if the theme doesn't set it). overscroll-behavior:contain
+           prevents touch-scroll chaining from leaking into the page
+           on mobile. */
         width: 100%;
         max-width: 100%;
         height: calc(100vh - var(--header-height, 56px));
         height: calc(100dvh - var(--header-height, 56px));
         max-height: calc(100dvh - var(--header-height, 56px));
+        overscroll-behavior: contain;
         border-radius: 0;
         border: 0;
       }
@@ -221,6 +224,7 @@ export class HomefrontMusicCard extends LitElement {
         flex: 1;
         min-height: 0;
         position: relative;
+        overscroll-behavior: contain;
       }
       .tab-bar {
         display: grid;

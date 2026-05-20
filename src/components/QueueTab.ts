@@ -171,6 +171,8 @@ export class QueueTab extends LitElement {
     .scroll {
       flex: 1;
       overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
       padding: 0 14px 16px;
     }
     .empty {

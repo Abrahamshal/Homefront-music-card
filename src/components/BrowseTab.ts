@@ -89,6 +89,8 @@ export class BrowseTab extends LitElement {
       display: block;
       height: 100%;
       overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
       padding-bottom: 12px;
       color: var(--hf-text);
       font-family: var(--hf-font);

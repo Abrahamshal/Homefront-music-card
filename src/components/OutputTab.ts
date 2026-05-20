@@ -31,6 +31,8 @@ export class OutputTab extends LitElement {
       display: block;
       height: 100%;
       overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
       padding: 8px 14px 16px;
       color: var(--hf-text);
       font-family: var(--hf-font);
