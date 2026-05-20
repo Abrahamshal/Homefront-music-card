@@ -16,6 +16,7 @@ import './components/GroupChipRail.js';
 import './components/GroupSheet.js';
 import './components/SetupHelp.js';
 import './components/CardEditor.js';
+import './components/ToastBar.js';
 
 declare global {
   interface Window {
@@ -98,6 +99,11 @@ export class HomefrontMusicCard extends LitElement {
     // downstream can opt in to these for finer-grained spacing.
     const density = config.density ?? 'regular';
     this.setAttribute('data-density', density);
+
+    // Wire theme → CSS vars swap via themeVars's :host([data-theme=…])
+    // rules. 'auto' follows prefers-color-scheme.
+    const themeMode = config.theme ?? 'dark';
+    this.setAttribute('data-theme', themeMode);
   }
 
   protected willUpdate(changed: Map<string, unknown>): void {
@@ -303,6 +309,7 @@ export class HomefrontMusicCard extends LitElement {
         ${this._renderTabBar()}
       </div>
       <hf-group-sheet .store=${this._store}></hf-group-sheet>
+      <hf-toast-bar .store=${this._store}></hf-toast-bar>
       ${this._config?.debug ? this._renderDebugOverlay() : ''}
     `;
   }

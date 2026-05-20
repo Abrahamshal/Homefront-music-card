@@ -91,6 +91,13 @@ export interface HomefrontCardConfig {
    *     Lovelace view in **Panel (1 card)** mode for a true full-page UI.
    */
   layout?: 'card' | 'panel';
+  /**
+   * Color theme:
+   *   - `dark` (default): the original Refined-dark palette.
+   *   - `light`: Refined-light variant.
+   *   - `auto`: follow the user's OS preference via prefers-color-scheme.
+   */
+  theme?: 'dark' | 'light' | 'auto';
 }
 
 // Browse media node shape (returned by media_player/browse_media WS command).

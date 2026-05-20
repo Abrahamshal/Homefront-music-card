@@ -85,6 +85,12 @@ export interface GroupingSheetState {
   leadId: string | null;
 }
 
+export interface Toast {
+  id: string;
+  level: 'info' | 'warning' | 'error';
+  message: string;
+}
+
 /** Generic search result item. Shape may vary between MA versions. */
 export interface SearchResultItem {
   name?: string;
@@ -157,6 +163,10 @@ export class Store extends EventTarget {
 
   private _tickInterval: number | null = null;
 
+  /** Active toast notifications. Auto-dismiss after _toastTtlMs. */
+  toasts: Toast[] = [];
+  private _toastTtlMs = 4500;
+
   /** Latest hass snapshot. Null until the card receives one (dev/no-HA). */
   private _hass: HomeAssistant | undefined;
   /** Effective zone map — either explicit config.zones or auto-discovered. */
@@ -213,17 +223,74 @@ export class Store extends EventTarget {
     };
     this.activeLeadId = 'sp1';
 
+    // Restore persisted UI state (active group, tab) BEFORE we start
+    // deriving from hass. Validity is re-checked after each derive in
+    // case the saved active group no longer exists.
+    this._loadPersistedState();
+
     this._startTick();
+  }
+
+  // ── persistence ──────────────────────────────────────────────────────────
+
+  private static _STORAGE_KEY = 'homefront-music-card.ui-state';
+
+  private _loadPersistedState(): void {
+    try {
+      const raw = window.localStorage?.getItem(Store._STORAGE_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw) as { activeLeadId?: string; tab?: Tab };
+      if (saved.tab) this.tab = saved.tab;
+      if (saved.activeLeadId) this.activeLeadId = saved.activeLeadId;
+    } catch {
+      // Ignore parse / quota errors; localStorage is a best-effort cache.
+    }
+  }
+
+  private _persistUiState(): void {
+    try {
+      window.localStorage?.setItem(
+        Store._STORAGE_KEY,
+        JSON.stringify({
+          activeLeadId: this.activeLeadId,
+          tab: this.tab,
+        }),
+      );
+    } catch {
+      // Quota / private-mode errors are non-fatal.
+    }
   }
 
   // ── derived ──────────────────────────────────────────────────────────────
 
+  /** Cache for the `groups` getter, keyed on input identity. */
+  private _groupsCache?: {
+    speakers: SpeakerWithLead[];
+    players: Record<string, PlayerState>;
+    activeLeadId: string;
+    result: Group[];
+  };
+
   get groups(): Group[] {
+    // Cheap memoization: speakers / players are replaced (not mutated)
+    // by `_deriveFromHass`, so reference equality detects "no change."
+    // At 11 zones × N hass ticks per second this matters; at 1 zone it's
+    // free.
+    const c = this._groupsCache;
+    if (
+      c &&
+      c.speakers === this.speakers &&
+      c.players === this.players &&
+      c.activeLeadId === this.activeLeadId
+    ) {
+      return c.result;
+    }
+
     const byLead: Record<string, SpeakerWithLead[]> = {};
     for (const s of this.speakers) {
       (byLead[s.leadId] ??= []).push(s);
     }
-    return Object.keys(byLead)
+    const result = Object.keys(byLead)
       .map((lid) => {
         const members = byLead[lid]!;
         const lead = members.find((m) => m.id === lid) ?? members[0]!;
@@ -246,6 +313,14 @@ export class Store extends EventTarget {
         if (a.isIdle !== b.isIdle) return a.isIdle ? 1 : -1;
         return a.lead.name.localeCompare(b.lead.name);
       });
+
+    this._groupsCache = {
+      speakers: this.speakers,
+      players: this.players,
+      activeLeadId: this.activeLeadId,
+      result,
+    };
+    return result;
   }
 
   get activePlayer(): PlayerState {
@@ -446,12 +521,26 @@ export class Store extends EventTarget {
     this.dispatchEvent(new Event('change'));
   }
 
+  // ── toasts ───────────────────────────────────────────────────────────────
+
+  showToast(message: string, level: Toast['level'] = 'info'): void {
+    const id = `t${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    this.toasts = [...this.toasts, { id, level, message }];
+    this._emit();
+    window.setTimeout(() => this.dismissToast(id), this._toastTtlMs);
+  }
+
+  dismissToast(id: string): void {
+    const before = this.toasts.length;
+    this.toasts = this.toasts.filter((t) => t.id !== id);
+    if (this.toasts.length !== before) this._emit();
+  }
+
   // ── service dispatch ─────────────────────────────────────────────────────
 
   /**
    * Fire-and-forget service call. No-op when not in hass-mode (i.e.,
-   * dev/mock). Failures are logged to the console; we don't surface them
-   * in the UI yet (toast notifications are a Phase 4 polish item).
+   * dev/mock). Failures show an error toast and log to console.
    */
   private _callService(
     domain: string,
@@ -468,6 +557,8 @@ export class Store extends EventTarget {
           `[homefront-music-card] ${domain}.${service} failed:`,
           err,
         );
+        const msg = (err as { message?: string } | null)?.message ?? String(err);
+        this.showToast(`${domain}.${service} failed: ${msg}`, 'error');
       });
   }
 
@@ -505,6 +596,8 @@ export class Store extends EventTarget {
         `[homefront-music-card] ${domain}.${service} (with response) failed:`,
         err,
       );
+      const msg = (err as { message?: string } | null)?.message ?? String(err);
+      this.showToast(`${domain}.${service} failed: ${msg}`, 'error');
       return undefined;
     }
   }
@@ -861,6 +954,7 @@ export class Store extends EventTarget {
   setTab(t: Tab): void {
     if (this.tab === t) return;
     this.tab = t;
+    this._persistUiState();
     this._emit();
   }
 
@@ -871,6 +965,7 @@ export class Store extends EventTarget {
       this.players[lid] = defaultPlayer(mockData.initialQueue, 0, 30);
     }
     this.activeLeadId = lid;
+    this._persistUiState();
     this._emit();
   }
 

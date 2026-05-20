@@ -1,13 +1,10 @@
 import { css, unsafeCSS } from 'lit';
 
 /**
- * Refined-dark palette ported from the prototype's `refinedTheme(true)`. We
- * ship dark-only for now; light theme is a Phase 4 polish item.
- *
- * Components consume these as `var(--hf-*)` rather than importing the JS
- * object, so the top-level card is the single source of truth and we can
- * later let users override the accent via card config without re-rendering
- * every descendant.
+ * Refined palette ported from the prototype, dark + light variants. The
+ * top-level card sets `data-theme` ('dark' | 'light') on the host; CSS
+ * vars are scoped per attribute so components consuming `var(--hf-*)`
+ * adapt automatically. `auto` switches via prefers-color-scheme.
  */
 export const theme = {
   bg: '#16181d',
@@ -26,8 +23,26 @@ export const theme = {
   radius: '14px',
 } as const;
 
+export const themeLight = {
+  bg: '#f4f3f0',
+  surface: '#ffffff',
+  surfaceAlt: '#fafaf7',
+  text: '#1c1b18',
+  textDim: 'rgba(28,27,24,0.55)',
+  border: 'rgba(0,0,0,0.07)',
+  borderActive: 'rgba(0,0,0,0.16)',
+  divider: 'rgba(0,0,0,0.06)',
+  accent: '#c46a30',
+  accentText: '#fff7f0',
+  sliderTrack: 'rgba(0,0,0,0.10)',
+  input: 'rgba(0,0,0,0.03)',
+  selected: 'rgba(196,106,48,0.10)',
+  radius: '14px',
+} as const;
+
 export const themeVars = css`
-  :host {
+  :host,
+  :host([data-theme='dark']) {
     --hf-bg: ${unsafeCSS(theme.bg)};
     --hf-surface: ${unsafeCSS(theme.surface)};
     --hf-surface-alt: ${unsafeCSS(theme.surfaceAlt)};
@@ -43,5 +58,37 @@ export const themeVars = css`
     --hf-selected: ${unsafeCSS(theme.selected)};
     --hf-radius: ${unsafeCSS(theme.radius)};
     --hf-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  }
+  :host([data-theme='light']) {
+    --hf-bg: ${unsafeCSS(themeLight.bg)};
+    --hf-surface: ${unsafeCSS(themeLight.surface)};
+    --hf-surface-alt: ${unsafeCSS(themeLight.surfaceAlt)};
+    --hf-text: ${unsafeCSS(themeLight.text)};
+    --hf-text-dim: ${unsafeCSS(themeLight.textDim)};
+    --hf-border: ${unsafeCSS(themeLight.border)};
+    --hf-border-active: ${unsafeCSS(themeLight.borderActive)};
+    --hf-divider: ${unsafeCSS(themeLight.divider)};
+    --hf-accent: ${unsafeCSS(themeLight.accent)};
+    --hf-accent-text: ${unsafeCSS(themeLight.accentText)};
+    --hf-slider-track: ${unsafeCSS(themeLight.sliderTrack)};
+    --hf-input: ${unsafeCSS(themeLight.input)};
+    --hf-selected: ${unsafeCSS(themeLight.selected)};
+  }
+  @media (prefers-color-scheme: light) {
+    :host([data-theme='auto']) {
+      --hf-bg: ${unsafeCSS(themeLight.bg)};
+      --hf-surface: ${unsafeCSS(themeLight.surface)};
+      --hf-surface-alt: ${unsafeCSS(themeLight.surfaceAlt)};
+      --hf-text: ${unsafeCSS(themeLight.text)};
+      --hf-text-dim: ${unsafeCSS(themeLight.textDim)};
+      --hf-border: ${unsafeCSS(themeLight.border)};
+      --hf-border-active: ${unsafeCSS(themeLight.borderActive)};
+      --hf-divider: ${unsafeCSS(themeLight.divider)};
+      --hf-accent: ${unsafeCSS(themeLight.accent)};
+      --hf-accent-text: ${unsafeCSS(themeLight.accentText)};
+      --hf-slider-track: ${unsafeCSS(themeLight.sliderTrack)};
+      --hf-input: ${unsafeCSS(themeLight.input)};
+      --hf-selected: ${unsafeCSS(themeLight.selected)};
+    }
   }
 `;

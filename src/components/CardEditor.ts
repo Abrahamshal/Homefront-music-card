@@ -378,6 +378,26 @@ export class CardEditor extends LitElement {
             />
           </div>
         </div>
+        <div class="field">
+          <label>Theme</label>
+          <select
+            @change=${(e: Event) =>
+              this._set('theme', (e.target as HTMLSelectElement).value as
+                | 'dark'
+                | 'light'
+                | 'auto')}
+          >
+            <option value="dark" ?selected=${!cfg.theme || cfg.theme === 'dark'}>
+              Dark
+            </option>
+            <option value="light" ?selected=${cfg.theme === 'light'}>
+              Light
+            </option>
+            <option value="auto" ?selected=${cfg.theme === 'auto'}>
+              Auto (follow OS preference)
+            </option>
+          </select>
+        </div>
         <div class="checkbox-row">
           <input
             type="checkbox"
