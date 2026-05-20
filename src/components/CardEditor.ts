@@ -6,14 +6,18 @@ import type {
   ZoneConfig,
 } from '../types.js';
 
+interface HaCardHelpers {
+  createCardElement?: (config: { type: string; [k: string]: unknown }) => Promise<HTMLElement>;
+}
+
 declare global {
   interface Window {
     /**
-     * HA-exposed helper that lazy-loads the dashboard-editor bundle
-     * (entity pickers, form widgets, etc.). Available on the dashboard
-     * but not always registered immediately when a custom editor opens.
+     * HA-exposed helper that lazy-loads the card-render bundle. Note it
+     * does NOT load the entity-picker / form widgets on its own — for
+     * those we need to instantiate a card that depends on them.
      */
-    loadCardHelpers?: () => Promise<unknown>;
+    loadCardHelpers?: () => Promise<HaCardHelpers>;
   }
 }
 
@@ -38,27 +42,56 @@ export class CardEditor extends LitElement {
   @property({ attribute: false }) hass!: HomeAssistant;
   @state() private _config?: HomefrontCardConfig;
 
+  /** Set once we've successfully triggered HA's picker bundle load. */
+  private _pickerInitTriggered = false;
+
   public setConfig(config: HomefrontCardConfig): void {
     this._config = { ...config };
   }
 
   /**
-   * Force HA to load its dashboard-editor bundle so `<ha-entity-picker>`
-   * (and friends) actually register as custom elements. Without this,
-   * the picker silently renders as an unknown element — a blank space.
-   * After the helpers load we request another update so the elements
-   * upgrade in place.
+   * Once both `hass` and `_config` are bound (HA edit-card dialog sets
+   * them in either order), kick off the picker-bundle load. We do this
+   * in `updated` rather than `firstUpdated` because the first render
+   * can fire before `hass` lands.
    */
-  override async firstUpdated(): Promise<void> {
+  override updated(): void {
     if (
-      typeof window.loadCardHelpers === 'function' &&
+      !this._pickerInitTriggered &&
+      this.hass &&
+      this._config &&
       !customElements.get('ha-entity-picker')
     ) {
-      try {
-        await window.loadCardHelpers();
-      } catch {
-        /* non-fatal — we'll fall through to a plain text input */
-      }
+      this._pickerInitTriggered = true;
+      void this._loadEntityPicker();
+    }
+  }
+
+  /**
+   * Trigger registration of `<ha-entity-picker>`. HA doesn't ship it as
+   * part of `loadCardHelpers()`'s core bundle — to force-load it we
+   * instantiate a throwaway built-in `entities` card and ask for its
+   * config element, which transitively imports the picker module.
+   * Standard pattern across community custom-card editors.
+   */
+  private async _loadEntityPicker(): Promise<void> {
+    try {
+      const helpers = await window.loadCardHelpers?.();
+      if (!helpers?.createCardElement) return;
+      const card = await helpers.createCardElement({
+        type: 'entities',
+        entities: [],
+      });
+      const ctor = card?.constructor as {
+        getConfigElement?: () => Promise<HTMLElement>;
+      };
+      await ctor?.getConfigElement?.();
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn('[homefront-music-card] failed to load ha-entity-picker:', err);
+    } finally {
+      // Re-render whether we succeeded or not — successful → picker
+      // upgrades; failed → text-input fallback shows.
       this.requestUpdate();
     }
   }
