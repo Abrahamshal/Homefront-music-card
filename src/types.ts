@@ -84,6 +84,13 @@ export interface HomefrontCardConfig {
   accent_color?: string;
   /** Render a diagnostic overlay showing zone discovery output. */
   debug?: boolean;
+  /**
+   * Card sizing mode:
+   *   - `card` (default): phone-shaped artboard, max 820px / 90vh.
+   *   - `panel`: fills the dashboard area, no max height. Pair with a
+   *     Lovelace view in **Panel (1 card)** mode for a true full-page UI.
+   */
+  layout?: 'card' | 'panel';
 }
 
 // Browse media node shape (returned by media_player/browse_media WS command).

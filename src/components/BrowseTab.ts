@@ -1,5 +1,5 @@
 import { LitElement, html, css, type PropertyValues, type TemplateResult } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import {
   mockData,
   fmtTime,
@@ -23,6 +23,18 @@ const SUBTABS = [
   { id: 'radio', label: 'Radio' },
 ] as const;
 
+type SortMode = 'default' | 'title_asc' | 'title_desc';
+
+const SORT_OPTIONS: ReadonlyArray<{ id: SortMode; label: string }> = [
+  { id: 'default', label: 'Default (MA order)' },
+  { id: 'title_asc', label: 'Title A → Z' },
+  { id: 'title_desc', label: 'Title Z → A' },
+];
+
+function labelFor(id: SortMode): string {
+  return SORT_OPTIONS.find((o) => o.id === id)?.label.split(' ')[0] ?? 'Default';
+}
+
 /**
  * Source → Account → Type → Detail browse flow. Bypasses the merged-Library
  * view (per ARCHITECTURE.md): always presents providers and accounts
@@ -34,6 +46,13 @@ export class BrowseTab extends LitElement {
 
   private _ctrl?: StoreController;
   private _kickedOffRoot = false;
+
+  // Sort UI: persists across drill-down so the user's choice sticks.
+  // Currently only title-based sorts are wired (duration / date_added /
+  // last_played / play_count need richer MA metadata than HA's standard
+  // browse_media response provides — future expansion).
+  @state() private _sortMode: SortMode = 'default';
+  @state() private _sortMenuOpen = false;
 
   protected willUpdate(changed: PropertyValues): void {
     if (changed.has('store') && this.store && !this._ctrl) {
@@ -385,6 +404,68 @@ export class BrowseTab extends LitElement {
     .hass-error {
       color: #e0413a;
     }
+    .sort-bar {
+      position: relative;
+      display: flex;
+      justify-content: flex-end;
+      padding: 4px 14px 4px;
+    }
+    .sort-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: var(--hf-surface);
+      border: 1px solid var(--hf-border);
+      border-radius: 999px;
+      color: var(--hf-text-dim);
+      cursor: pointer;
+      font: inherit;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+    .sort-menu {
+      position: absolute;
+      right: 14px;
+      top: 100%;
+      margin-top: 4px;
+      z-index: 10;
+      background: var(--hf-surface);
+      border: 1px solid var(--hf-border);
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      min-width: 180px;
+      padding: 4px;
+      display: flex;
+      flex-direction: column;
+    }
+    .sort-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      background: transparent;
+      border: 0;
+      border-radius: 7px;
+      color: var(--hf-text);
+      cursor: pointer;
+      font: inherit;
+      font-size: 12.5px;
+      text-align: left;
+    }
+    .sort-option:hover {
+      background: var(--hf-input);
+    }
+    .sort-option[data-active='true'] {
+      color: var(--hf-accent);
+    }
+    .sort-option-check {
+      opacity: 0;
+    }
+    .sort-option[data-active='true'] .sort-option-check {
+      opacity: 1;
+    }
   `;
 
   protected render() {
@@ -400,6 +481,9 @@ export class BrowseTab extends LitElement {
     const current = stack[stack.length - 1];
     return html`
       ${this._renderHassCrumbs(stack)}
+      ${current && (current.children?.length ?? 0) > 0
+        ? this._renderSortBar()
+        : ''}
       ${this.store.hassBrowseError
         ? html`<div class="hass-error">${this.store.hassBrowseError}</div>`
         : this.store.hassBrowseLoading && !current
@@ -409,6 +493,70 @@ export class BrowseTab extends LitElement {
             : html`<div class="hass-empty">No library available</div>`}
     `;
   }
+
+  private _renderSortBar(): TemplateResult {
+    return html`
+      <div class="sort-bar">
+        <button
+          class="sort-btn"
+          @click=${(e: Event) => {
+            e.stopPropagation();
+            this._sortMenuOpen = !this._sortMenuOpen;
+          }}
+        >
+          ${Icons.filter({ size: 12 })} Sort: ${labelFor(this._sortMode)}
+        </button>
+        ${this._sortMenuOpen
+          ? html`
+              <div class="sort-menu" @click=${(e: Event) => e.stopPropagation()}>
+                ${SORT_OPTIONS.map(
+                  (opt) => html`
+                    <button
+                      class="sort-option"
+                      data-active=${opt.id === this._sortMode}
+                      @click=${() => this._chooseSort(opt.id)}
+                    >
+                      <span>${opt.label}</span>
+                      <span class="sort-option-check">
+                        ${Icons.check({ size: 12, sw: 2.4 })}
+                      </span>
+                    </button>
+                  `,
+                )}
+              </div>
+            `
+          : ''}
+      </div>
+    `;
+  }
+
+  private _chooseSort(mode: SortMode): void {
+    this._sortMode = mode;
+    this._sortMenuOpen = false;
+  }
+
+  private _applySort(children: BrowseMediaNode[]): BrowseMediaNode[] {
+    if (this._sortMode === 'default') return children;
+    const out = [...children];
+    if (this._sortMode === 'title_asc') {
+      out.sort((a, b) => a.title.localeCompare(b.title));
+    } else if (this._sortMode === 'title_desc') {
+      out.sort((a, b) => b.title.localeCompare(a.title));
+    }
+    return out;
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    document.addEventListener('click', this._closeSortMenu);
+  }
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    document.removeEventListener('click', this._closeSortMenu);
+  }
+  private _closeSortMenu = (): void => {
+    if (this._sortMenuOpen) this._sortMenuOpen = false;
+  };
 
   private _renderHassCrumbs(stack: BrowseMediaNode[]): TemplateResult {
     if (stack.length === 0) return html``;
@@ -439,40 +587,8 @@ export class BrowseTab extends LitElement {
     if (children.length === 0) {
       return html`<div class="hass-empty">No items</div>`;
     }
-    // Grid is reserved for playlists (visually distinctive). Albums,
-    // tracks, artists, directories, radio — all easier to scan as lists.
-    const usesGrid =
-      children.every((c) => c.media_class === 'playlist') &&
-      children.some((c) => c.thumbnail);
-    return html`
-      <div class="body">
-        ${usesGrid ? this._renderHassGrid(children) : this._renderHassList(children)}
-      </div>
-    `;
-  }
-
-  private _renderHassGrid(children: BrowseMediaNode[]): TemplateResult {
-    return html`
-      <div class="grid2">
-        ${children.map(
-          (c) => html`
-            <button class="art-tile" @click=${() => this._onHassChildClick(c)}>
-              <hf-album-art
-                .obj=${null}
-                .imageUrl=${c.thumbnail ?? undefined}
-                size="100%"
-                radius="8"
-                style="aspect-ratio:1/1; width:100%"
-              ></hf-album-art>
-              <div>
-                <div class="art-tile-name">${c.title}</div>
-                <div class="art-tile-sub">${c.media_class}</div>
-              </div>
-            </button>
-          `,
-        )}
-      </div>
-    `;
+    const sorted = this._applySort(children);
+    return html`<div class="body">${this._renderHassList(sorted)}</div>`;
   }
 
   private _renderHassList(children: BrowseMediaNode[]): TemplateResult {

@@ -68,6 +68,13 @@ export class HomefrontMusicCard extends LitElement {
     }
     this._config = config;
     this._store.setConfig(config);
+    // Reflect the chosen layout onto the host so :host([data-layout=…])
+    // styles apply.
+    if (config.layout === 'panel') {
+      this.setAttribute('data-layout', 'panel');
+    } else {
+      this.removeAttribute('data-layout');
+    }
   }
 
   protected willUpdate(changed: Map<string, unknown>): void {
@@ -103,10 +110,19 @@ export class HomefrontMusicCard extends LitElement {
         overflow: hidden;
         font-family: var(--hf-font);
         border: 1px solid var(--hf-border);
-        /* Keep the card a fixed height so the body scrolls internally,
-           never the dashboard. Capped at 90vh so it always fits the
-           viewport (mobile included). */
+        /* Default (card) layout — phone-shaped artboard, body scrolls
+           internally. Capped at 90vh so it always fits the viewport. */
         height: min(820px, 90vh);
+      }
+      :host([data-layout='panel']) {
+        /* Panel layout — pair with a Lovelace view in "Panel (1 card)"
+           mode for a full-page UI. Fills the container with no cap and
+           drops rounded corners + border to look native at full size. */
+        height: 100%;
+        max-height: none;
+        min-height: 100vh;
+        border-radius: 0;
+        border: 0;
       }
       .frame {
         display: flex;
