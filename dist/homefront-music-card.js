@@ -3394,7 +3394,7 @@ function e(e,t,s,r){var a,o=arguments.length,n=o<3?t:null===r?r=Object.getOwnPro
       from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
     }
-  `,e([ue({attribute:!1})],zt.prototype,"store",void 0),zt=e([ce("hf-toast-bar")],zt),window.customCards=window.customCards||[],window.customCards.push({type:"homefront-music-card",name:"Homefront Music Card",description:"Music Assistant + WiiM multi-room controller",preview:!1});const Mt=[{id:"player",label:"Player",icon:"play"},{id:"browser",label:"Browse",icon:"home"},{id:"search",label:"Search",icon:"search"},{id:"queue",label:"Queue",icon:"queue"},{id:"group",label:"Output",icon:"speaker"}];let At=class extends i{constructor(){super(),this._store=new Store,new StoreController(this,this._store)}setConfig(e){if(!e)throw new Error("Invalid configuration");this._config=e,this._store.setConfig(e),"panel"===e.layout?this.setAttribute("data-layout","panel"):this.removeAttribute("data-layout"),e.accent_color?(this.style.setProperty("--hf-accent",e.accent_color),this.style.setProperty("--hf-accent-text",function(e){const t=e.trim().replace(/^#/,"");if(3!==t.length&&6!==t.length)return"#fff";const s=3===t.length?t.split("").map(e=>e+e).join(""):t,r=parseInt(s.slice(0,2),16),a=parseInt(s.slice(2,4),16),o=parseInt(s.slice(4,6),16);if([r,a,o].some(e=>Number.isNaN(e)))return"#fff";const n=(.2126*r+.7152*a+.0722*o)/255;return n>.55?"#111":"#fff"}(e.accent_color))):(this.style.removeProperty("--hf-accent"),this.style.removeProperty("--hf-accent-text"));const t=e.density??"regular";this.setAttribute("data-density",t);const s=e.theme??"dark";this.setAttribute("data-theme",s)}willUpdate(e){e.has("hass")&&this.hass&&(this._integrationStatus=function(e){const t=e.services??{},s=e.states??{},r=[],a=t.music_assistant??{},o=t.mass_queue??{},n=t.wiim??{},l=!!a.play_media;r.push({target:"MA",label:"service music_assistant.play_media",matched:l});const d=["get_queue_items","remove_queue_item","move_queue_item_up","play_queue_item","clear_queue_from_here"],c=d.find(e=>!!o[e]),h=!!c;r.push({target:"QueueActions",label:`mass_queue domain has any of ${d.join(", ")}`,matched:h});const p=Object.keys(o);p.length>0&&r.push({target:"QueueActions",label:`mass_queue domain services found: ${p.slice(0,6).join(", ")}${p.length>6?"…":""}`,matched:!0});const u=["play_preset","play_url","set_eq","get_queue"],f=u.find(e=>!!n[e]),m=!!f;r.push({target:"WiiM",label:`wiim domain has any of ${u.join(", ")}`,matched:m});const v=Object.keys(n);v.length>0&&r.push({target:"WiiM",label:`wiim domain services found: ${v.slice(0,6).join(", ")}${v.length>6?"…":""}`,matched:!0});const g=Object.values(s).some(e=>{if(!e.entity_id.startsWith("media_player."))return!1;const t=e.attributes.group_role;return"master"===t||"slave"===t||"solo"===t});r.push({target:"WiiM",label:"any media_player.* attribute group_role is master/slave/solo",matched:g});const b=m||g;return{hasMA:l,hasQueueActions:h,hasWiim:b,allPresent:l&&h&&b,diagnostics:r}}(this.hass),this._integrationStatus.allPresent&&this._store.setHass(this.hass))}getCardSize(){return 12}static getConfigElement(){return document.createElement("hf-card-editor")}static getStubConfig(){return{type:"custom:homefront-music-card"}}disconnectedCallback(){super.disconnectedCallback(),this._store.dispose()}render(){return this._integrationStatus&&!this._integrationStatus.allPresent?X`<hf-setup-help .status=${this._integrationStatus}></hf-setup-help>`:X`
+  `,e([ue({attribute:!1})],zt.prototype,"store",void 0),zt=e([ce("hf-toast-bar")],zt),window.customCards=window.customCards||[],window.customCards.push({type:"homefront-music-card",name:"Homefront Music Card",description:"Music Assistant + WiiM multi-room controller",preview:!1});const Mt=[{id:"player",label:"Player",icon:"play"},{id:"browser",label:"Browse",icon:"home"},{id:"search",label:"Search",icon:"search"},{id:"queue",label:"Queue",icon:"queue"},{id:"group",label:"Output",icon:"speaker"}];let At=class extends i{constructor(){super(),this.editMode=!1,this._store=new Store,this._openCardEditor=e=>{e.stopPropagation(),this.dispatchEvent(new CustomEvent("show-edit-card",{bubbles:!0,composed:!0}))},new StoreController(this,this._store)}setConfig(e){if(!e)throw new Error("Invalid configuration");this._config=e,this._store.setConfig(e),"panel"===e.layout?this.setAttribute("data-layout","panel"):this.removeAttribute("data-layout"),e.accent_color?(this.style.setProperty("--hf-accent",e.accent_color),this.style.setProperty("--hf-accent-text",function(e){const t=e.trim().replace(/^#/,"");if(3!==t.length&&6!==t.length)return"#fff";const s=3===t.length?t.split("").map(e=>e+e).join(""):t,r=parseInt(s.slice(0,2),16),a=parseInt(s.slice(2,4),16),o=parseInt(s.slice(4,6),16);if([r,a,o].some(e=>Number.isNaN(e)))return"#fff";const n=(.2126*r+.7152*a+.0722*o)/255;return n>.55?"#111":"#fff"}(e.accent_color))):(this.style.removeProperty("--hf-accent"),this.style.removeProperty("--hf-accent-text"));const t=e.density??"regular";this.setAttribute("data-density",t);const s=e.theme??"dark";this.setAttribute("data-theme",s)}willUpdate(e){e.has("hass")&&this.hass&&(this._integrationStatus=function(e){const t=e.services??{},s=e.states??{},r=[],a=t.music_assistant??{},o=t.mass_queue??{},n=t.wiim??{},l=!!a.play_media;r.push({target:"MA",label:"service music_assistant.play_media",matched:l});const d=["get_queue_items","remove_queue_item","move_queue_item_up","play_queue_item","clear_queue_from_here"],c=d.find(e=>!!o[e]),h=!!c;r.push({target:"QueueActions",label:`mass_queue domain has any of ${d.join(", ")}`,matched:h});const p=Object.keys(o);p.length>0&&r.push({target:"QueueActions",label:`mass_queue domain services found: ${p.slice(0,6).join(", ")}${p.length>6?"…":""}`,matched:!0});const u=["play_preset","play_url","set_eq","get_queue"],f=u.find(e=>!!n[e]),m=!!f;r.push({target:"WiiM",label:`wiim domain has any of ${u.join(", ")}`,matched:m});const v=Object.keys(n);v.length>0&&r.push({target:"WiiM",label:`wiim domain services found: ${v.slice(0,6).join(", ")}${v.length>6?"…":""}`,matched:!0});const g=Object.values(s).some(e=>{if(!e.entity_id.startsWith("media_player."))return!1;const t=e.attributes.group_role;return"master"===t||"slave"===t||"solo"===t});r.push({target:"WiiM",label:"any media_player.* attribute group_role is master/slave/solo",matched:g});const b=m||g;return{hasMA:l,hasQueueActions:h,hasWiim:b,allPresent:l&&h&&b,diagnostics:r}}(this.hass),this._integrationStatus.allPresent&&this._store.setHass(this.hass))}getCardSize(){return 12}static getConfigElement(){return document.createElement("hf-card-editor")}static getStubConfig(){return{type:"custom:homefront-music-card"}}disconnectedCallback(){super.disconnectedCallback(),this._store.dispose()}render(){return this._integrationStatus&&!this._integrationStatus.allPresent?X`<hf-setup-help .status=${this._integrationStatus}></hf-setup-help>`:X`
       <div class="frame">
         ${this._renderTitle()}
         <hf-group-chip-rail .store=${this._store}></hf-group-chip-rail>
@@ -3418,6 +3418,16 @@ function e(e,t,s,r){var a,o=arguments.length,n=o<3?t:null===r?r=Object.getOwnPro
         <span class="title-sub">
           ${t} group${1===t?"":"s"} playing${s}
         </span>
+        ${this.editMode?X`
+              <button
+                class="edit-btn"
+                title="Edit card"
+                aria-label="Edit card"
+                @click=${this._openCardEditor}
+              >
+                ${De.filter({size:12})}
+              </button>
+            `:""}
       </div>
     `}_renderActiveTab(){switch(this._store.tab){case"player":return X`<hf-player-tab .store=${this._store}></hf-player-tab>`;case"browser":return X`<hf-browse-tab .store=${this._store}></hf-browse-tab>`;case"search":return X`<hf-search-tab .store=${this._store}></hf-search-tab>`;case"queue":return X`<hf-queue-tab .store=${this._store}></hf-queue-tab>`;case"group":return X`<hf-output-tab .store=${this._store}></hf-output-tab>`}}_renderTabBar(){return X`
       <div class="tab-bar" role="tablist">
@@ -3495,6 +3505,26 @@ function e(e,t,s,r){var a,o=arguments.length,n=o<3?t:null===r?r=Object.getOwnPro
         align-items: center;
         gap: 8px;
         padding: var(--hf-density-title-pad-y) 14px var(--hf-density-tab-pad-y);
+      }
+      .edit-btn {
+        margin-left: auto;
+        background: var(--hf-input);
+        border: 1px solid var(--hf-border);
+        color: var(--hf-text);
+        width: 26px;
+        height: 26px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font: inherit;
+        padding: 0;
+        flex: none;
+      }
+      .edit-btn:hover {
+        background: var(--hf-surface);
+        color: var(--hf-accent);
       }
       .title-icon {
         color: var(--hf-text);
@@ -3584,4 +3614,4 @@ function e(e,t,s,r){var a,o=arguments.length,n=o<3?t:null===r?r=Object.getOwnPro
         white-space: pre-wrap;
         word-break: break-word;
       }
-    `],e([ue({attribute:!1})],At.prototype,"hass",void 0),e([fe()],At.prototype,"_config",void 0),e([fe()],At.prototype,"_integrationStatus",void 0),At=e([ce("homefront-music-card")],At);export{At as HomefrontMusicCard};
+    `],e([ue({attribute:!1})],At.prototype,"hass",void 0),e([ue({attribute:!1})],At.prototype,"editMode",void 0),e([fe()],At.prototype,"_config",void 0),e([fe()],At.prototype,"_integrationStatus",void 0),At=e([ce("homefront-music-card")],At);export{At as HomefrontMusicCard};

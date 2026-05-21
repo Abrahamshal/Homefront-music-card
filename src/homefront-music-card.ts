@@ -48,6 +48,13 @@ const TABS: Array<{ id: Tab; label: string; icon: keyof typeof Icons }> = [
 @customElement('homefront-music-card')
 export class HomefrontMusicCard extends LitElement {
   @property({ attribute: false }) public hass?: HomeAssistant;
+  /**
+   * HA sets this to `true` when the dashboard is in edit mode. We use it
+   * to show an inline edit button that works consistently across view
+   * types — Panel mode's normal hover overlay is unreliable, especially
+   * on desktop.
+   */
+  @property({ attribute: false }) public editMode = false;
 
   @state() private _config?: HomefrontCardConfig;
   @state() private _integrationStatus?: IntegrationStatus;
@@ -206,6 +213,26 @@ export class HomefrontMusicCard extends LitElement {
         gap: 8px;
         padding: var(--hf-density-title-pad-y) 14px var(--hf-density-tab-pad-y);
       }
+      .edit-btn {
+        margin-left: auto;
+        background: var(--hf-input);
+        border: 1px solid var(--hf-border);
+        color: var(--hf-text);
+        width: 26px;
+        height: 26px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font: inherit;
+        padding: 0;
+        flex: none;
+      }
+      .edit-btn:hover {
+        background: var(--hf-surface);
+        color: var(--hf-accent);
+      }
       .title-icon {
         color: var(--hf-text);
         display: inline-flex;
@@ -343,9 +370,38 @@ export class HomefrontMusicCard extends LitElement {
         <span class="title-sub">
           ${playingGroups} group${playingGroups === 1 ? '' : 's'} playing${zoneNote}
         </span>
+        ${this.editMode
+          ? html`
+              <button
+                class="edit-btn"
+                title="Edit card"
+                aria-label="Edit card"
+                @click=${this._openCardEditor}
+              >
+                ${Icons.filter({ size: 12 })}
+              </button>
+            `
+          : ''}
       </div>
     `;
   }
+
+  /**
+   * Fire HA's `show-edit-card` event so the parent dashboard opens its
+   * card-editor dialog with our config loaded. Works in any view type —
+   * the affordance HA usually provides (hover overlay, tab pencil) is
+   * inconsistent across Panel mode and across desktop/mobile, so we
+   * provide our own.
+   */
+  private _openCardEditor = (e: Event): void => {
+    e.stopPropagation();
+    this.dispatchEvent(
+      new CustomEvent('show-edit-card', {
+        bubbles: true,
+        composed: true,
+      }),
+    );
+  };
 
   private _renderActiveTab() {
     const tab = this._store.tab;
