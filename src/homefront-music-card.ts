@@ -48,13 +48,6 @@ const TABS: Array<{ id: Tab; label: string; icon: keyof typeof Icons }> = [
 @customElement('homefront-music-card')
 export class HomefrontMusicCard extends LitElement {
   @property({ attribute: false }) public hass?: HomeAssistant;
-  /**
-   * HA sets this to `true` when the dashboard is in edit mode. We use it
-   * to show an inline edit button that works consistently across view
-   * types — Panel mode's normal hover overlay is unreliable, especially
-   * on desktop.
-   */
-  @property({ attribute: false }) public editMode = false;
 
   @state() private _config?: HomefrontCardConfig;
   @state() private _integrationStatus?: IntegrationStatus;
@@ -185,19 +178,17 @@ export class HomefrontMusicCard extends LitElement {
 
       :host([data-layout='panel']) {
         /* Panel layout — pair with a Lovelace view in "Panel (1 card)".
-           Size against the viewport directly rather than relying on
-           height:100% propagating through HA's container chain, which
-           breaks in some HA versions / themes. dvh adjusts for mobile
-           browser chrome; --header-height is the HA app bar (fallback
-           56px if the theme doesn't set it). overscroll-behavior:contain
-           prevents touch-scroll chaining from leaking into the page
-           on mobile. */
+           Use height:100% so HA's hui-panel-view governs our size —
+           that way when HA shows an edit-mode toolbar / overlay below
+           the card, our height shrinks to make room. We deliberately
+           do NOT set overscroll-behavior on the host here; inner tab
+           contents have their own containment (which fixes the mobile
+           scroll-chaining issue without preventing HA's own affordances
+           below the card from being reached). */
         width: 100%;
         max-width: 100%;
-        height: calc(100vh - var(--header-height, 56px));
-        height: calc(100dvh - var(--header-height, 56px));
-        max-height: calc(100dvh - var(--header-height, 56px));
-        overscroll-behavior: contain;
+        height: 100%;
+        max-height: 100%;
         border-radius: 0;
         border: 0;
       }
@@ -212,26 +203,6 @@ export class HomefrontMusicCard extends LitElement {
         align-items: center;
         gap: 8px;
         padding: var(--hf-density-title-pad-y) 14px var(--hf-density-tab-pad-y);
-      }
-      .edit-btn {
-        margin-left: auto;
-        background: var(--hf-input);
-        border: 1px solid var(--hf-border);
-        color: var(--hf-text);
-        width: 26px;
-        height: 26px;
-        border-radius: 999px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font: inherit;
-        padding: 0;
-        flex: none;
-      }
-      .edit-btn:hover {
-        background: var(--hf-surface);
-        color: var(--hf-accent);
       }
       .title-icon {
         color: var(--hf-text);
@@ -370,57 +341,8 @@ export class HomefrontMusicCard extends LitElement {
         <span class="title-sub">
           ${playingGroups} group${playingGroups === 1 ? '' : 's'} playing${zoneNote}
         </span>
-        <button
-          class="edit-btn"
-          title="Edit card (only works when dashboard is in edit mode)"
-          aria-label="Edit card"
-          @click=${this._openCardEditor}
-        >
-          ${Icons.filter({ size: 12 })}
-        </button>
       </div>
     `;
-  }
-
-  /**
-   * Open HA's card-editor dialog. The exact event name HA listens for
-   * has varied across releases (`show-edit-card`, `ll-edit-card`,
-   * `ll-show-edit-card`), so we fire all three — only the one HA's
-   * current dashboard listener actually subscribes to will do anything.
-   *
-   * The path is the card's position in the dashboard config. We don't
-   * know it from inside our shadow root, so we walk up the DOM tree
-   * looking for a `hui-card` ancestor with a `path` attribute (HA wraps
-   * cards in `hui-card` in normal views, but not in panel views — so
-   * we fall back to no-path which works on single-card panel views).
-   */
-  private _openCardEditor = (e: Event): void => {
-    e.stopPropagation();
-    const path = this._findCardPath();
-    const detail: Record<string, unknown> = {};
-    if (path) detail.path = path;
-    for (const name of ['show-edit-card', 'll-edit-card', 'll-show-edit-card']) {
-      this.dispatchEvent(
-        new CustomEvent(name, { detail, bubbles: true, composed: true }),
-      );
-    }
-  };
-
-  /** Walk up the DOM tree to find the card's path in the dashboard config. */
-  private _findCardPath(): unknown {
-    let el: Node | null = this;
-    while (el) {
-      if (el instanceof HTMLElement) {
-        const p =
-          (el as { path?: unknown }).path ??
-          (el.tagName === 'HUI-CARD' ? (el as { _path?: unknown })._path : undefined);
-        if (p !== undefined && p !== null) return p;
-      }
-      const root = el.getRootNode();
-      if (root instanceof ShadowRoot) el = root.host;
-      else el = el.parentNode;
-    }
-    return undefined;
   }
 
   private _renderActiveTab() {
