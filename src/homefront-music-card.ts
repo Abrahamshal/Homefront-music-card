@@ -370,38 +370,58 @@ export class HomefrontMusicCard extends LitElement {
         <span class="title-sub">
           ${playingGroups} group${playingGroups === 1 ? '' : 's'} playing${zoneNote}
         </span>
-        ${this.editMode
-          ? html`
-              <button
-                class="edit-btn"
-                title="Edit card"
-                aria-label="Edit card"
-                @click=${this._openCardEditor}
-              >
-                ${Icons.filter({ size: 12 })}
-              </button>
-            `
-          : ''}
+        <button
+          class="edit-btn"
+          title="Edit card (only works when dashboard is in edit mode)"
+          aria-label="Edit card"
+          @click=${this._openCardEditor}
+        >
+          ${Icons.filter({ size: 12 })}
+        </button>
       </div>
     `;
   }
 
   /**
-   * Fire HA's `show-edit-card` event so the parent dashboard opens its
-   * card-editor dialog with our config loaded. Works in any view type —
-   * the affordance HA usually provides (hover overlay, tab pencil) is
-   * inconsistent across Panel mode and across desktop/mobile, so we
-   * provide our own.
+   * Open HA's card-editor dialog. The exact event name HA listens for
+   * has varied across releases (`show-edit-card`, `ll-edit-card`,
+   * `ll-show-edit-card`), so we fire all three — only the one HA's
+   * current dashboard listener actually subscribes to will do anything.
+   *
+   * The path is the card's position in the dashboard config. We don't
+   * know it from inside our shadow root, so we walk up the DOM tree
+   * looking for a `hui-card` ancestor with a `path` attribute (HA wraps
+   * cards in `hui-card` in normal views, but not in panel views — so
+   * we fall back to no-path which works on single-card panel views).
    */
   private _openCardEditor = (e: Event): void => {
     e.stopPropagation();
-    this.dispatchEvent(
-      new CustomEvent('show-edit-card', {
-        bubbles: true,
-        composed: true,
-      }),
-    );
+    const path = this._findCardPath();
+    const detail: Record<string, unknown> = {};
+    if (path) detail.path = path;
+    for (const name of ['show-edit-card', 'll-edit-card', 'll-show-edit-card']) {
+      this.dispatchEvent(
+        new CustomEvent(name, { detail, bubbles: true, composed: true }),
+      );
+    }
   };
+
+  /** Walk up the DOM tree to find the card's path in the dashboard config. */
+  private _findCardPath(): unknown {
+    let el: Node | null = this;
+    while (el) {
+      if (el instanceof HTMLElement) {
+        const p =
+          (el as { path?: unknown }).path ??
+          (el.tagName === 'HUI-CARD' ? (el as { _path?: unknown })._path : undefined);
+        if (p !== undefined && p !== null) return p;
+      }
+      const root = el.getRootNode();
+      if (root instanceof ShadowRoot) el = root.host;
+      else el = el.parentNode;
+    }
+    return undefined;
+  }
 
   private _renderActiveTab() {
     const tab = this._store.tab;
