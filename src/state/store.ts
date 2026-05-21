@@ -601,9 +601,16 @@ export class Store extends EventTarget {
 
   /**
    * Call a HA service that returns response data (e.g.
-   * `mass_queue.get_queue_items`). Uses the raw `call_service` WS frame
-   * with `return_response: true` since `hass.callService` doesn't
+   * `mass_queue.get_queue_items`). Uses `call_service` with
+   * `return_response: true` since `hass.callService` typically doesn't
    * surface the response payload.
+   *
+   * Some HA versions auto-merge `target.entity_id` into `service_data`
+   * before invoking the service's schema validator, which then rejects
+   * the "extra" entity_id key. To avoid that we:
+   *   1. Omit `service_data` entirely when `data` is empty.
+   *   2. Fall back to `execute_script` (always a clean target / data
+   *      split) if the first call returns a validation error.
    */
   private async _callServiceWithResponse<T = unknown>(
     domain: string,
@@ -612,24 +619,54 @@ export class Store extends EventTarget {
     target: { entity_id?: string | string[] } = {},
   ): Promise<T | undefined> {
     if (!this._isHassMode || !this._hass) return undefined;
+    const hasData = Object.keys(data).length > 0;
+    const hasTarget = Object.keys(target).length > 0;
+    const msg: { type: string; [k: string]: unknown } = {
+      type: 'call_service',
+      domain,
+      service,
+      return_response: true,
+    };
+    if (hasData) msg.service_data = data;
+    if (hasTarget) msg.target = target;
     try {
-      const result = await this._hass.callWS<{ response: T }>({
-        type: 'call_service',
-        domain,
-        service,
-        service_data: data,
-        target,
-        return_response: true,
-      });
+      const result = await this._hass.callWS<{ response: T }>(msg);
       return result?.response;
     } catch (err) {
+      const errMsg = (err as { message?: string } | null)?.message ?? String(err);
+      // Fallback for HA versions that mis-merge target/data: use
+      // execute_script which always keeps them separate.
+      if (errMsg.includes('extra keys not allowed') && hasTarget) {
+        try {
+          const result = await this._hass.callWS<{ response: T }>({
+            type: 'execute_script',
+            sequence: [
+              {
+                service: `${domain}.${service}`,
+                target,
+                ...(hasData ? { data } : {}),
+              },
+            ],
+            return_response: true,
+          });
+          return result?.response;
+        } catch (err2) {
+          // eslint-disable-next-line no-console
+          console.warn(
+            `[homefront-music-card] ${domain}.${service} (execute_script fallback) failed:`,
+            err2,
+          );
+          const m2 = (err2 as { message?: string } | null)?.message ?? String(err2);
+          this.showToast(`${domain}.${service} failed: ${m2}`, 'error');
+          return undefined;
+        }
+      }
       // eslint-disable-next-line no-console
       console.warn(
         `[homefront-music-card] ${domain}.${service} (with response) failed:`,
         err,
       );
-      const msg = (err as { message?: string } | null)?.message ?? String(err);
-      this.showToast(`${domain}.${service} failed: ${msg}`, 'error');
+      this.showToast(`${domain}.${service} failed: ${errMsg}`, 'error');
       return undefined;
     }
   }
