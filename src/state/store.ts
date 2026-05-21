@@ -440,11 +440,28 @@ export class Store extends EventTarget {
   private _deriveFromHass(): void {
     if (!this._hass) return;
 
-    // Resolve zones: explicit config wins; otherwise discover.
+    // Resolve zones. We always run sync discovery on each hass tick so
+    // newly-added devices appear without a manual reload; the slower
+    // async registry-based discovery (more authoritative for pairing)
+    // runs separately and reconciles when complete.
     let zones: ZoneConfig[];
+    let zonesChanged = false;
     if (this._zones.length > 0 && this._isHassMode) {
-      zones = this._zones;
-      this.diagnosticNotes = ['using explicit config.zones from card YAML'];
+      const result = discoverZonesWithDiagnostics(this._hass);
+      const cachedWiims = new Set(this._zones.map((z) => z.wiim));
+      const newOrMissing =
+        result.zones.length !== this._zones.length ||
+        result.zones.some((z) => !cachedWiims.has(z.wiim));
+      if (newOrMissing) {
+        zones = result.zones;
+        this.diagnosticNotes = ['Zone set changed — sync rediscovery', ...result.notes];
+        zonesChanged = true;
+        // Re-trigger the authoritative registry pass so the pairing is
+        // verified against entity-registry device_ids.
+        this._registryAttempted = false;
+      } else {
+        zones = this._zones;
+      }
     } else {
       const result = discoverZonesWithDiagnostics(this._hass);
       zones = result.zones;
@@ -501,6 +518,9 @@ export class Store extends EventTarget {
       );
     }
     this.diagnosticNotes = [...this.diagnosticNotes, '— per-zone MA state —', ...extra];
+
+    // Trigger async registry reconciliation if zones just changed.
+    if (zonesChanged) void this._reconcileFromRegistry();
   }
 
   /** Is the store currently driven from hass (vs. mock data)? */
@@ -523,8 +543,20 @@ export class Store extends EventTarget {
 
   // ── toasts ───────────────────────────────────────────────────────────────
 
+  /** Dedupe: suppress identical toasts fired within this window. */
+  private _toastDedupeWindowMs = 5000;
+  private _recentToasts = new Map<string, number>();
+
   showToast(message: string, level: Toast['level'] = 'info'): void {
-    const id = `t${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const key = `${level}:${message}`;
+    const now = Date.now();
+    const last = this._recentToasts.get(key);
+    if (last !== undefined && now - last < this._toastDedupeWindowMs) {
+      this._recentToasts.set(key, now);
+      return;
+    }
+    this._recentToasts.set(key, now);
+    const id = `t${now}-${Math.random().toString(36).slice(2, 8)}`;
     this.toasts = [...this.toasts, { id, level, message }];
     this._emit();
     window.setTimeout(() => this.dismissToast(id), this._toastTtlMs);
