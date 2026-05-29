@@ -688,8 +688,22 @@ export class Store extends EventTarget {
   /** Fetch the MA browse root for the active leader and reset the stack. */
   async browseRoot(): Promise<void> {
     if (!this._isHassMode || !this._hass) return;
-    const ma = this._maFor(this.activeLeadId);
-    if (!ma) return;
+    let ma = this._maFor(this.activeLeadId);
+    // The active lead's MA entity may be missing or non-browsable (e.g.
+    // a mis-mapped Cast entity). Fall back to the first zone that has a
+    // resolvable MA entity present in hass.states.
+    if (!ma || !this._hass.states?.[ma]) {
+      const firstUsable = this._zones.find(
+        (z) => this._hass?.states?.[z.ma],
+      );
+      ma = firstUsable?.ma;
+    }
+    if (!ma) {
+      this.hassBrowseError =
+        'No Music Assistant entity available to browse. Check zone mapping (the "ma" entity must be a music_assistant media_player).';
+      this._emit();
+      return;
+    }
     this.hassBrowseLoading = true;
     this.hassBrowseError = null;
     this._emit();
@@ -719,9 +733,14 @@ export class Store extends EventTarget {
       this._browseCache.set(root.media_content_id || '__root__', rootWithFiltered);
       this.hassBrowseStack = [rootWithFiltered];
     } catch (err) {
-      this.hassBrowseError = String(err);
+      const msg = (err as { message?: string } | null)?.message ?? String(err);
+      this.hassBrowseError = `Browse failed for ${ma}: ${msg}`;
       // eslint-disable-next-line no-console
-      console.warn('[homefront-music-card] browse_media root failed:', err);
+      console.warn(
+        `[homefront-music-card] browse_media root failed for ${ma}:`,
+        msg,
+        err,
+      );
     } finally {
       this.hassBrowseLoading = false;
       this._emit();

@@ -178,17 +178,18 @@ export class HomefrontMusicCard extends LitElement {
 
       :host([data-layout='panel']) {
         /* Panel layout — pair with a Lovelace view in "Panel (1 card)".
-           Use height:100% so HA's hui-panel-view governs our size —
-           that way when HA shows an edit-mode toolbar / overlay below
-           the card, our height shrinks to make room. We deliberately
-           do NOT set overscroll-behavior on the host here; inner tab
-           contents have their own containment (which fixes the mobile
-           scroll-chaining issue without preventing HA's own affordances
-           below the card from being reached). */
+           Use height:100% so HA's hui-panel-view governs our size, but
+           cap at viewport height minus the HA header so the card never
+           grows taller than the screen (which in edit mode would push
+           HA's edit affordance off the bottom and require zoom-out).
+           Inner tab contents have their own overscroll containment;
+           the host stays scrollable so edit-mode toolbars below remain
+           reachable. */
         width: 100%;
         max-width: 100%;
         height: 100%;
-        max-height: 100%;
+        max-height: calc(100vh - var(--header-height, 56px));
+        max-height: calc(100dvh - var(--header-height, 56px));
         border-radius: 0;
         border: 0;
       }
