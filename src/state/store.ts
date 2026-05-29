@@ -379,17 +379,65 @@ export class Store extends EventTarget {
    * every call. The first call switches the store into hass-mode (stops
    * the mock 1-second tick, since HA pushes state updates).
    */
+  /** Signature of the watched entities' state objects from last derive. */
+  private _lastWatchSig = '';
+
   setHass(hass: HomeAssistant): void {
+    const prevHass = this._hass;
+    // Always keep the latest hass so service calls dispatch against fresh
+    // state, even when we skip the (expensive) re-derive below.
     this._hass = hass;
+
+    // Fast path: once we're in hass-mode, skip the full re-derive + emit
+    // unless a watched entity actually changed. HA fires `set hass` for
+    // EVERY entity in the system (sensors, lights, etc.), so without this
+    // gate we'd re-render the whole card dozens of times per second.
+    if (this._isHassMode && prevHass) {
+      const sig = this._computeWatchSignature(hass);
+      if (sig === this._lastWatchSig) {
+        return; // nothing we care about changed
+      }
+      this._lastWatchSig = sig;
+    }
+
     this._deriveFromHass();
+    this._lastWatchSig = this._computeWatchSignature(hass);
     this._emit();
-    // Kick off the authoritative entity-registry-based discovery once per
-    // session — but only when zones aren't explicitly configured. With
-    // explicit zones, the user's YAML is the source of truth.
+
     if (!this._hasExplicitZones && !this._registryAttempted) {
       this._registryAttempted = true;
       void this._reconcileFromRegistry();
     }
+  }
+
+  /**
+   * Build a cheap change-signature from the entities we actually render.
+   * HA replaces an entity's state object (new reference) whenever it
+   * changes, so we key on `last_updated` of each watched entity. When the
+   * signature is unchanged, nothing the card displays has changed.
+   *
+   * Watched set:
+   *   - Explicit zones: each zone's wiim + ma entity.
+   *   - Auto-discovery: every media_player (so new devices are noticed),
+   *     keyed by entity_id + last_updated.
+   */
+  private _computeWatchSignature(hass: HomeAssistant): string {
+    const states = hass.states ?? {};
+    const parts: string[] = [];
+    if (this._hasExplicitZones && this._zones.length > 0) {
+      for (const z of this._zones) {
+        const w = states[z.wiim];
+        const m = states[z.ma];
+        if (w) parts.push(`${z.wiim}@${w.last_updated}`);
+        if (m) parts.push(`${z.ma}@${m.last_updated}`);
+      }
+    } else {
+      for (const id of Object.keys(states)) {
+        if (!id.startsWith('media_player.')) continue;
+        parts.push(`${id}@${states[id]!.last_updated}`);
+      }
+    }
+    return parts.join('|');
   }
 
   private async _reconcileFromRegistry(): Promise<void> {

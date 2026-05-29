@@ -108,10 +108,16 @@ export class HomefrontMusicCard extends LitElement {
 
   protected willUpdate(changed: Map<string, unknown>): void {
     if (changed.has('hass') && this.hass) {
-      this._integrationStatus = checkIntegrations(this.hass);
-      // Only flow hass into the store once all required integrations are
-      // present. Otherwise the store would derive an empty zone map and
-      // the user would see "no zones" UI on top of the setup-help panel.
+      // Integration detection is expensive (scans all services + states).
+      // Once everything's present it can't go missing in normal use, so
+      // we only re-run it until the first all-present result.
+      if (!this._integrationStatus?.allPresent) {
+        this._integrationStatus = checkIntegrations(this.hass);
+      }
+      // The store decides internally whether anything it cares about
+      // changed; it's cheap to call on every tick and a no-op when no
+      // watched entity changed (this is the key to staying smooth — HA
+      // fires `hass` for every unrelated entity in the system).
       if (this._integrationStatus.allPresent) {
         this._store.setHass(this.hass);
       }
