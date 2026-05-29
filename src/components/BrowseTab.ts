@@ -36,6 +36,31 @@ function labelFor(id: SortMode): string {
 }
 
 /**
+ * Coerce a browse-node field that might be a string, an object with
+ * `.name`/`.title`, or null into a plain display string. MA's
+ * browse_media nodes occasionally return structured objects where the
+ * card expects a string, which otherwise renders as "[object Object]".
+ */
+function safeStr(v: unknown): string {
+  if (typeof v === 'string') {
+    return v === '[object Object]' ? '' : v;
+  }
+  if (typeof v === 'number') return String(v);
+  if (Array.isArray(v) && v.length > 0) return safeStr(v[0]);
+  if (v && typeof v === 'object') {
+    const o = v as Record<string, unknown>;
+    return (
+      safeStr(o.name) ||
+      safeStr(o.title) ||
+      safeStr(o.path) ||
+      safeStr(o.url) ||
+      ''
+    );
+  }
+  return '';
+}
+
+/**
  * Source → Account → Type → Detail browse flow. Bypasses the merged-Library
  * view (per ARCHITECTURE.md): always presents providers and accounts
  * separately so multi-account households (Spotify x2) stay disambiguated.
@@ -634,7 +659,7 @@ export class BrowseTab extends LitElement {
       <div class="crumbs">
         ${stack.map((node, i) => {
           const current = i === stack.length - 1;
-          const label = i === 0 ? 'Sources' : node.title;
+          const label = i === 0 ? 'Sources' : safeStr(node.title) || 'Item';
           return html`
             <button
               class="crumb-btn"
@@ -672,30 +697,33 @@ export class BrowseTab extends LitElement {
   private _applyFilter(children: BrowseMediaNode[]): BrowseMediaNode[] {
     const q = this._filterQuery.trim().toLowerCase();
     if (!q) return children;
-    return children.filter((c) => c.title.toLowerCase().includes(q));
+    return children.filter((c) => safeStr(c.title).toLowerCase().includes(q));
   }
 
   private _renderHassList(children: BrowseMediaNode[]): TemplateResult {
     return html`
       <div>
-        ${children.map(
-          (c) => html`
+        ${children.map((c) => {
+          const title = safeStr(c.title) || '(untitled)';
+          const cls = safeStr(c.media_class);
+          const thumb = safeStr(c.thumbnail);
+          return html`
             <button class="track-row" @click=${() => this._onHassChildClick(c)}>
-              ${c.thumbnail
+              ${thumb
                 ? html`<hf-album-art
                     .obj=${null}
-                    .imageUrl=${c.thumbnail}
+                    .imageUrl=${thumb}
                     size="36"
                     radius="6"
                   ></hf-album-art>`
                 : html`<div
                     style="width:36px;height:36px;border-radius:6px;background:var(--hf-input);display:grid;place-items:center;color:var(--hf-text-dim);flex:none"
                   >
-                    ${this._iconForClass(c.media_class)}
+                    ${this._iconForClass(cls)}
                   </div>`}
               <div class="track-meta">
-                <div class="track-name">${c.title}</div>
-                <div class="track-sub">${c.media_class}</div>
+                <div class="track-name">${title}</div>
+                ${cls ? html`<div class="track-sub">${cls}</div>` : ''}
               </div>
               ${c.can_expand
                 ? Icons.chev({ size: 14 })
@@ -703,8 +731,8 @@ export class BrowseTab extends LitElement {
                   ? Icons.play({ size: 14 })
                   : ''}
             </button>
-          `,
-        )}
+          `;
+        })}
       </div>
     `;
   }
