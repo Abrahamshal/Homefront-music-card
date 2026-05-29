@@ -23,7 +23,24 @@ export function deriveSpeakers(hass: HomeAssistant, zones: ZoneConfig[]): Speake
 
   for (const zone of zones) {
     const wiim = states[zone.wiim];
-    if (!wiim) continue;
+    if (!wiim) {
+      // The configured WiiM entity doesn't exist in HA. Still surface
+      // the zone (as a solo, unavailable speaker) so the user can SEE
+      // the mapping is wrong rather than the zone silently vanishing.
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[homefront-music-card] zone "${zone.name}": WiiM entity ${zone.wiim} not found in hass.states`,
+      );
+      out.push({
+        id: zone.wiim,
+        name: `${zone.name} (entity missing)`,
+        room: zone.name,
+        model: 'unavailable',
+        volume: 0,
+        leadId: zone.wiim,
+      });
+      continue;
+    }
 
     const attrs = wiim.attributes as Record<string, unknown>;
     const role = attrs.group_role as 'master' | 'slave' | 'solo' | undefined;

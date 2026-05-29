@@ -171,6 +171,12 @@ export class Store extends EventTarget {
   private _hass: HomeAssistant | undefined;
   /** Effective zone map — either explicit config.zones or auto-discovered. */
   private _zones: ZoneConfig[] = [];
+  /**
+   * True when zones came from the card's YAML `zones:` block. Explicit
+   * zones are authoritative — discovery (sync or registry) never
+   * overrides them.
+   */
+  private _hasExplicitZones = false;
   /** True once we've ever seen a hass AND found at least one zone. */
   private _isHassMode = false;
   /** Last discovery diagnostic for the debug overlay. */
@@ -378,16 +384,16 @@ export class Store extends EventTarget {
     this._deriveFromHass();
     this._emit();
     // Kick off the authoritative entity-registry-based discovery once per
-    // session. If it returns zones, they replace whatever the sync
-    // heuristic found. If it fails, the sync result stays in play.
-    if (!this._registryAttempted) {
+    // session — but only when zones aren't explicitly configured. With
+    // explicit zones, the user's YAML is the source of truth.
+    if (!this._hasExplicitZones && !this._registryAttempted) {
       this._registryAttempted = true;
       void this._reconcileFromRegistry();
     }
   }
 
   private async _reconcileFromRegistry(): Promise<void> {
-    if (!this._hass) return;
+    if (!this._hass || this._hasExplicitZones) return;
     const result = await discoverZonesFromRegistry(this._hass);
     if (result.zones.length === 0) {
       // Registry returned nothing — leave the sync result in place but
@@ -428,8 +434,10 @@ export class Store extends EventTarget {
   setConfig(config: HomefrontCardConfig): void {
     if (config.zones && config.zones.length > 0) {
       this._zones = config.zones;
+      this._hasExplicitZones = true;
     } else {
       this._zones = [];
+      this._hasExplicitZones = false;
     }
     if (this._hass) {
       this._deriveFromHass();
@@ -440,13 +448,17 @@ export class Store extends EventTarget {
   private _deriveFromHass(): void {
     if (!this._hass) return;
 
-    // Resolve zones. We always run sync discovery on each hass tick so
-    // newly-added devices appear without a manual reload; the slower
-    // async registry-based discovery (more authoritative for pairing)
-    // runs separately and reconciles when complete.
     let zones: ZoneConfig[];
     let zonesChanged = false;
-    if (this._zones.length > 0 && this._isHassMode) {
+
+    if (this._hasExplicitZones) {
+      // Explicit YAML zones are authoritative — never overridden by
+      // discovery. Use them verbatim.
+      zones = this._zones;
+    } else if (this._zones.length > 0 && this._isHassMode) {
+      // Auto-discovery mode, already running. Re-scan each tick so newly
+      // added devices appear; only swap the zone set if it actually
+      // changed (avoids churn).
       const result = discoverZonesWithDiagnostics(this._hass);
       const cachedWiims = new Set(this._zones.map((z) => z.wiim));
       const newOrMissing =
@@ -456,13 +468,12 @@ export class Store extends EventTarget {
         zones = result.zones;
         this.diagnosticNotes = ['Zone set changed — sync rediscovery', ...result.notes];
         zonesChanged = true;
-        // Re-trigger the authoritative registry pass so the pairing is
-        // verified against entity-registry device_ids.
         this._registryAttempted = false;
       } else {
         zones = this._zones;
       }
     } else {
+      // First auto-discovery pass.
       const result = discoverZonesWithDiagnostics(this._hass);
       zones = result.zones;
       this.diagnosticNotes = result.notes;
@@ -472,10 +483,11 @@ export class Store extends EventTarget {
       );
     }
 
-    // If discovery found nothing, stay in mock mode so the user sees the
-    // prototype rather than an empty card. They'll switch automatically
-    // once a WiiM-MA pair becomes available.
-    if (zones.length === 0) {
+    // If we have no zones AND none are explicitly configured, stay in
+    // mock mode so the user sees the prototype rather than an empty card.
+    // With explicit zones we always enter hass-mode even if the entities
+    // aren't all present yet (so the user sees their configured set).
+    if (zones.length === 0 && !this._hasExplicitZones) {
       // eslint-disable-next-line no-console
       console.warn(
         '[homefront-music-card] No zones discovered — staying in mock mode. See store.diagnosticNotes for details.',
