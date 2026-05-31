@@ -334,6 +334,42 @@ export class BrowseTab extends LitElement {
       text-align: left;
       font: inherit;
     }
+    .browse-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-bottom: 1px solid var(--hf-divider);
+    }
+    .browse-row-main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 4px;
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      color: var(--hf-text);
+      text-align: left;
+      font: inherit;
+    }
+    .browse-play {
+      flex: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--hf-accent);
+      color: var(--hf-accent-text);
+      border: 0;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      padding: 0;
+    }
+    .browse-play:hover {
+      filter: brightness(1.08);
+    }
     .track-index {
       width: 18px;
       text-align: right;
@@ -708,36 +744,59 @@ export class BrowseTab extends LitElement {
           const cls = safeStr(c.media_class);
           const thumb = safeStr(c.thumbnail);
           return html`
-            <button class="track-row" @click=${() => this._onHassChildClick(c)}>
-              ${thumb
-                ? html`<hf-album-art
-                    .obj=${null}
-                    .imageUrl=${thumb}
-                    size="36"
-                    radius="6"
-                  ></hf-album-art>`
-                : html`<div
-                    style="width:36px;height:36px;border-radius:6px;background:var(--hf-input);display:grid;place-items:center;color:var(--hf-text-dim);flex:none"
-                  >
-                    ${this._iconForClass(cls)}
-                  </div>`}
-              <div class="track-meta">
-                <div class="track-name">${title}</div>
-                ${cls ? html`<div class="track-sub">${cls}</div>` : ''}
-              </div>
-              ${c.can_expand
-                ? Icons.chev({ size: 14 })
-                : c.can_play
-                  ? Icons.play({ size: 14 })
-                  : ''}
-            </button>
+            <div class="browse-row">
+              <button
+                class="browse-row-main"
+                @click=${() => this._onHassRowClick(c)}
+              >
+                ${thumb
+                  ? html`<hf-album-art
+                      .obj=${null}
+                      .imageUrl=${thumb}
+                      size="36"
+                      radius="6"
+                    ></hf-album-art>`
+                  : html`<div
+                      style="width:36px;height:36px;border-radius:6px;background:var(--hf-input);display:grid;place-items:center;color:var(--hf-text-dim);flex:none"
+                    >
+                      ${this._iconForClass(cls)}
+                    </div>`}
+                <div class="track-meta">
+                  <div class="track-name">${title}</div>
+                  ${cls ? html`<div class="track-sub">${cls}</div>` : ''}
+                </div>
+                ${c.can_expand ? Icons.chev({ size: 14 }) : ''}
+              </button>
+              ${c.can_play
+                ? html`
+                    <button
+                      class="browse-play"
+                      title="Play"
+                      aria-label="Play ${title}"
+                      @click=${(e: Event) => {
+                        e.stopPropagation();
+                        this.store.playBrowseNode(c, 'replace');
+                      }}
+                    >
+                      ${Icons.play({ size: 14 })}
+                    </button>
+                  `
+                : ''}
+            </div>
           `;
         })}
       </div>
     `;
   }
 
-  private _onHassChildClick(node: BrowseMediaNode): void {
+  /**
+   * Row body click. Drill in when expandable (so you can pick an
+   * individual track); otherwise, if it's a playable leaf, play it. The
+   * dedicated play button (rendered separately) always plays the whole
+   * thing — that mirrors maxi-media-player's "tap to open, ▶ to play
+   * everything" behavior.
+   */
+  private _onHassRowClick(node: BrowseMediaNode): void {
     if (node.can_expand) {
       void this.store.browseInto(node);
     } else if (node.can_play) {
