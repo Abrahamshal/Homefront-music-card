@@ -665,12 +665,9 @@ export class Store extends EventTarget {
    * `return_response: true` since `hass.callService` typically doesn't
    * surface the response payload.
    *
-   * Some HA versions auto-merge `target.entity_id` into `service_data`
-   * before invoking the service's schema validator, which then rejects
-   * the "extra" entity_id key. To avoid that we:
-   *   1. Omit `service_data` entirely when `data` is empty.
-   *   2. Fall back to `execute_script` (always a clean target / data
-   *      split) if the first call returns a validation error.
+   * Pass the entity in `data` for services that expect it that way
+   * (mass_queue uses `data.entity`); use `target` only for services that
+   * genuinely take target.entity_id (media_player.*).
    */
   private async _callServiceWithResponse<T = unknown>(
     domain: string,
@@ -679,51 +676,23 @@ export class Store extends EventTarget {
     target: { entity_id?: string | string[] } = {},
   ): Promise<T | undefined> {
     if (!this._isHassMode || !this._hass) return undefined;
-    const hasData = Object.keys(data).length > 0;
-    const hasTarget = Object.keys(target).length > 0;
     const msg: { type: string; [k: string]: unknown } = {
       type: 'call_service',
       domain,
       service,
       return_response: true,
     };
-    if (hasData) msg.service_data = data;
-    if (hasTarget) msg.target = target;
+    if (Object.keys(data).length > 0) msg.service_data = data;
+    if (Object.keys(target).length > 0) msg.target = target;
     try {
       const result = await this._hass.callWS<{ response: T }>(msg);
       return result?.response;
     } catch (err) {
       const errMsg = (err as { message?: string } | null)?.message ?? String(err);
-      // Fallback for HA versions that mis-merge target/data: use
-      // execute_script which always keeps them separate.
-      if (errMsg.includes('extra keys not allowed') && hasTarget) {
-        try {
-          const result = await this._hass.callWS<{ response: T }>({
-            type: 'execute_script',
-            sequence: [
-              {
-                service: `${domain}.${service}`,
-                target,
-                ...(hasData ? { data } : {}),
-              },
-            ],
-            return_response: true,
-          });
-          return result?.response;
-        } catch (err2) {
-          // eslint-disable-next-line no-console
-          console.warn(
-            `[homefront-music-card] ${domain}.${service} (execute_script fallback) failed:`,
-            err2,
-          );
-          const m2 = (err2 as { message?: string } | null)?.message ?? String(err2);
-          this.showToast(`${domain}.${service} failed: ${m2}`, 'error');
-          return undefined;
-        }
-      }
       // eslint-disable-next-line no-console
       console.warn(
         `[homefront-music-card] ${domain}.${service} (with response) failed:`,
+        errMsg,
         err,
       );
       this.showToast(`${domain}.${service} failed: ${errMsg}`, 'error');
@@ -872,11 +841,14 @@ export class Store extends EventTarget {
     this.hassQueueLoading = true;
     this.hassQueueError = null;
     this._emit();
+    // mass_queue services take the media_player as a `data.entity`
+    // field (NOT target.entity_id). Passing it as a target makes HA
+    // merge entity_id into the data, which the service schema rejects.
     const response = await this._callServiceWithResponse<{ queue_items?: QueueItem[] } | QueueItem[]>(
       'mass_queue',
       'get_queue_items',
+      { entity: ma },
       {},
-      { entity_id: ma },
     );
     // Response shape varies between versions: sometimes the array is at
     // the top level, sometimes under `queue_items`.
@@ -943,6 +915,9 @@ export class Store extends EventTarget {
     return null;
   }
 
+  // mass_queue services take the media_player as `data.entity` (not
+  // target.entity_id). See loadQueue note.
+
   /** Play a queue item by ID. */
   playQueueItem(queueItemId: string): void {
     const ma = this._maFor(this.activeLeadId);
@@ -950,10 +925,9 @@ export class Store extends EventTarget {
     this._callService(
       'mass_queue',
       'play_queue_item',
-      { queue_item_id: queueItemId },
-      { entity_id: ma },
+      { entity: ma, queue_item_id: queueItemId },
+      {},
     );
-    // Optimistic refresh after a beat so the now-playing reflects.
     window.setTimeout(() => void this.loadQueue(), 400);
   }
 
@@ -964,10 +938,9 @@ export class Store extends EventTarget {
     this._callService(
       'mass_queue',
       'remove_queue_item',
-      { queue_item_id: queueItemId },
-      { entity_id: ma },
+      { entity: ma, queue_item_id: queueItemId },
+      {},
     );
-    // Optimistic local removal so UI updates instantly; reload to confirm.
     this.hassQueue = this.hassQueue.filter((q) => q.queue_item_id !== queueItemId);
     this._emit();
     window.setTimeout(() => void this.loadQueue(), 400);
@@ -981,8 +954,8 @@ export class Store extends EventTarget {
       this._callService(
         'mass_queue',
         'remove_queue_item',
-        { queue_item_id: id },
-        { entity_id: ma },
+        { entity: ma, queue_item_id: id },
+        {},
       );
     }
     this.hassQueue = this.hassQueue.filter((q) => !queueItemIds.has(q.queue_item_id));
@@ -996,7 +969,7 @@ export class Store extends EventTarget {
   clearQueueFromHere(): void {
     const ma = this._maFor(this.activeLeadId);
     if (!ma) return;
-    this._callService('mass_queue', 'clear_queue_from_here', {}, { entity_id: ma });
+    this._callService('mass_queue', 'clear_queue_from_here', { entity: ma }, {});
     window.setTimeout(() => void this.loadQueue(), 400);
   }
 
@@ -1007,8 +980,8 @@ export class Store extends EventTarget {
     this._callService(
       'mass_queue',
       'move_queue_item_next',
-      { queue_item_id: queueItemId },
-      { entity_id: ma },
+      { entity: ma, queue_item_id: queueItemId },
+      {},
     );
     window.setTimeout(() => void this.loadQueue(), 400);
   }
