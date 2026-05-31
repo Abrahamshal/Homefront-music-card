@@ -1251,43 +1251,57 @@ export class Store extends EventTarget {
   // per the architecture, MA group volume on a Linkplay group would
   // collide with WiiM's native sync.
 
-  setSpeakerVol(id: string, v: number): void {
-    const sp = this.speakers.find((s) => s.id === id);
-    if (!sp) return;
-    sp.volume = v;
-    this._emit();
-    if (this._isHassMode) {
+  /** Pending debounced volume_set calls, keyed by WiiM entity_id. */
+  private _volumeDebounce = new Map<string, number>();
+
+  /**
+   * Debounced volume_set. The optimistic local value already updated the
+   * UI; we wait until the user settles (120ms of no further change) before
+   * issuing the actual service call, so a drag fires one call per entity
+   * instead of dozens.
+   */
+  private _dispatchVolume(entityId: string, v: number): void {
+    if (!this._isHassMode) return;
+    const existing = this._volumeDebounce.get(entityId);
+    if (existing !== undefined) window.clearTimeout(existing);
+    const t = window.setTimeout(() => {
+      this._volumeDebounce.delete(entityId);
       this._callService(
         'media_player',
         'volume_set',
         { volume_level: clamp01(v / 100) },
-        { entity_id: id },
+        { entity_id: entityId },
       );
-    }
+    }, 120);
+    this._volumeDebounce.set(entityId, t);
+  }
+
+  setSpeakerVol(id: string, v: number): void {
+    // Replace the speaker object + array reference so the memoized
+    // `groups` getter invalidates and the UI reflects the change.
+    this.speakers = this.speakers.map((s) =>
+      s.id === id ? { ...s, volume: v } : s,
+    );
+    this._emit();
+    this._dispatchVolume(id, v);
   }
 
   setGroupVolumeFor(leadId: string, v: number): void {
-    const cur = this.players[leadId];
-    if (cur) this.players[leadId] = { ...cur, groupVolume: v };
     const memberIds: string[] = [];
-    for (const s of this.speakers) {
+    this.speakers = this.speakers.map((s) => {
       if (s.leadId === leadId) {
-        s.volume = v;
         memberIds.push(s.id);
+        return { ...s, volume: v };
       }
+      return s;
+    });
+    const cur = this.players[leadId];
+    if (cur) {
+      this.players = { ...this.players, [leadId]: { ...cur, groupVolume: v } };
     }
     this._emit();
-    if (this._isHassMode && memberIds.length > 0) {
-      // Per-member calls (parallel is fine; HA serializes WS frames anyway).
-      const level = clamp01(v / 100);
-      for (const id of memberIds) {
-        this._callService(
-          'media_player',
-          'volume_set',
-          { volume_level: level },
-          { entity_id: id },
-        );
-      }
+    if (this._isHassMode) {
+      for (const id of memberIds) this._dispatchVolume(id, v);
     }
   }
 

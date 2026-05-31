@@ -1,5 +1,5 @@
 import { LitElement, html, css } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 
 /**
  * Cross-browser-styled range input.
@@ -23,6 +23,15 @@ export class Slider extends LitElement {
   @property({ type: Number, attribute: 'track-height' }) trackHeight = 4;
   @property({ type: Number }) thumb = 14;
   @property({ attribute: 'aria-label' }) override ariaLabel = '';
+
+  /**
+   * While the user is actively dragging, we ignore external `value`
+   * updates (HA echoes the old/in-flight volume back as state updates,
+   * which would otherwise yank the thumb out from under the finger).
+   * `_dragValue` holds the live local value during a drag.
+   */
+  @state() private _dragging = false;
+  private _dragValue = 0;
 
   static styles = css`
     :host {
@@ -88,7 +97,10 @@ export class Slider extends LitElement {
   `;
 
   protected render() {
-    const pct = ((this.value - this.min) / (this.max - this.min)) * 100;
+    // During a drag, render the live local value so HA echoes don't
+    // snap the thumb back.
+    const shown = this._dragging ? this._dragValue : this.value;
+    const pct = ((shown - this.min) / (this.max - this.min)) * 100;
     this.style.setProperty('--hf-pct', `${pct}%`);
     this.style.setProperty('--hf-color', this.color);
     this.style.setProperty('--hf-track', this.track);
@@ -98,16 +110,40 @@ export class Slider extends LitElement {
       type="range"
       min=${this.min}
       max=${this.max}
-      .value=${String(this.value)}
+      .value=${String(shown)}
       aria-label=${this.ariaLabel || 'Slider'}
       @input=${this._onInput}
+      @pointerdown=${this._onPointerDown}
+      @pointerup=${this._onPointerUp}
+      @pointercancel=${this._onPointerUp}
     />`;
   }
 
   private _onInput = (e: Event) => {
     const v = Number((e.target as HTMLInputElement).value);
+    this._dragValue = v;
     this.value = v;
-    this.dispatchEvent(new CustomEvent<number>('hf-input', { detail: v, bubbles: true, composed: true }));
+    // `change` only fires on release; emit a distinct event so the
+    // parent can debounce live drags vs. the final settle.
+    this.dispatchEvent(
+      new CustomEvent<number>('hf-input', { detail: v, bubbles: true, composed: true }),
+    );
+  };
+
+  private _onPointerDown = (e: Event) => {
+    this._dragging = true;
+    this._dragValue = Number((e.target as HTMLInputElement).value);
+  };
+
+  private _onPointerUp = (e: Event) => {
+    if (!this._dragging) return;
+    this._dragging = false;
+    const v = Number((e.target as HTMLInputElement).value);
+    // Fire a settle event so the parent can issue the authoritative
+    // service call once, on release.
+    this.dispatchEvent(
+      new CustomEvent<number>('hf-change', { detail: v, bubbles: true, composed: true }),
+    );
   };
 }
 
