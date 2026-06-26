@@ -2,7 +2,7 @@
 
 A Home Assistant Lovelace card for whole‑home audio, built for **multi‑account households**. It is a fork of the excellent [maxi‑media‑player](https://github.com/punxaphil/maxi-media-player) (a.k.a. custom‑sonos‑card) that keeps maxi's smooth, Sonos‑style interface and **adds one thing maxi/Music Assistant can't do on their own: browsing your music by source account.**
 
-> If two people in your home each have their own Spotify (or Pandora, Apple Music, Tidal…) connected to Music Assistant, the standard library merges them into one giant flat list. This card lets you browse **per account** — "Abe's Spotify", "Marlene's Spotify", "Eileen's Pandora" — and drill down from there.
+> If two people in your home each have their own Spotify (or Pandora, Apple Music, Tidal…) connected to Music Assistant, the standard library merges them into one giant flat list. This card lets you browse **per account** — "Alex's Spotify", "Jordan's Spotify", "Sam's Pandora" — and drill down from there.
 
 ---
 
@@ -10,7 +10,7 @@ A Home Assistant Lovelace card for whole‑home audio, built for **multi‑accou
 
 Music Assistant is fantastic at pulling many streaming accounts into one place. But that's also the problem in a shared home: once everything is merged, you can't tell whose playlists are whose. You scroll one endless "Playlists" list mixing four people's libraries.
 
-We run a multi‑zone home on **WiiM amps + Music Assistant**, with several family members' streaming accounts connected. We wanted a wall‑tablet card that:
+We run a multi‑zone home on **WiiM amps + Music Assistant**, with several family members' streaming accounts connected — but **WiiM is not required** (see below); it's just what we happen to run. We wanted a wall‑tablet card that:
 
 - looks and feels like Sonos (grouping, volumes, queue, now‑playing), and
 - lets each person find **their own** music quickly, separated by account.
@@ -31,13 +31,15 @@ The Sources tab defaults on, because per‑account browsing is the whole point o
 
 ## Requirements
 
-This card targets a **Music Assistant + WiiM (Linkplay)** setup. You'll want:
+**Required** (for the per‑account Sources browsing that makes this fork worthwhile):
 
-1. **[Music Assistant](https://www.music-assistant.io/)** — installed, with your streaming accounts connected. This is what makes the per‑account browsing possible.
+1. **[Music Assistant](https://www.music-assistant.io/)** — installed, with your streaming accounts connected. This is what makes per‑account browsing possible.
 2. **[Music Assistant Queue Actions](https://github.com/droans/ha-mass-queue)** (HACS, `mass_queue`) — the Sources tab calls Music Assistant's native `music/browse` through this integration. **Without it, the Sources tab can't load** (the rest of the card still works).
-3. **A Music Assistant media player** configured as the card's `entityId`. For multi‑room sync we target WiiM group leaders' MA entities (see [maxi's docs](https://punxaphil.github.io/maxi-media-player/) for grouping config).
+3. **A Music Assistant media player** as the card's `entityId`, with `entityPlatform: music_assistant`.
 
 If Music Assistant or the queue integration is missing, the Sources tab shows a help message instead of failing silently.
+
+**Not required — WiiM/Linkplay.** The card contains *no* WiiM‑ or Linkplay‑specific code. Multi‑room grouping uses Home Assistant's standard `media_player` join/unjoin, so **any group‑capable players work** (Sonos, WiiM, HEOS, Music Assistant / Squeezelite, …). WiiM amps are simply what this card was built and tested on. If you don't group at all, you can drop the Grouping section entirely and use it as a single‑zone card.
 
 ## Installation (HACS)
 
@@ -53,7 +55,7 @@ The card registers as `custom:homefront-music-card`.
 
 ## Configuration
 
-Configuration mirrors maxi‑media‑player — see the **[maxi configuration docs](https://punxaphil.github.io/maxi-media-player/)** — just use the `homefront-music-card` type. Minimal example:
+Configuration mirrors maxi‑media‑player — see the **[maxi configuration docs](https://github.com/punxaphil/maxi-media-player#configuration)** — just use the `homefront-music-card` type. Minimal example:
 
 ```yaml
 type: custom:homefront-music-card
