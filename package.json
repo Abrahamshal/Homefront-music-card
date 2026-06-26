@@ -1,7 +1,7 @@
 {
   "name": "homefront-music-card",
   "version": "0.0.1",
-  "description": "Custom Lovelace card for Music Assistant + WiiM multi-room control",
+  "description": "Sonos-style Lovelace card for Music Assistant + WiiM with per-account media browsing. Fork of maxi-media-player.",
   "type": "module",
   "main": "dist/homefront-music-card.js",
   "scripts": {
@@ -24,8 +24,8 @@
     "wiim",
     "hacs"
   ],
-  "author": "",
-  "license": "MIT",
+  "author": "Abraham Shalam",
+  "license": "Apache-2.0",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-json": "^6.1.0",
