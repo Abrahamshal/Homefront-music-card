@@ -270,6 +270,7 @@ export interface MediaPlayerItem extends Partial<UpstreamMediaPlayerItem> {
   favoriteType?: string;
   queueItemId?: string; // Music Assistant queue item ID for remove/play operations
   massBrowsePath?: string; // Music Assistant native browse path (music/browse) for drilling into providers/accounts
+  massIconPath?: string; // mdi icon path to show when this browse item has no artwork (accounts/categories)
 }
 
 /**

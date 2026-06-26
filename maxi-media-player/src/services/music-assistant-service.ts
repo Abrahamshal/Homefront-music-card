@@ -14,6 +14,18 @@ import { MediaPlayer } from '../model/media-player';
 
 import { EnqueueMode, MusicAssistantFavoritesMediaType } from '../types';
 
+import {
+  mdiAccountMusic,
+  mdiAlbum,
+  mdiBookMusic,
+  mdiFolderMusic,
+  mdiMusicNote,
+  mdiPlaylistMusic,
+  mdiPodcast,
+  mdiRadio,
+  mdiSpotify,
+} from '@mdi/js';
+
 const LIBRARY_URI_PREFIX = 'library://';
 
 /** Turn a snake/raw key like 'playlists' into a display label 'Playlists'. */
@@ -22,6 +34,37 @@ function titleCaseKey(key?: string | null): string {
     return '';
   }
   return key.replace(/[_-]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+/** Icon for a top-level provider/account folder, by provider domain. */
+function providerIcon(provider: string): string {
+  if (provider.startsWith('spotify')) {
+    return mdiSpotify;
+  }
+  // No dedicated mdi glyphs for Pandora/etc — a music folder reads cleanly.
+  return mdiFolderMusic;
+}
+
+/** Icon for a category folder (artists/albums/tracks/...), by its key. */
+function categoryIcon(key: string): string {
+  switch (key) {
+    case 'artists':
+      return mdiAccountMusic;
+    case 'albums':
+      return mdiAlbum;
+    case 'tracks':
+      return mdiMusicNote;
+    case 'playlists':
+      return mdiPlaylistMusic;
+    case 'radio':
+      return mdiRadio;
+    case 'podcasts':
+      return mdiPodcast;
+    case 'audiobooks':
+      return mdiBookMusic;
+    default:
+      return mdiFolderMusic;
+  }
 }
 
 export class MusicAssistantService {
@@ -406,13 +449,18 @@ export class MusicAssistantService {
     if (!Array.isArray(items)) {
       return [];
     }
-    return (
-      items
-        // MA injects a ".." back-link (name "..", path "root") as the first
-        // item; our own back navigation handles that, so drop it.
-        .filter((item) => item.name !== '..' && item.path !== 'root')
-        .map((item) => this.transformBrowseItem(item))
-    );
+    return items
+      .filter(
+        (item) =>
+          // MA injects a ".." back-link (name "..", path "root"); our own back
+          // navigation handles that, so drop it.
+          item.name !== '..' &&
+          item.path !== 'root' &&
+          // Hide the "Music Assistant" builtin source folder — not useful here.
+          item.path !== 'builtin://' &&
+          item.provider !== 'builtin',
+      )
+      .map((item) => this.transformBrowseItem(item));
   }
 
   private transformBrowseItem(item: MassBrowseItem): MediaPlayerItem {
@@ -423,6 +471,17 @@ export class MusicAssistantService {
     const isLeaf = item.media_type === 'track' || item.media_type === 'radio';
     // Account folders & category folders have empty name → use translation_key.
     const title = item.name?.trim() || titleCaseKey(item.translation_key) || titleCaseKey(item.item_id) || 'Item';
+    // Fallback icon when an item has no artwork: provider glyph for the
+    // top-level account folders (item_id 'root'), category glyph for the
+    // library-category folders, a music note for everything else.
+    let massIconPath: string;
+    if (item.item_id === 'root') {
+      massIconPath = providerIcon(item.provider);
+    } else if (item.media_type === 'folder') {
+      massIconPath = categoryIcon(item.translation_key || item.item_id);
+    } else {
+      massIconPath = isLeaf ? mdiMusicNote : mdiPlaylistMusic;
+    }
     return {
       title,
       media_content_id: item.uri,
@@ -431,6 +490,7 @@ export class MusicAssistantService {
       can_play: isLeaf || item.is_playable,
       can_expand: !isLeaf,
       massBrowsePath: item.path,
+      massIconPath,
     };
   }
 

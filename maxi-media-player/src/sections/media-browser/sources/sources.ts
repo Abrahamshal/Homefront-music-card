@@ -1,15 +1,16 @@
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, LitElement } from 'lit';
 import { property, state } from 'lit/decorators.js';
+import { styleMap } from 'lit/directives/style-map.js';
 import { mdiArrowLeft, mdiStar } from '@mdi/js';
 import Store from '../../../model/store';
 import '../favorites/favorites-list';
-import '../favorites/favorites-icons';
 import '../../../components/icon-button';
-import { MEDIA_ITEM_SELECTED } from '../../../constants';
+import { MEDIA_ITEM_SELECTED, mediaItemTitleStyle } from '../../../constants';
 import { customEvent, getSpeakerList } from '../../../utils/utils';
 import { MediaPlayerItem } from '../../../types';
 import { mediaBrowserStyles } from '../styles';
 import { renderLayoutMenu } from '../layout-menu';
+import { mediaGridCardStyles, renderMediaGridCard } from '../utils';
 import { LayoutType } from '../media-browser.types';
 
 interface SourceNav {
@@ -26,8 +27,8 @@ let currentNav: SourceNav[] | null = null;
  * `music/browse` command (via mass_queue). Unlike HA's merged
  * `media_player/browse_media`, this starts at one folder PER provider/account
  * — e.g. "Abe's Spotify", "Marlene's Spotify", "Eileen's Pandora" — and drills
- * down within a single account. Reuses the favorites grid/list renderers so it
- * looks identical to the rest of the card.
+ * down within a single account. Renders artwork when available and a provider/
+ * category icon otherwise, so account + category folders never show blank tiles.
  */
 export class MediaBrowserSources extends LitElement {
   @property({ attribute: false }) store!: Store;
@@ -63,8 +64,7 @@ export class MediaBrowserSources extends LitElement {
     }
   }
 
-  private onItemSelected = async (event: CustomEvent) => {
-    const item = event.detail as MediaPlayerItem;
+  private async selectItem(item: MediaPlayerItem) {
     if (item.can_expand && item.massBrowsePath) {
       this.nav = [...this.nav, { path: item.massBrowsePath, title: item.title }];
       currentNav = this.nav;
@@ -74,6 +74,11 @@ export class MediaBrowserSources extends LitElement {
     // Leaf — play it on the active player.
     await this.store.mediaControlService.playMedia(this.store.activePlayer, item);
     this.dispatchEvent(customEvent(MEDIA_ITEM_SELECTED, item));
+  }
+
+  // Event form for the list renderer (sonos-favorites-list emits item-selected).
+  private onItemSelected = (event: CustomEvent) => {
+    void this.selectItem(event.detail as MediaPlayerItem);
   };
 
   private goBack = () => {
@@ -121,23 +126,64 @@ export class MediaBrowserSources extends LitElement {
           : this.items.length === 0
             ? html`<div class="sources-message">Empty</div>`
             : useGrid
-              ? html`<sonos-favorites-icons .items=${this.items} .store=${this.store} @item-selected=${this.onItemSelected}></sonos-favorites-icons>`
+              ? this.renderGrid()
               : html`<sonos-favorites-list .items=${this.items} .store=${this.store} @item-selected=${this.onItemSelected}></sonos-favorites-list>`}
-      ${this.loading ? nothing : nothing}
+    `;
+  }
+
+  private renderGrid() {
+    const itemsPerRow = this.store.config.mediaBrowser?.itemsPerRow || 3;
+    const margin = '1%';
+    const cardStyle = styleMap({
+      width: `calc(100% / ${itemsPerRow} - ${margin} * 2)`,
+      margin,
+    });
+    return html`
+      <div class="sources-grid">
+        ${this.items.map((item) => {
+          const thumbnailContent = item.thumbnail
+            ? html`<div class="image" style="background-image:url('${item.thumbnail}')"></div>`
+            : html`<div class="image icon-fallback">
+                <ha-svg-icon .path=${item.massIconPath}></ha-svg-icon>
+              </div>`;
+          return html`<div style=${cardStyle}>${renderMediaGridCard({ item, onClick: () => void this.selectItem(item), thumbnailContent })}</div>`;
+        })}
+      </div>
     `;
   }
 
   static get styles() {
     return [
+      mediaItemTitleStyle,
+      mediaGridCardStyles,
       mediaBrowserStyles,
       css`
-        sonos-favorites-icons,
+        .sources-grid {
+          display: flex;
+          flex-wrap: wrap;
+          align-content: flex-start;
+          flex: 1;
+          min-height: 0;
+          overflow: auto;
+        }
         sonos-favorites-list {
           --mdc-icon-size: 24px;
           --media-browse-item-size: 100px;
           flex: 1;
           min-height: 0;
           overflow: auto;
+        }
+        .icon-fallback {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: var(--secondary-background-color);
+          color: var(--secondary-text-color);
+        }
+        .icon-fallback ha-svg-icon {
+          --mdc-icon-size: 45%;
+          width: 45%;
+          height: 45%;
         }
         .sources-message {
           flex: 1;
