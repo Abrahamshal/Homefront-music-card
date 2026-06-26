@@ -18,6 +18,20 @@ import { mdiAccountMusic, mdiAlbum, mdiBookMusic, mdiFolderMusic, mdiMusicNote, 
 
 const LIBRARY_URI_PREFIX = 'library://';
 
+/**
+ * Shared, page-lifetime cache of `config_entries/get`.
+ *
+ * That WS call returns the FULL config-entry list (every integration in the
+ * install), so it's the slowest part of opening the Search / Favorites /
+ * Sources tabs. It used to be fetched twice per discovery (once for the MA
+ * entry, once for mass_queue) and re-fetched on every tab mount. Config
+ * entries don't change without a full frontend reload, so we memoize the
+ * promise: the first caller pays the round trip, everyone else (both
+ * discovery methods, every later mount, every service instance) reuses it.
+ * A rejected fetch clears the cache so a transient failure can be retried.
+ */
+let configEntriesPromise: Promise<ConfigEntry[]> | null = null;
+
 /** Turn a snake/raw key like 'playlists' into a display label 'Playlists'. */
 function titleCaseKey(key?: string | null): string {
   if (!key) {
@@ -97,9 +111,7 @@ export class MusicAssistantService {
    * Returns the first found Music Assistant integration ID, or null if not found
    */
   async discoverConfigEntryId(): Promise<string> {
-    const entries = await this.hass.callWS<ConfigEntry[]>({
-      type: 'config_entries/get',
-    });
+    const entries = await this.getConfigEntries();
 
     const musicAssistant = entries.find((entry) => entry.domain === 'music_assistant' && entry.state === 'loaded');
 
@@ -114,12 +126,21 @@ export class MusicAssistantService {
    * Returns the first found mass_queue integration ID, or null if not found
    */
   async discoverMassQueueConfigEntryId(): Promise<string | null> {
-    const entries = await this.hass.callWS<ConfigEntry[]>({
-      type: 'config_entries/get',
-    });
+    const entries = await this.getConfigEntries();
 
     const massQueue = entries.find((entry) => entry.domain === 'mass_queue' && entry.state === 'loaded');
     return massQueue?.entry_id ?? null;
+  }
+
+  /** Memoized full config-entry list — see configEntriesPromise above. */
+  private getConfigEntries(): Promise<ConfigEntry[]> {
+    if (!configEntriesPromise) {
+      configEntriesPromise = this.hass.callWS<ConfigEntry[]>({ type: 'config_entries/get' }).catch((e) => {
+        configEntriesPromise = null; // don't cache a failure
+        throw e;
+      });
+    }
+    return configEntriesPromise;
   }
 
   /**

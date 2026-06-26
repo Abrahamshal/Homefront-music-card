@@ -38,7 +38,11 @@ class Footer extends LitElement {
     return css`
       :host {
         display: flex;
-        justify-content: space-between;
+        /* Center the tab buttons and space them evenly. With few sections
+           (e.g. just Volumes + Grouping) 'space-between' shoved them to the
+           opposite edges of the card; centering keeps them grouped. */
+        justify-content: center;
+        gap: clamp(0.5rem, 8%, 4rem);
       }
       :host > * {
         align-content: center;

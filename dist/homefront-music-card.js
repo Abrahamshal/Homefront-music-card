@@ -2248,6 +2248,19 @@ var r = (r, o, t) => {
 //#endregion
 //#region src/services/music-assistant-service.ts
 var LIBRARY_URI_PREFIX = "library://";
+/**
+* Shared, page-lifetime cache of `config_entries/get`.
+*
+* That WS call returns the FULL config-entry list (every integration in the
+* install), so it's the slowest part of opening the Search / Favorites /
+* Sources tabs. It used to be fetched twice per discovery (once for the MA
+* entry, once for mass_queue) and re-fetched on every tab mount. Config
+* entries don't change without a full frontend reload, so we memoize the
+* promise: the first caller pays the round trip, everyone else (both
+* discovery methods, every later mount, every service instance) reuses it.
+* A rejected fetch clears the cache so a transient failure can be retried.
+*/
+var configEntriesPromise = null;
 /** Turn a snake/raw key like 'playlists' into a display label 'Playlists'. */
 function titleCaseKey(key) {
 	if (!key) return "";
@@ -2298,7 +2311,7 @@ var MusicAssistantService = class {
 	* Returns the first found Music Assistant integration ID, or null if not found
 	*/
 	async discoverConfigEntryId() {
-		const musicAssistant = (await this.hass.callWS({ type: "config_entries/get" })).find((entry) => entry.domain === "music_assistant" && entry.state === "loaded");
+		const musicAssistant = (await this.getConfigEntries()).find((entry) => entry.domain === "music_assistant" && entry.state === "loaded");
 		if (!musicAssistant) throw new Error("Music Assistant integration not found or not loaded");
 		return musicAssistant.entry_id;
 	}
@@ -2307,7 +2320,15 @@ var MusicAssistantService = class {
 	* Returns the first found mass_queue integration ID, or null if not found
 	*/
 	async discoverMassQueueConfigEntryId() {
-		return (await this.hass.callWS({ type: "config_entries/get" })).find((entry) => entry.domain === "mass_queue" && entry.state === "loaded")?.entry_id ?? null;
+		return (await this.getConfigEntries()).find((entry) => entry.domain === "mass_queue" && entry.state === "loaded")?.entry_id ?? null;
+	}
+	/** Memoized full config-entry list — see configEntriesPromise above. */
+	getConfigEntries() {
+		if (!configEntriesPromise) configEntriesPromise = this.hass.callWS({ type: "config_entries/get" }).catch((e) => {
+			configEntriesPromise = null;
+			throw e;
+		});
+		return configEntriesPromise;
 	}
 	/**
 	* Get favorites from Music Assistant library
@@ -3485,7 +3506,11 @@ var Footer = class extends i$5 {
 		return i$8`
       :host {
         display: flex;
-        justify-content: space-between;
+        /* Center the tab buttons and space them evenly. With few sections
+           (e.g. just Volumes + Grouping) 'space-between' shoved them to the
+           opposite edges of the card; centering keeps them grouped. */
+        justify-content: center;
+        gap: clamp(0.5rem, 8%, 4rem);
       }
       :host > * {
         align-content: center;
@@ -9922,6 +9947,8 @@ var MediaBrowserSources = class extends i$5 {
 		this.items = [];
 		this.loading = false;
 		this.error = "";
+		this.filter = "";
+		this.showSearch = false;
 		this.onItemSelected = (event) => {
 			this.selectItem(event.detail);
 		};
@@ -9933,6 +9960,16 @@ var MediaBrowserSources = class extends i$5 {
 		};
 		this.goToFavorites = () => {
 			this.dispatchEvent(new CustomEvent("go-to-favorites"));
+		};
+		this.toggleSearch = () => {
+			this.showSearch = !this.showSearch;
+			if (!this.showSearch) this.filter = "";
+		};
+		this.onFilterInput = (e) => {
+			this.filter = e.target.value;
+		};
+		this.clearFilter = () => {
+			this.filter = "";
 		};
 		this.playCurrentCollection = async () => {
 			const current = this.nav[this.nav.length - 1];
@@ -9949,6 +9986,11 @@ var MediaBrowserSources = class extends i$5 {
 			this.dispatchEvent(new CustomEvent("layout-change", { detail: ev.detail.item.value }));
 		};
 	}
+	get filteredItems() {
+		const q = this.filter.trim().toLowerCase();
+		if (!q) return this.items;
+		return this.items.filter((item) => item.title?.toLowerCase().includes(q));
+	}
 	connectedCallback() {
 		super.connectedCallback();
 		this.load();
@@ -9957,6 +9999,8 @@ var MediaBrowserSources = class extends i$5 {
 		const current = this.nav[this.nav.length - 1];
 		this.loading = true;
 		this.error = "";
+		this.filter = "";
+		this.showSearch = false;
 		try {
 			if (current?.collectionUri) this.items = await this.store.mediaBrowseService.browseSourcesCollection(this.store.activePlayer.id, current.collectionUri, current.collectionType);
 			else this.items = await this.store.mediaBrowseService.browseSources(current?.path);
@@ -10005,10 +10049,21 @@ var MediaBrowserSources = class extends i$5 {
               <span class="player-name" ?hidden=${hideActivePlayerName}>${playerName}</span>
             </div>
             ${this.nav[this.nav.length - 1]?.collectionUri ? x`<hmc-icon-button .path=${mdiPlay} @click=${this.playCurrentCollection} title="Play all"></hmc-icon-button>` : ""}
+            <hmc-icon-button
+              class=${this.showSearch ? "search-active" : ""}
+              .path=${mdiMagnify}
+              @click=${this.toggleSearch}
+              title="Search this list"
+            ></hmc-icon-button>
             <hmc-icon-button .path=${mdiStar} @click=${this.goToFavorites} title="Favorites"></hmc-icon-button>
             ${renderLayoutMenu(this.layout, this.handleLayoutChange)}
           </div>`}
-      ${this.loading ? x`<div class="sources-message">Loading…</div>` : this.error ? x`<div class="sources-message">${this.error}</div>` : this.items.length === 0 ? x`<div class="sources-message">Empty</div>` : useGrid ? this.renderGrid() : x`<hmc-favorites-list .items=${this.items} .store=${this.store} @item-selected=${this.onItemSelected}></hmc-favorites-list>`}
+      ${this.showSearch ? x`<div class="search-bar">
+            <hmc-icon-button .path=${mdiMagnify}></hmc-icon-button>
+            <input type="text" placeholder="Filter ${title}…" .value=${this.filter} @input=${this.onFilterInput} autofocus />
+            <hmc-icon-button .path=${mdiClose} @click=${this.clearFilter} title="Clear" ?hidden=${!this.filter}></hmc-icon-button>
+          </div>` : ""}
+      ${this.loading ? x`<div class="sources-message">Loading…</div>` : this.error ? x`<div class="sources-message">${this.error}</div>` : this.items.length === 0 ? x`<div class="sources-message">Empty</div>` : this.filteredItems.length === 0 ? x`<div class="sources-message">No matches for “${this.filter}”.</div>` : useGrid ? this.renderGrid() : x`<hmc-favorites-list .items=${this.filteredItems} .store=${this.store} @item-selected=${this.onItemSelected}></hmc-favorites-list>`}
     `;
 	}
 	renderGrid() {
@@ -10020,7 +10075,7 @@ var MediaBrowserSources = class extends i$5 {
 		});
 		return x`
       <div class="sources-grid">
-        ${this.items.map((item) => {
+        ${this.filteredItems.map((item) => {
 			return x`<div style=${cardStyle}>${renderMediaGridCard({
 				item,
 				onClick: () => void this.selectItem(item),
@@ -10074,6 +10129,33 @@ var MediaBrowserSources = class extends i$5 {
           padding: 1rem;
           color: var(--secondary-text-color);
         }
+        .search-active {
+          color: var(--accent-color, var(--primary-color));
+        }
+        .search-bar {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          background: var(--secondary-background-color);
+          margin: 0 0.5rem 0.5rem;
+          border-radius: 0.5rem;
+          flex-shrink: 0;
+        }
+        .search-bar input {
+          flex: 1;
+          border: none;
+          background: transparent;
+          color: var(--primary-text-color);
+          font-size: 1rem;
+          outline: none;
+          padding: 0.5rem;
+        }
+        .search-bar input::placeholder {
+          color: var(--secondary-text-color);
+        }
+        .search-bar [hidden] {
+          display: none !important;
+        }
       `
 		];
 	}
@@ -10084,6 +10166,8 @@ __decorate$1([r$3()], MediaBrowserSources.prototype, "nav", void 0);
 __decorate$1([r$3()], MediaBrowserSources.prototype, "items", void 0);
 __decorate$1([r$3()], MediaBrowserSources.prototype, "loading", void 0);
 __decorate$1([r$3()], MediaBrowserSources.prototype, "error", void 0);
+__decorate$1([r$3()], MediaBrowserSources.prototype, "filter", void 0);
+__decorate$1([r$3()], MediaBrowserSources.prototype, "showSearch", void 0);
 customElements.define("hmc-media-browser-sources", MediaBrowserSources);
 //#endregion
 //#region src/sections/media-browser/media-browser-section.ts

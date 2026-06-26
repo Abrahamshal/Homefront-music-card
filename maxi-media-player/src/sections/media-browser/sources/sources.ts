@@ -1,7 +1,7 @@
 import { css, html, LitElement } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
-import { mdiArrowLeft, mdiMusicNote, mdiPlay, mdiStar } from '@mdi/js';
+import { mdiArrowLeft, mdiClose, mdiMagnify, mdiMusicNote, mdiPlay, mdiStar } from '@mdi/js';
 import Store from '../../../model/store';
 import '../favorites/favorites-list';
 import '../../../components/icon-button';
@@ -42,6 +42,18 @@ export class MediaBrowserSources extends LitElement {
   @state() private items: MediaPlayerItem[] = [];
   @state() private loading = false;
   @state() private error = '';
+  // Client-side filter over the currently-loaded list (playlist tracks,
+  // account folders, etc.). Resets on every navigation via load().
+  @state() private filter = '';
+  @state() private showSearch = false;
+
+  private get filteredItems(): MediaPlayerItem[] {
+    const q = this.filter.trim().toLowerCase();
+    if (!q) {
+      return this.items;
+    }
+    return this.items.filter((item) => item.title?.toLowerCase().includes(q));
+  }
 
   connectedCallback() {
     super.connectedCallback();
@@ -52,6 +64,9 @@ export class MediaBrowserSources extends LitElement {
     const current = this.nav[this.nav.length - 1];
     this.loading = true;
     this.error = '';
+    // A fresh list — drop any filter from the previous view.
+    this.filter = '';
+    this.showSearch = false;
     try {
       if (current?.collectionUri) {
         // Container (playlist/album/artist) → its tracks via browse_media.
@@ -113,6 +128,21 @@ export class MediaBrowserSources extends LitElement {
     this.dispatchEvent(new CustomEvent('go-to-favorites'));
   };
 
+  private toggleSearch = () => {
+    this.showSearch = !this.showSearch;
+    if (!this.showSearch) {
+      this.filter = '';
+    }
+  };
+
+  private onFilterInput = (e: Event) => {
+    this.filter = (e.target as HTMLInputElement).value;
+  };
+
+  private clearFilter = () => {
+    this.filter = '';
+  };
+
   /** Play the whole container we're currently inside (playlist/album). */
   private playCurrentCollection = async () => {
     const current = this.nav[this.nav.length - 1];
@@ -153,18 +183,33 @@ export class MediaBrowserSources extends LitElement {
             ${this.nav[this.nav.length - 1]?.collectionUri
               ? html`<sonos-icon-button .path=${mdiPlay} @click=${this.playCurrentCollection} title="Play all"></sonos-icon-button>`
               : ''}
+            <sonos-icon-button
+              class=${this.showSearch ? 'search-active' : ''}
+              .path=${mdiMagnify}
+              @click=${this.toggleSearch}
+              title="Search this list"
+            ></sonos-icon-button>
             <sonos-icon-button .path=${mdiStar} @click=${this.goToFavorites} title="Favorites"></sonos-icon-button>
             ${renderLayoutMenu(this.layout, this.handleLayoutChange)}
           </div>`}
+      ${this.showSearch
+        ? html`<div class="search-bar">
+            <sonos-icon-button .path=${mdiMagnify}></sonos-icon-button>
+            <input type="text" placeholder="Filter ${title}…" .value=${this.filter} @input=${this.onFilterInput} autofocus />
+            <sonos-icon-button .path=${mdiClose} @click=${this.clearFilter} title="Clear" ?hidden=${!this.filter}></sonos-icon-button>
+          </div>`
+        : ''}
       ${this.loading
         ? html`<div class="sources-message">Loading…</div>`
         : this.error
           ? html`<div class="sources-message">${this.error}</div>`
           : this.items.length === 0
             ? html`<div class="sources-message">Empty</div>`
-            : useGrid
-              ? this.renderGrid()
-              : html`<sonos-favorites-list .items=${this.items} .store=${this.store} @item-selected=${this.onItemSelected}></sonos-favorites-list>`}
+            : this.filteredItems.length === 0
+              ? html`<div class="sources-message">No matches for “${this.filter}”.</div>`
+              : useGrid
+                ? this.renderGrid()
+                : html`<sonos-favorites-list .items=${this.filteredItems} .store=${this.store} @item-selected=${this.onItemSelected}></sonos-favorites-list>`}
     `;
   }
 
@@ -177,7 +222,7 @@ export class MediaBrowserSources extends LitElement {
     });
     return html`
       <div class="sources-grid">
-        ${this.items.map((item) => {
+        ${this.filteredItems.map((item) => {
           const thumbnailContent = item.thumbnail
             ? html`<div class="image" style="background-image:url('${item.thumbnail}')"></div>`
             : html`<div class="image icon-fallback">
@@ -230,6 +275,33 @@ export class MediaBrowserSources extends LitElement {
           text-align: center;
           padding: 1rem;
           color: var(--secondary-text-color);
+        }
+        .search-active {
+          color: var(--accent-color, var(--primary-color));
+        }
+        .search-bar {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          background: var(--secondary-background-color);
+          margin: 0 0.5rem 0.5rem;
+          border-radius: 0.5rem;
+          flex-shrink: 0;
+        }
+        .search-bar input {
+          flex: 1;
+          border: none;
+          background: transparent;
+          color: var(--primary-text-color);
+          font-size: 1rem;
+          outline: none;
+          padding: 0.5rem;
+        }
+        .search-bar input::placeholder {
+          color: var(--secondary-text-color);
+        }
+        .search-bar [hidden] {
+          display: none !important;
         }
       `,
     ];
