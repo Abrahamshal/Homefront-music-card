@@ -9990,7 +9990,6 @@ var MediaBrowserSources = class extends i$5 {
 			return;
 		}
 		await this.store.mediaControlService.playMedia(this.store.activePlayer, item);
-		this.dispatchEvent(customEvent(MEDIA_ITEM_SELECTED, item));
 	}
 	render() {
 		const config = this.store.config.mediaBrowser ?? {};

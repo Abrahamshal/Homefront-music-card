@@ -88,9 +88,11 @@ export class MediaBrowserSources extends LitElement {
       await this.load();
       return;
     }
-    // Leaf (track / radio) — play it on the active player.
+    // Leaf (track / radio) — play it on the active player. We deliberately
+    // do NOT emit MEDIA_ITEM_SELECTED here: the card reacts to that by
+    // auto-switching to the Player section (after a 1s delay), which is
+    // jarring while you're browsing. Playback still happens; you stay put.
     await this.store.mediaControlService.playMedia(this.store.activePlayer, item);
-    this.dispatchEvent(customEvent(MEDIA_ITEM_SELECTED, item));
   }
 
   // Event form for the list renderer (sonos-favorites-list emits item-selected).
