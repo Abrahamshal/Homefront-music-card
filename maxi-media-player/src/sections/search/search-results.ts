@@ -1,0 +1,333 @@
+import { html, LitElement, css } from 'lit';
+import { property, state } from 'lit/decorators.js';
+import { repeat } from 'lit/directives/repeat.js';
+import Store from '../../model/store';
+import { MEDIA_ITEM_SELECTED } from '../../constants';
+import { customEvent } from '../../utils/utils';
+import { clearSelection, invertSelection, updateSelection } from '../../utils/selection-utils';
+import { toMediaPlayerItem, toggleMassItemProperty, getMediaTypeIcon } from './search-utils';
+import { getSelectedItems, executeBatchPlay, executeBatchQueue } from './search-batch-utils';
+import { searchResultsStyles } from './styles';
+import '../../components/media-row';
+import '../../components/operation-overlay';
+import '../../components/play-menu';
+import { SearchResultItem, SearchViewMode } from './search.types';
+import { OperationProgress } from '../../types';
+import type { EnqueueMode } from '../../types';
+import type { PlayMenuAction } from '../../types';
+import { MusicAssistantService } from '../../services/music-assistant-service';
+
+export class SearchResults extends LitElement {
+  @property({ attribute: false }) store!: Store;
+  @property({ attribute: false }) results: SearchResultItem[] = [];
+  @property({ type: Boolean }) loading = false;
+  @property() error: string | null = null;
+  @property({ type: Boolean }) selectMode = false;
+  @property() searchText = '';
+  @property() viewMode: SearchViewMode = 'list';
+  @property({ attribute: false }) musicAssistantService!: MusicAssistantService;
+  @property() massQueueConfigEntryId = '';
+  @state() private selectedIndices = new Set<number>();
+  @state() private favoriteLoadingIndices = new Set<number>();
+  @state() private libraryLoadingIndices = new Set<number>();
+  @state() private playMenuItemIndex: number | null = null;
+  @state() private operationProgress: OperationProgress | null = null;
+  @state() private cancelOperation = false;
+
+  render() {
+    const hasContent = !this.loading && !this.error && this.results.length > 0;
+    const autoSearchMinChars = this.store.config.search?.autoSearchMinChars ?? 2;
+    const tooShort = this.searchText && this.searchText.trim().length < autoSearchMinChars;
+    const noResults = !this.loading && this.results.length === 0 && this.searchText && !tooShort;
+    const emptyPrompt = !this.loading && this.results.length === 0 && !this.searchText;
+
+    return html`
+      <sonos-operation-overlay
+        .progress=${this.operationProgress}
+        .hass=${this.store.hass}
+        @cancel-operation=${() => (this.cancelOperation = true)}
+      ></sonos-operation-overlay>
+      <div class="loading" ?hidden=${!this.loading}><ha-spinner></ha-spinner></div>
+      <div class="error-message" ?hidden=${!this.error}>${this.error}</div>
+      <div class="no-results" ?hidden=${!tooShort}>Type at least ${autoSearchMinChars} characters to search</div>
+      <div class="no-results" ?hidden=${!noResults}>No results found</div>
+      <div class="no-results" ?hidden=${!emptyPrompt}>Enter a search term</div>
+      ${this.viewMode === 'grid' ? this.renderGrid(hasContent) : this.renderList(hasContent)}
+      <div
+        class="play-menu-overlay"
+        ?hidden=${this.playMenuItemIndex === null}
+        @click=${() => (this.playMenuItemIndex = null)}
+        @wheel=${(e: Event) => e.preventDefault()}
+        @touchmove=${(e: Event) => e.preventDefault()}
+      >
+        <sonos-play-menu
+          .hasSelection=${true}
+          .inline=${true}
+          @play-menu-action=${(e: CustomEvent) => this.handleItemPlayAction(e)}
+          @play-menu-close=${() => (this.playMenuItemIndex = null)}
+        ></sonos-play-menu>
+      </div>
+    `;
+  }
+
+  private renderList(hasContent: boolean) {
+    return html`
+      <div class="list" ?hidden=${!hasContent}>
+        <mwc-list multi>
+          ${repeat(
+            this.results,
+            (item) => item.uri,
+            (item, index) => {
+              const mediaPlayerItem = toMediaPlayerItem(item);
+              return html`
+                <sonos-media-row
+                  @click=${() => this.onItemClick(index)}
+                  .item=${mediaPlayerItem}
+                  .showCheckbox=${this.selectMode}
+                  .checked=${this.selectedIndices.has(index)}
+                  .isFavorite=${item.favorite ?? null}
+                  .favoriteLoading=${this.favoriteLoadingIndices.has(index)}
+                  .isInLibrary=${item.inLibrary ?? null}
+                  .libraryLoading=${this.libraryLoadingIndices.has(index)}
+                  @checkbox-change=${(e: CustomEvent) => this.onCheckboxChange(index, e.detail.checked)}
+                  @favorite-toggle=${() => this.toggleItemState(index, 'favorite')}
+                  @library-toggle=${() => this.toggleItemState(index, 'library')}
+                  .store=${this.store}
+                ></sonos-media-row>
+              `;
+            },
+          )}
+        </mwc-list>
+      </div>
+    `;
+  }
+
+  private renderGrid(hasContent: boolean) {
+    const columns = this.store.config.search?.gridColumns ?? 4;
+    return html`
+      <div class="grid-scroll" ?hidden=${!hasContent}>
+        <div class="grid" style="grid-template-columns: repeat(${columns}, minmax(0, 1fr))">
+          ${repeat(
+            this.results,
+            (item) => item.uri,
+            (item, index) => {
+              const selected = this.selectedIndices.has(index);
+              return html`
+                <div class="grid-tile ${selected ? 'selected' : ''}" @click=${() => this.onItemClick(index)}>
+                  ${this.selectMode
+                    ? html`<ha-checkbox
+                        class="grid-checkbox"
+                        .checked=${selected}
+                        @change=${(e: Event) => this.onCheckboxChange(index, (e.target as HTMLInputElement).checked)}
+                        @click=${(e: Event) => e.stopPropagation()}
+                      ></ha-checkbox>`
+                    : ''}
+                  ${item.imageUrl
+                    ? html`<img class="grid-img" src="${item.imageUrl}" alt="${item.title}" loading="lazy" />`
+                    : html`<div class="grid-placeholder"><ha-svg-icon .path=${getMediaTypeIcon(item.mediaType)}></ha-svg-icon></div>`}
+                  <div class="grid-info">
+                    <div class="grid-title">${item.title}</div>
+                    ${item.subtitle ? html`<div class="grid-subtitle">${item.subtitle}</div>` : ''}
+                  </div>
+                </div>
+              `;
+            },
+          )}
+        </div>
+      </div>
+    `;
+  }
+
+  get hasSelection(): boolean {
+    return this.selectedIndices.size > 0;
+  }
+
+  handleInvertSelection() {
+    this.selectedIndices = invertSelection(this.selectedIndices, this.results.length);
+  }
+
+  clearSelectionState() {
+    this.selectedIndices = clearSelection();
+    this.playMenuItemIndex = null;
+  }
+
+  async executeSelectionAction(detail: { enqueue?: EnqueueMode; radioMode?: boolean }) {
+    const enqueue: EnqueueMode = detail.enqueue ?? 'play';
+    const radioMode = detail.radioMode ?? false;
+    const items = getSelectedItems(this.results, this.selectedIndices);
+    if (items.length === 0) {
+      return;
+    }
+    this.cancelOperation = false;
+    const callbacks = {
+      setProgress: (p: OperationProgress | null) => (this.operationProgress = p),
+      shouldCancel: () => this.cancelOperation,
+      onComplete: () => {
+        this.selectedIndices = clearSelection();
+        this.dispatchEvent(customEvent('has-selection-change', false));
+        this.dispatchEvent(customEvent(MEDIA_ITEM_SELECTED));
+      },
+    };
+    if (enqueue === 'next' || enqueue === 'replace_next' || enqueue === 'add') {
+      await executeBatchQueue(this.store, items, enqueue === 'add' ? 'add' : 'next', callbacks);
+    } else {
+      const firstIndex = Array.from(this.selectedIndices).sort((a, b) => a - b)[0];
+      await executeBatchPlay(this.store, this.musicAssistantService, items, this.results[firstIndex], enqueue, radioMode, callbacks);
+    }
+  }
+
+  private onItemClick(index: number) {
+    const item = this.results[index];
+    if (!item) {
+      return;
+    }
+    if (this.selectMode) {
+      this.selectedIndices = updateSelection(this.selectedIndices, index, !this.selectedIndices.has(index));
+      this.dispatchEvent(customEvent('has-selection-change', this.selectedIndices.size > 0));
+      return;
+    }
+    if (item.mediaType === 'album' || item.mediaType === 'playlist' || item.mediaType === 'artist') {
+      this.dispatchEvent(customEvent('browse-collection', item));
+      return;
+    }
+    this.playMenuItemIndex = this.playMenuItemIndex === index ? null : index;
+  }
+
+  private async handleItemPlayAction(e: CustomEvent<PlayMenuAction>) {
+    const item = this.results[this.playMenuItemIndex!];
+    if (!item) {
+      return;
+    }
+    this.playMenuItemIndex = null;
+    await this.musicAssistantService.playMedia(this.store.activePlayer, item.uri, e.detail.enqueue as EnqueueMode, e.detail.radioMode);
+    this.dispatchEvent(customEvent(MEDIA_ITEM_SELECTED));
+  }
+
+  private onCheckboxChange(index: number, checked: boolean) {
+    this.selectedIndices = updateSelection(this.selectedIndices, index, checked);
+    this.dispatchEvent(customEvent('has-selection-change', this.selectedIndices.size > 0));
+  }
+
+  private async toggleItemState(index: number, kind: 'favorite' | 'library') {
+    if (!this.massQueueConfigEntryId || !this.results[index]) {
+      return;
+    }
+    const item = this.results[index];
+    this.setItemLoading(index, kind, true);
+    try {
+      const success = await toggleMassItemProperty(this.musicAssistantService, this.massQueueConfigEntryId, item, kind);
+      if (success) {
+        const currentValue = kind === 'favorite' ? item.favorite : item.inLibrary;
+        const newResults = [...this.results];
+        newResults[index] = { ...item, [kind === 'favorite' ? 'favorite' : 'inLibrary']: !currentValue };
+        this.dispatchEvent(customEvent('results-updated', newResults));
+      }
+    } finally {
+      this.setItemLoading(index, kind, false);
+    }
+  }
+
+  private setItemLoading(index: number, kind: 'favorite' | 'library', loading: boolean) {
+    const prop = kind === 'favorite' ? 'favoriteLoadingIndices' : 'libraryLoadingIndices';
+    const next = new Set(this[prop]);
+    if (loading) {
+      next.add(index);
+    } else {
+      next.delete(index);
+    }
+    this[prop] = next;
+  }
+
+  static get styles() {
+    return [
+      ...searchResultsStyles,
+      css`
+        :host {
+          flex: 1;
+          min-height: 0;
+          position: relative;
+          overflow: hidden;
+        }
+        .grid-scroll {
+          flex: 1;
+          min-height: 0;
+          overflow-y: auto;
+        }
+        .grid {
+          display: grid;
+          gap: 0.75rem;
+          padding: 0.75rem;
+        }
+        .grid-tile {
+          cursor: pointer;
+          border-radius: 8px;
+          background: var(--secondary-background-color);
+          position: relative;
+          transition: outline 0.15s;
+          overflow: hidden;
+          min-width: 0;
+        }
+        .grid-tile:hover {
+          outline: 2px solid var(--divider-color, rgba(255, 255, 255, 0.2));
+        }
+        .grid-tile.selected {
+          outline: 2px solid var(--accent-color);
+        }
+        .grid-checkbox {
+          position: absolute;
+          top: 4px;
+          left: 4px;
+          z-index: 1;
+          --mdc-checkbox-unchecked-color: var(--secondary-text-color);
+        }
+        .grid-img {
+          width: 100%;
+          aspect-ratio: 1 / 1;
+          display: block;
+          object-fit: cover;
+          background-color: var(--primary-background-color);
+          border-radius: 8px 8px 0 0;
+        }
+        .grid-placeholder {
+          width: 100%;
+          aspect-ratio: 1 / 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: var(--primary-background-color);
+          border-radius: 8px 8px 0 0;
+        }
+        .grid-placeholder ha-svg-icon {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          --mdc-icon-size: 40px;
+          color: var(--secondary-text-color);
+          opacity: 0.4;
+        }
+        .grid-info {
+          padding: 8px;
+        }
+        .grid-title {
+          font-size: calc(var(--sonos-font-size, 1rem) * 0.85);
+          font-weight: 500;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          color: var(--primary-text-color);
+        }
+        .grid-subtitle {
+          font-size: calc(var(--sonos-font-size, 1rem) * 0.75);
+          color: var(--secondary-text-color);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          margin-top: 2px;
+        }
+      `,
+    ];
+  }
+}
+
+customElements.define('sonos-search-results', SearchResults);

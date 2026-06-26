@@ -1,0 +1,55 @@
+{
+  "name": "custom-sonos-card",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/main.js",
+  "module": "src/main.js",
+  "repository": "",
+  "author": "punxaphil",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@lit-labs/virtualizer": "^2.1.1",
+    "@mdi/js": "^7.4.47",
+    "custom-card-helpers": "^2.0.0",
+    "lit": "^3.3.3"
+  },
+  "devDependencies": {
+    "@babel/core": "^8.0.1",
+    "@eslint/js": "^9.39.4",
+    "@types/eslint__js": "^9.14.0",
+    "@types/node": "^26.0.0",
+    "@types/semver": "^7.7.1",
+    "@types/ws": "^8.18.1",
+    "@vitest/coverage-v8": "^4.1.9",
+    "eslint": "^9.39.4",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.6",
+    "jsdom": "^29.1.1",
+    "prettier": "^3.8.4",
+    "semver": "^7.8.5",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.1",
+    "vite": "^8.0.16",
+    "vitest": "^4.0.4",
+    "ws": "^8.21.0"
+  },
+  "scripts": {
+    "build": "npm run lint -- --fix && tsc --noEmit && vite build && bash create-dist-maxi-media-player.sh",
+    "deploy": "bash scripts/deploy.sh",
+    "deploy:remote": "DEPLOY_REMOTE=1 bash scripts/deploy.sh",
+    "deploy:localhost": "DEPLOY_LOCALHOST=1 bash scripts/deploy.sh",
+    "predeploy": "npm run build",
+    "predeploy:remote": "npm run build",
+    "predeploy:localhost": "npm run build",
+    "lint": "eslint src test scripts/deploy.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ci": "vitest run",
+    "release": "tsx scripts/select-version.ts",
+    "release:notes": "tsx scripts/generate-release-notes.ts"
+  },
+  "overrides": {
+    "rollup": "^4.59.0"
+  }
+}

@@ -1,0 +1,24 @@
+Homefront Music Card
+====================
+
+This card is a fork/derivative of:
+
+  custom-sonos-card / maxi-media-player
+  Copyright (c) punxaphil and contributors
+  https://github.com/punxaphil/custom-sonos-card
+  Licensed under the Apache License, Version 2.0
+
+The upstream source is vendored under `maxi-media-player/` and retains its
+original Apache 2.0 LICENSE. Modifications by the Homefront Music Card
+authors (notably an added Music Assistant source/account-separated media
+browser) are also released under the Apache License, Version 2.0.
+
+A copy of the Apache License is at `maxi-media-player/LICENSE`.
+
+Changes from upstream:
+- Added a "Sources" media-browser view that browses Music Assistant's native
+  per-provider/per-account tree (via the `music/browse` command), so multiple
+  accounts of the same provider (e.g. two Spotify accounts) are separated
+  rather than merged into one flat library list.
+- Renamed the registered card element to `homefront-music-card` to avoid
+  collision with the upstream `sonos-card` / `maxi-media-player` elements.
