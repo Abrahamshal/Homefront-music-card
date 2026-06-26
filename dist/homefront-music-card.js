@@ -2892,20 +2892,14 @@ var MediaBrowseService = class {
 		return this.musicAssistantService.browse(massQueueId, path);
 	}
 	/**
-	* Drill into a container item's tracks (playlist / album / artist). MA's
-	* `music/browse` tree only exposes folders → containers as leaves, so to
-	* show a playlist's tracks we use mass_queue's `get_<type>_tracks`.
+	* Drill into a container (playlist / album / artist) to list its tracks.
+	* MA's native `music/browse` can't drill into a playlist (it's a leaf in
+	* that tree), but HA's standard `media_player/browse_media` can — it's
+	* what maxi's "Browse Media" grid uses. We browse the leader's MA entity
+	* with the item's own uri as the content id.
 	*/
-	async browseSourcesCollection(uri, mediaType) {
-		const massQueueId = await this.getMassQueueConfigEntryId();
-		if (!massQueueId) return [];
-		return (await this.musicAssistantService.getCollectionItems(uri, mediaType, massQueueId)).map((it) => ({
-			title: it.title,
-			media_content_id: it.uri,
-			media_content_type: it.mediaType,
-			thumbnail: it.imageUrl,
-			can_play: true
-		}));
+	async browseSourcesCollection(playerId, contentId, contentType) {
+		return (await browseMediaPlayer(this.hass, playerId, contentId, contentType)).children ?? [];
 	}
 	isMusicAssistant(player) {
 		return player.attributes.platform === "music_assistant";
@@ -9940,6 +9934,17 @@ var MediaBrowserSources = class extends i$5 {
 		this.goToFavorites = () => {
 			this.dispatchEvent(new CustomEvent("go-to-favorites"));
 		};
+		this.playCurrentCollection = async () => {
+			const current = this.nav[this.nav.length - 1];
+			if (!current?.collectionUri) return;
+			const collectionItem = {
+				title: current.title,
+				media_content_id: current.collectionUri,
+				media_content_type: current.collectionType
+			};
+			await this.store.mediaControlService.playMedia(this.store.activePlayer, collectionItem);
+			this.dispatchEvent(customEvent(MEDIA_ITEM_SELECTED, collectionItem));
+		};
 		this.handleLayoutChange = (ev) => {
 			this.dispatchEvent(new CustomEvent("layout-change", { detail: ev.detail.item.value }));
 		};
@@ -9953,19 +9958,19 @@ var MediaBrowserSources = class extends i$5 {
 		this.loading = true;
 		this.error = "";
 		try {
-			if (current?.collectionUri) this.items = await this.store.mediaBrowseService.browseSourcesCollection(current.collectionUri, current.collectionType ?? "playlist");
+			if (current?.collectionUri) this.items = await this.store.mediaBrowseService.browseSourcesCollection(this.store.activePlayer.id, current.collectionUri, current.collectionType);
 			else this.items = await this.store.mediaBrowseService.browseSources(current?.path);
 			if (this.items.length === 0 && this.nav.length === 1) this.error = "No music sources found. (Requires Music Assistant + the Music Assistant Queue integration.)";
 		} catch (e) {
 			console.error("Source browse failed:", e);
-			this.error = "Could not load sources from Music Assistant.";
+			this.error = "Could not load this list from Music Assistant.";
 			this.items = [];
 		} finally {
 			this.loading = false;
 		}
 	}
 	async selectItem(item) {
-		if (item.can_expand && item.massBrowsePath) {
+		if (item.massBrowsePath) {
 			this.nav = [...this.nav, {
 				path: item.massBrowsePath,
 				title: item.title
@@ -9974,7 +9979,7 @@ var MediaBrowserSources = class extends i$5 {
 			await this.load();
 			return;
 		}
-		if (item.can_expand && item.media_content_id && item.media_content_type) {
+		if (item.can_expand && item.media_content_id) {
 			this.nav = [...this.nav, {
 				collectionUri: item.media_content_id,
 				collectionType: item.media_content_type,
@@ -10000,6 +10005,7 @@ var MediaBrowserSources = class extends i$5 {
               <span class="title">${title}</span>
               <span class="player-name" ?hidden=${hideActivePlayerName}>${playerName}</span>
             </div>
+            ${this.nav[this.nav.length - 1]?.collectionUri ? x`<hmc-icon-button .path=${mdiPlay} @click=${this.playCurrentCollection} title="Play all"></hmc-icon-button>` : ""}
             <hmc-icon-button .path=${mdiStar} @click=${this.goToFavorites} title="Favorites"></hmc-icon-button>
             ${renderLayoutMenu(this.layout, this.handleLayoutChange)}
           </div>`}
@@ -10020,7 +10026,7 @@ var MediaBrowserSources = class extends i$5 {
 				item,
 				onClick: () => void this.selectItem(item),
 				thumbnailContent: item.thumbnail ? x`<div class="image" style="background-image:url('${item.thumbnail}')"></div>` : x`<div class="image icon-fallback">
-                <ha-svg-icon .path=${item.massIconPath}></ha-svg-icon>
+                <ha-svg-icon .path=${item.massIconPath ?? "M12 3V13.55C11.41 13.21 10.73 13 10 13C7.79 13 6 14.79 6 17S7.79 21 10 21 14 19.21 14 17V7H18V3H12Z"}></ha-svg-icon>
               </div>`
 			})}</div>`;
 		})}

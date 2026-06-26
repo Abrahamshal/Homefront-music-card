@@ -1,7 +1,7 @@
 import { css, html, LitElement } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
-import { mdiArrowLeft, mdiStar } from '@mdi/js';
+import { mdiArrowLeft, mdiMusicNote, mdiPlay, mdiStar } from '@mdi/js';
 import Store from '../../../model/store';
 import '../favorites/favorites-list';
 import '../../../components/icon-button';
@@ -15,9 +15,10 @@ import { LayoutType } from '../media-browser.types';
 
 interface SourceNav {
   title: string;
-  // Either a music/browse path (folders) OR a collection uri+type (drilling
-  // into a playlist/album/artist's tracks). Root has neither.
+  // For account/category folders: a music/browse path (per-account tree).
   path?: string;
+  // For a container (playlist/album/artist): its media_content_id, drilled
+  // via HA's browse_media (music/browse can't enter a playlist).
   collectionUri?: string;
   collectionType?: string;
 }
@@ -53,10 +54,10 @@ export class MediaBrowserSources extends LitElement {
     this.error = '';
     try {
       if (current?.collectionUri) {
-        // Drilling into a playlist/album/artist → its tracks.
-        this.items = await this.store.mediaBrowseService.browseSourcesCollection(current.collectionUri, current.collectionType ?? 'playlist');
+        // Container (playlist/album/artist) → its tracks via browse_media.
+        this.items = await this.store.mediaBrowseService.browseSourcesCollection(this.store.activePlayer.id, current.collectionUri, current.collectionType);
       } else {
-        // Folder browse (root accounts, or an account's category folders).
+        // Account/category folder → MA native per-account tree.
         this.items = await this.store.mediaBrowseService.browseSources(current?.path);
       }
       if (this.items.length === 0 && this.nav.length === 1) {
@@ -64,7 +65,7 @@ export class MediaBrowserSources extends LitElement {
       }
     } catch (e) {
       console.error('Source browse failed:', e);
-      this.error = 'Could not load sources from Music Assistant.';
+      this.error = 'Could not load this list from Music Assistant.';
       this.items = [];
     } finally {
       this.loading = false;
@@ -72,16 +73,16 @@ export class MediaBrowserSources extends LitElement {
   }
 
   private async selectItem(item: MediaPlayerItem) {
-    // A folder (account or category) → drill via music/browse path.
-    if (item.can_expand && item.massBrowsePath) {
+    // Account/category folder → drill via MA's native music/browse path.
+    if (item.massBrowsePath) {
       this.nav = [...this.nav, { path: item.massBrowsePath, title: item.title }];
       currentNav = this.nav;
       await this.load();
       return;
     }
-    // A container (playlist / album / artist) → drill into its tracks, so
-    // tapping it browses rather than playing + jumping to the player.
-    if (item.can_expand && item.media_content_id && item.media_content_type) {
+    // Container (playlist/album/artist) → drill into its tracks via
+    // browse_media, so tapping it browses rather than playing + jumping.
+    if (item.can_expand && item.media_content_id) {
       this.nav = [...this.nav, { collectionUri: item.media_content_id, collectionType: item.media_content_type, title: item.title }];
       currentNav = this.nav;
       await this.load();
@@ -110,6 +111,21 @@ export class MediaBrowserSources extends LitElement {
     this.dispatchEvent(new CustomEvent('go-to-favorites'));
   };
 
+  /** Play the whole container we're currently inside (playlist/album). */
+  private playCurrentCollection = async () => {
+    const current = this.nav[this.nav.length - 1];
+    if (!current?.collectionUri) {
+      return;
+    }
+    const collectionItem: MediaPlayerItem = {
+      title: current.title,
+      media_content_id: current.collectionUri,
+      media_content_type: current.collectionType,
+    };
+    await this.store.mediaControlService.playMedia(this.store.activePlayer, collectionItem);
+    this.dispatchEvent(customEvent(MEDIA_ITEM_SELECTED, collectionItem));
+  };
+
   private handleLayoutChange = (ev: CustomEvent<{ item: { value: string } }>) => {
     this.dispatchEvent(new CustomEvent('layout-change', { detail: ev.detail.item.value }));
   };
@@ -132,6 +148,9 @@ export class MediaBrowserSources extends LitElement {
               <span class="title">${title}</span>
               <span class="player-name" ?hidden=${hideActivePlayerName}>${playerName}</span>
             </div>
+            ${this.nav[this.nav.length - 1]?.collectionUri
+              ? html`<sonos-icon-button .path=${mdiPlay} @click=${this.playCurrentCollection} title="Play all"></sonos-icon-button>`
+              : ''}
             <sonos-icon-button .path=${mdiStar} @click=${this.goToFavorites} title="Favorites"></sonos-icon-button>
             ${renderLayoutMenu(this.layout, this.handleLayoutChange)}
           </div>`}
@@ -160,7 +179,7 @@ export class MediaBrowserSources extends LitElement {
           const thumbnailContent = item.thumbnail
             ? html`<div class="image" style="background-image:url('${item.thumbnail}')"></div>`
             : html`<div class="image icon-fallback">
-                <ha-svg-icon .path=${item.massIconPath}></ha-svg-icon>
+                <ha-svg-icon .path=${item.massIconPath ?? mdiMusicNote}></ha-svg-icon>
               </div>`;
           return html`<div style=${cardStyle}>${renderMediaGridCard({ item, onClick: () => void this.selectItem(item), thumbnailContent })}</div>`;
         })}

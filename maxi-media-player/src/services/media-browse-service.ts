@@ -6,7 +6,6 @@ import { customEvent } from '../utils/utils';
 import { HASS_MORE_INFO } from '../constants';
 import { browseMediaPlayer } from '../upstream/data/media-player';
 import { MusicAssistantService } from './music-assistant-service';
-import { SearchMediaType } from '../sections/search/search.types';
 
 export default class MediaBrowseService {
   private hass: HomeAssistant;
@@ -47,23 +46,15 @@ export default class MediaBrowseService {
   }
 
   /**
-   * Drill into a container item's tracks (playlist / album / artist). MA's
-   * `music/browse` tree only exposes folders → containers as leaves, so to
-   * show a playlist's tracks we use mass_queue's `get_<type>_tracks`.
+   * Drill into a container (playlist / album / artist) to list its tracks.
+   * MA's native `music/browse` can't drill into a playlist (it's a leaf in
+   * that tree), but HA's standard `media_player/browse_media` can — it's
+   * what maxi's "Browse Media" grid uses. We browse the leader's MA entity
+   * with the item's own uri as the content id.
    */
-  async browseSourcesCollection(uri: string, mediaType: string): Promise<MediaPlayerItem[]> {
-    const massQueueId = await this.getMassQueueConfigEntryId();
-    if (!massQueueId) {
-      return [];
-    }
-    const items = await this.musicAssistantService.getCollectionItems(uri, mediaType as SearchMediaType, massQueueId);
-    return items.map((it) => ({
-      title: it.title,
-      media_content_id: it.uri,
-      media_content_type: it.mediaType,
-      thumbnail: it.imageUrl,
-      can_play: true,
-    }));
+  async browseSourcesCollection(playerId: string, contentId: string, contentType?: string): Promise<MediaPlayerItem[]> {
+    const node = await browseMediaPlayer(this.hass, playerId, contentId, contentType);
+    return node.children ?? [];
   }
 
   private isMusicAssistant(player: MediaPlayer): boolean {
