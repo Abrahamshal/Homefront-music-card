@@ -6,6 +6,7 @@ import { customEvent } from '../utils/utils';
 import { HASS_MORE_INFO } from '../constants';
 import { browseMediaPlayer } from '../upstream/data/media-player';
 import { MusicAssistantService } from './music-assistant-service';
+import { SearchMediaType } from '../sections/search/search.types';
 
 export default class MediaBrowseService {
   private hass: HomeAssistant;
@@ -43,6 +44,26 @@ export default class MediaBrowseService {
       return [];
     }
     return this.musicAssistantService.browse(massQueueId, path);
+  }
+
+  /**
+   * Drill into a container item's tracks (playlist / album / artist). MA's
+   * `music/browse` tree only exposes folders → containers as leaves, so to
+   * show a playlist's tracks we use mass_queue's `get_<type>_tracks`.
+   */
+  async browseSourcesCollection(uri: string, mediaType: string): Promise<MediaPlayerItem[]> {
+    const massQueueId = await this.getMassQueueConfigEntryId();
+    if (!massQueueId) {
+      return [];
+    }
+    const items = await this.musicAssistantService.getCollectionItems(uri, mediaType as SearchMediaType, massQueueId);
+    return items.map((it) => ({
+      title: it.title,
+      media_content_id: it.uri,
+      media_content_type: it.mediaType,
+      thumbnail: it.imageUrl,
+      can_play: true,
+    }));
   }
 
   private isMusicAssistant(player: MediaPlayer): boolean {

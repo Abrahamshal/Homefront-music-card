@@ -2891,6 +2891,22 @@ var MediaBrowseService = class {
 		}
 		return this.musicAssistantService.browse(massQueueId, path);
 	}
+	/**
+	* Drill into a container item's tracks (playlist / album / artist). MA's
+	* `music/browse` tree only exposes folders → containers as leaves, so to
+	* show a playlist's tracks we use mass_queue's `get_<type>_tracks`.
+	*/
+	async browseSourcesCollection(uri, mediaType) {
+		const massQueueId = await this.getMassQueueConfigEntryId();
+		if (!massQueueId) return [];
+		return (await this.musicAssistantService.getCollectionItems(uri, mediaType, massQueueId)).map((it) => ({
+			title: it.title,
+			media_content_id: it.uri,
+			media_content_type: it.mediaType,
+			thumbnail: it.imageUrl,
+			can_play: true
+		}));
+	}
 	isMusicAssistant(player) {
 		return player.attributes.platform === "music_assistant";
 	}
@@ -9932,14 +9948,13 @@ var MediaBrowserSources = class extends i$5 {
 		super.connectedCallback();
 		this.load();
 	}
-	get currentPath() {
-		return this.nav[this.nav.length - 1]?.path;
-	}
 	async load() {
+		const current = this.nav[this.nav.length - 1];
 		this.loading = true;
 		this.error = "";
 		try {
-			this.items = await this.store.mediaBrowseService.browseSources(this.currentPath);
+			if (current?.collectionUri) this.items = await this.store.mediaBrowseService.browseSourcesCollection(current.collectionUri, current.collectionType ?? "playlist");
+			else this.items = await this.store.mediaBrowseService.browseSources(current?.path);
 			if (this.items.length === 0 && this.nav.length === 1) this.error = "No music sources found. (Requires Music Assistant + the Music Assistant Queue integration.)";
 		} catch (e) {
 			console.error("Source browse failed:", e);
@@ -9953,6 +9968,16 @@ var MediaBrowserSources = class extends i$5 {
 		if (item.can_expand && item.massBrowsePath) {
 			this.nav = [...this.nav, {
 				path: item.massBrowsePath,
+				title: item.title
+			}];
+			currentNav = this.nav;
+			await this.load();
+			return;
+		}
+		if (item.can_expand && item.media_content_id && item.media_content_type) {
+			this.nav = [...this.nav, {
+				collectionUri: item.media_content_id,
+				collectionType: item.media_content_type,
 				title: item.title
 			}];
 			currentNav = this.nav;
@@ -10134,7 +10159,7 @@ var MediaBrowser = class extends i$5 {
 		}
 		const startPath = localStorage.getItem(START_PATH_KEY);
 		if (startPath && startPath !== FAVORITES_VIEW) this.view = "browser";
-		else this.view = "favorites";
+		else this.view = "sources";
 		this.updateIsCurrentPathStart();
 	}
 	updateIsCurrentPathStart() {

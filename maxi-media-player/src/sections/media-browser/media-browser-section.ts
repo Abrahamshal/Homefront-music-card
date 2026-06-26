@@ -65,7 +65,9 @@ export class MediaBrowser extends LitElement {
     if (startPath && startPath !== FAVORITES_VIEW) {
       this.view = 'browser';
     } else {
-      this.view = 'favorites';
+      // Default to the source/account-separated view — the main reason this
+      // fork exists. (Switches to favorites/browser stick via currentView.)
+      this.view = 'sources';
     }
     this.updateIsCurrentPathStart();
   }

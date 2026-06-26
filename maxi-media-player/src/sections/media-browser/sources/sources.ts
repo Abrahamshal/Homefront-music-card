@@ -14,8 +14,12 @@ import { mediaGridCardStyles, renderMediaGridCard } from '../utils';
 import { LayoutType } from '../media-browser.types';
 
 interface SourceNav {
-  path?: string;
   title: string;
+  // Either a music/browse path (folders) OR a collection uri+type (drilling
+  // into a playlist/album/artist's tracks). Root has neither.
+  path?: string;
+  collectionUri?: string;
+  collectionType?: string;
 }
 
 // Module-level so the path survives view switches within a session, matching
@@ -43,15 +47,18 @@ export class MediaBrowserSources extends LitElement {
     void this.load();
   }
 
-  private get currentPath(): string | undefined {
-    return this.nav[this.nav.length - 1]?.path;
-  }
-
   private async load() {
+    const current = this.nav[this.nav.length - 1];
     this.loading = true;
     this.error = '';
     try {
-      this.items = await this.store.mediaBrowseService.browseSources(this.currentPath);
+      if (current?.collectionUri) {
+        // Drilling into a playlist/album/artist → its tracks.
+        this.items = await this.store.mediaBrowseService.browseSourcesCollection(current.collectionUri, current.collectionType ?? 'playlist');
+      } else {
+        // Folder browse (root accounts, or an account's category folders).
+        this.items = await this.store.mediaBrowseService.browseSources(current?.path);
+      }
       if (this.items.length === 0 && this.nav.length === 1) {
         this.error = 'No music sources found. (Requires Music Assistant + the Music Assistant Queue integration.)';
       }
@@ -65,13 +72,22 @@ export class MediaBrowserSources extends LitElement {
   }
 
   private async selectItem(item: MediaPlayerItem) {
+    // A folder (account or category) → drill via music/browse path.
     if (item.can_expand && item.massBrowsePath) {
       this.nav = [...this.nav, { path: item.massBrowsePath, title: item.title }];
       currentNav = this.nav;
       await this.load();
       return;
     }
-    // Leaf — play it on the active player.
+    // A container (playlist / album / artist) → drill into its tracks, so
+    // tapping it browses rather than playing + jumping to the player.
+    if (item.can_expand && item.media_content_id && item.media_content_type) {
+      this.nav = [...this.nav, { collectionUri: item.media_content_id, collectionType: item.media_content_type, title: item.title }];
+      currentNav = this.nav;
+      await this.load();
+      return;
+    }
+    // Leaf (track / radio) — play it on the active player.
     await this.store.mediaControlService.playMedia(this.store.activePlayer, item);
     this.dispatchEvent(customEvent(MEDIA_ITEM_SELECTED, item));
   }
