@@ -14,17 +14,7 @@ import { MediaPlayer } from '../model/media-player';
 
 import { EnqueueMode, MusicAssistantFavoritesMediaType } from '../types';
 
-import {
-  mdiAccountMusic,
-  mdiAlbum,
-  mdiBookMusic,
-  mdiFolderMusic,
-  mdiMusicNote,
-  mdiPlaylistMusic,
-  mdiPodcast,
-  mdiRadio,
-  mdiSpotify,
-} from '@mdi/js';
+import { mdiAccountMusic, mdiAlbum, mdiBookMusic, mdiFolderMusic, mdiMusicNote, mdiPlaylistMusic, mdiPodcast, mdiRadio, mdiSpotify } from '@mdi/js';
 
 const LIBRARY_URI_PREFIX = 'library://';
 
@@ -43,6 +33,34 @@ function providerIcon(provider: string): string {
   }
   // No dedicated mdi glyphs for Pandora/etc — a music folder reads cleanly.
   return mdiFolderMusic;
+}
+
+/**
+ * Pull a usable artwork URL from a `music/browse` item. The top-level
+ * `image` field is almost always null; the real artwork lives under
+ * `metadata.images[]`. Prefer a remotely-accessible `thumb` (a direct
+ * https URL the browser can load), falling back to any remote image.
+ */
+function pickBrowseImage(item: MassBrowseItem): string | undefined {
+  if (typeof item.image === 'string' && item.image) {
+    return item.image;
+  }
+  if (item.image && typeof item.image === 'object' && item.image.path) {
+    return item.image.path;
+  }
+  const images = item.metadata?.images;
+  if (Array.isArray(images) && images.length) {
+    const isHttp = (p?: string) => !!p && /^https?:\/\//.test(p);
+    const thumb = images.find((i) => i.type === 'thumb' && i.remotely_accessible && isHttp(i.path));
+    if (thumb?.path) {
+      return thumb.path;
+    }
+    const anyRemote = images.find((i) => i.remotely_accessible && isHttp(i.path));
+    if (anyRemote?.path) {
+      return anyRemote.path;
+    }
+  }
+  return undefined;
 }
 
 /** Icon for a category folder (artists/albums/tracks/...), by its key. */
@@ -464,7 +482,7 @@ export class MusicAssistantService {
   }
 
   private transformBrowseItem(item: MassBrowseItem): MediaPlayerItem {
-    const thumbnail = typeof item.image === 'string' ? item.image : (item.image?.path ?? undefined);
+    const thumbnail = pickBrowseImage(item);
     // Folder-vs-leaf is determined by media_type, NOT is_playable (MA marks
     // category folders is_playable:true). Tracks/radio are leaves we play;
     // everything else (folder, playlist, album, artist) we drill into.

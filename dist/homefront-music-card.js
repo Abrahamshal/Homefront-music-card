@@ -1049,6 +1049,7 @@ var mdiAlphaABoxOutline = "M3,5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,
 var mdiApplication = "M21 2H3C1.9 2 1 2.9 1 4V20C1 21.1 1.9 22 3 22H21C22.1 22 23 21.1 23 20V4C23 2.9 22.1 2 21 2M21 7H3V4H21V7Z";
 var mdiArrowLeft = "M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z";
 var mdiArrowUpRight = "M21.5 9.5L20.09 10.92L17 7.83V13.5C17 17.09 14.09 20 10.5 20H4V18H10.5C13 18 15 16 15 13.5V7.83L11.91 10.91L10.5 9.5L16 4L21.5 9.5Z";
+var mdiBookMusic = "M13 20.5C13 21.03 13.09 21.53 13.26 22H6C4.89 22 4 21.11 4 20V4C4 2.9 4.89 2 6 2H7V9L9.5 7.5L12 9V2H18C19.1 2 20 2.89 20 4V11H16.5V16.11C14.5 16.57 13 18.36 13 20.5M20 13H18.5V18.21C18.19 18.07 17.86 18 17.5 18C16.12 18 15 19.12 15 20.5S16.12 23 17.5 23 20 21.88 20 20.5V15H22V13H20Z";
 var mdiBookshelf = "M9 3V18H12V3H9M12 5L16 18L19 17L15 4L12 5M5 5V18H8V5H5M3 19V21H21V19H3Z";
 var mdiCheck = "M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z";
 var mdiCheckAll = "M0.41,13.41L6,19L7.41,17.58L1.83,12M22.24,5.58L11.66,16.17L7.5,12L6.07,13.41L11.66,19L23.66,7M18,7L16.59,5.58L10.24,11.93L11.66,13.34L18,7Z";
@@ -1069,6 +1070,7 @@ var mdiEyeCheck = "M23.5,17L18.5,22L15,18.5L16.5,17L18.5,19L22,15.5L23.5,17M12,9
 var mdiFastForward = "M13,6V18L21.5,12M4,18L12.5,12L4,6V18Z";
 var mdiFileMusic = "M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M13,13H11V18A2,2 0 0,1 9,20A2,2 0 0,1 7,18A2,2 0 0,1 9,16C9.4,16 9.7,16.1 10,16.3V11H13V13M13,9V3.5L18.5,9H13Z";
 var mdiFolder = "M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z";
+var mdiFolderMusic = "M22 8V11H16.5V16.11C14.66 16.53 13.26 18.09 13.04 20H4C2.9 20 2 19.11 2 18V6C2 4.89 2.89 4 4 4H10L12 6H20C21.1 6 22 6.89 22 8M18.5 13V18.21C18.19 18.07 17.86 18 17.5 18C16.12 18 15 19.12 15 20.5S16.12 23 17.5 23 20 21.88 20 20.5V15H22V13H18.5Z";
 var mdiFolderStar = "M20,6H12L10,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8A2,2 0 0,0 20,6M17.94,17L15,15.28L12.06,17L12.84,13.67L10.25,11.43L13.66,11.14L15,8L16.34,11.14L19.75,11.43L17.16,13.67L17.94,17Z";
 var mdiFolderStarOutline = "M10.78 12.05L13.81 11.79L15 9L16.19 11.79L19.22 12.05L16.92 14.04L17.61 17L15 15.47L12.39 17L13.08 14.04L10.78 12.05M22 8V18C22 19.11 21.11 20 20 20H4C2.9 20 2 19.11 2 18V6C2 4.89 2.9 4 4 4H10L12 6H20C21.11 6 22 6.9 22 8M20 8H4V18H20V8Z";
 var mdiGamepadVariant = "M7,6H17A6,6 0 0,1 23,12A6,6 0 0,1 17,18C15.22,18 13.63,17.23 12.53,16H11.47C10.37,17.23 8.78,18 7,18A6,6 0 0,1 1,12A6,6 0 0,1 7,6M6,9V11H4V13H6V15H8V13H10V11H8V9H6M15.5,12A1.5,1.5 0 0,0 14,13.5A1.5,1.5 0 0,0 15.5,15A1.5,1.5 0 0,0 17,13.5A1.5,1.5 0 0,0 15.5,12M18.5,9A1.5,1.5 0 0,0 17,10.5A1.5,1.5 0 0,0 18.5,12A1.5,1.5 0 0,0 20,10.5A1.5,1.5 0 0,0 18.5,9Z";
@@ -1081,6 +1083,7 @@ var mdiListBoxOutline = "M11 15H17V17H11V15M9 7H7V9H9V7M11 13H17V11H11V13M11 9H1
 var mdiMagnify = "M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z";
 var mdiMovie = "M18,4L20,8H17L15,4H13L15,8H12L10,4H8L10,8H7L5,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V4H18Z";
 var mdiMusic = "M21,3V15.5A3.5,3.5 0 0,1 17.5,19A3.5,3.5 0 0,1 14,15.5A3.5,3.5 0 0,1 17.5,12C18.04,12 18.55,12.12 19,12.34V6.47L9,8.6V17.5A3.5,3.5 0 0,1 5.5,21A3.5,3.5 0 0,1 2,17.5A3.5,3.5 0 0,1 5.5,14C6.04,14 6.55,14.12 7,14.34V6L21,3Z";
+var mdiMusicNote = "M12 3V13.55C11.41 13.21 10.73 13 10 13C7.79 13 6 14.79 6 17S7.79 21 10 21 14 19.21 14 17V7H18V3H12Z";
 var mdiPauseCircle = "M15,16H13V8H15M11,16H9V8H11M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
 var mdiPen = "M20.71,7.04C20.37,7.38 20.04,7.71 20.03,8.04C20,8.36 20.34,8.69 20.66,9C21.14,9.5 21.61,9.95 21.59,10.44C21.57,10.93 21.06,11.44 20.55,11.94L16.42,16.08L15,14.66L19.25,10.42L18.29,9.46L16.87,10.87L13.12,7.12L16.96,3.29C17.35,2.9 18,2.9 18.37,3.29L20.71,5.63C21.1,6 21.1,6.65 20.71,7.04M3,17.25L12.56,7.68L16.31,11.43L6.75,21H3V17.25Z";
 var mdiPlay = "M8,5.14V19.14L19,12.14L8,5.14Z";
@@ -1102,6 +1105,7 @@ var mdiShuffleDisabled = "M16,4.5V7H5V9H16V11.5L19.5,8M16,12.5V15H5V17H16V19.5L1
 var mdiSkipNext = "M16,18H18V6H16M6,18L14.5,12L6,6V18Z";
 var mdiSkipNextCircle = "M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M8,8L13,12L8,16M14,8H16V16H14";
 var mdiSkipPrevious = "M6,18V6H8V18H6M9.5,12L18,6V18L9.5,12Z";
+var mdiSpotify = "M17.9,10.9C14.7,9 9.35,8.8 6.3,9.75C5.8,9.9 5.3,9.6 5.15,9.15C5,8.65 5.3,8.15 5.75,8C9.3,6.95 15.15,7.15 18.85,9.35C19.3,9.6 19.45,10.2 19.2,10.65C18.95,11 18.35,11.15 17.9,10.9M17.8,13.7C17.55,14.05 17.1,14.2 16.75,13.95C14.05,12.3 9.95,11.8 6.8,12.8C6.4,12.9 5.95,12.7 5.85,12.3C5.75,11.9 5.95,11.45 6.35,11.35C10,10.25 14.5,10.8 17.6,12.7C17.9,12.85 18.05,13.35 17.8,13.7M16.6,16.45C16.4,16.75 16.05,16.85 15.75,16.65C13.4,15.2 10.45,14.9 6.95,15.7C6.6,15.8 6.3,15.55 6.2,15.25C6.1,14.9 6.35,14.6 6.65,14.5C10.45,13.65 13.75,14 16.35,15.6C16.7,15.75 16.75,16.15 16.6,16.45M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
 var mdiStar = "M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z";
 var mdiStopCircle = "M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M9,9H15V15H9";
 var mdiTelevisionClassic = "M8.16,3L6.75,4.41L9.34,7H4C2.89,7 2,7.89 2,9V19C2,20.11 2.89,21 4,21H20C21.11,21 22,20.11 22,19V9C22,7.89 21.11,7 20,7H14.66L17.25,4.41L15.84,3L12,6.84L8.16,3M4,9H17V19H4V9M19.5,9A1,1 0 0,1 20.5,10A1,1 0 0,1 19.5,11A1,1 0 0,1 18.5,10A1,1 0 0,1 19.5,9M19.5,12A1,1 0 0,1 20.5,13A1,1 0 0,1 19.5,14A1,1 0 0,1 18.5,13A1,1 0 0,1 19.5,12Z";
@@ -2249,6 +2253,42 @@ function titleCaseKey(key) {
 	if (!key) return "";
 	return key.replace(/[_-]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
+/** Icon for a top-level provider/account folder, by provider domain. */
+function providerIcon(provider) {
+	if (provider.startsWith("spotify")) return mdiSpotify;
+	return mdiFolderMusic;
+}
+/**
+* Pull a usable artwork URL from a `music/browse` item. The top-level
+* `image` field is almost always null; the real artwork lives under
+* `metadata.images[]`. Prefer a remotely-accessible `thumb` (a direct
+* https URL the browser can load), falling back to any remote image.
+*/
+function pickBrowseImage(item) {
+	if (typeof item.image === "string" && item.image) return item.image;
+	if (item.image && typeof item.image === "object" && item.image.path) return item.image.path;
+	const images = item.metadata?.images;
+	if (Array.isArray(images) && images.length) {
+		const isHttp = (p) => !!p && /^https?:\/\//.test(p);
+		const thumb = images.find((i) => i.type === "thumb" && i.remotely_accessible && isHttp(i.path));
+		if (thumb?.path) return thumb.path;
+		const anyRemote = images.find((i) => i.remotely_accessible && isHttp(i.path));
+		if (anyRemote?.path) return anyRemote.path;
+	}
+}
+/** Icon for a category folder (artists/albums/tracks/...), by its key. */
+function categoryIcon(key) {
+	switch (key) {
+		case "artists": return mdiAccountMusic;
+		case "albums": return mdiAlbum;
+		case "tracks": return mdiMusicNote;
+		case "playlists": return mdiPlaylistMusic;
+		case "radio": return mdiRadio;
+		case "podcasts": return mdiPodcast;
+		case "audiobooks": return mdiBookMusic;
+		default: return mdiFolderMusic;
+	}
+}
 var MusicAssistantService = class {
 	constructor(hass) {
 		this.hass = hass;
@@ -2526,19 +2566,25 @@ var MusicAssistantService = class {
 		const data = path ? { path } : {};
 		const items = await this.sendMassCommand(massQueueConfigEntryId, "music/browse", data, true);
 		if (!Array.isArray(items)) return [];
-		return items.filter((item) => item.name !== ".." && item.path !== "root").map((item) => this.transformBrowseItem(item));
+		return items.filter((item) => item.name !== ".." && item.path !== "root" && item.path !== "builtin://" && item.provider !== "builtin").map((item) => this.transformBrowseItem(item));
 	}
 	transformBrowseItem(item) {
-		const thumbnail = typeof item.image === "string" ? item.image : item.image?.path ?? void 0;
+		const thumbnail = pickBrowseImage(item);
 		const isLeaf = item.media_type === "track" || item.media_type === "radio";
+		const title = item.name?.trim() || titleCaseKey(item.translation_key) || titleCaseKey(item.item_id) || "Item";
+		let massIconPath;
+		if (item.item_id === "root") massIconPath = providerIcon(item.provider);
+		else if (item.media_type === "folder") massIconPath = categoryIcon(item.translation_key || item.item_id);
+		else massIconPath = isLeaf ? mdiMusicNote : mdiPlaylistMusic;
 		return {
-			title: item.name?.trim() || titleCaseKey(item.translation_key) || titleCaseKey(item.item_id) || "Item",
+			title,
 			media_content_id: item.uri,
 			media_content_type: item.media_type,
 			thumbnail,
 			can_play: isLeaf || item.is_playable,
 			can_expand: !isLeaf,
-			massBrowsePath: item.path
+			massBrowsePath: item.path,
+			massIconPath
 		};
 	}
 	/**
@@ -9855,8 +9901,8 @@ var currentNav = null;
 * `music/browse` command (via mass_queue). Unlike HA's merged
 * `media_player/browse_media`, this starts at one folder PER provider/account
 * — e.g. "Abe's Spotify", "Marlene's Spotify", "Eileen's Pandora" — and drills
-* down within a single account. Reuses the favorites grid/list renderers so it
-* looks identical to the rest of the card.
+* down within a single account. Renders artwork when available and a provider/
+* category icon otherwise, so account + category folders never show blank tiles.
 */
 var MediaBrowserSources = class extends i$5 {
 	constructor(..._args) {
@@ -9866,19 +9912,8 @@ var MediaBrowserSources = class extends i$5 {
 		this.items = [];
 		this.loading = false;
 		this.error = "";
-		this.onItemSelected = async (event) => {
-			const item = event.detail;
-			if (item.can_expand && item.massBrowsePath) {
-				this.nav = [...this.nav, {
-					path: item.massBrowsePath,
-					title: item.title
-				}];
-				currentNav = this.nav;
-				await this.load();
-				return;
-			}
-			await this.store.mediaControlService.playMedia(this.store.activePlayer, item);
-			this.dispatchEvent(customEvent(MEDIA_ITEM_SELECTED, item));
+		this.onItemSelected = (event) => {
+			this.selectItem(event.detail);
 		};
 		this.goBack = () => {
 			if (this.nav.length <= 1) return;
@@ -9914,6 +9949,19 @@ var MediaBrowserSources = class extends i$5 {
 			this.loading = false;
 		}
 	}
+	async selectItem(item) {
+		if (item.can_expand && item.massBrowsePath) {
+			this.nav = [...this.nav, {
+				path: item.massBrowsePath,
+				title: item.title
+			}];
+			currentNav = this.nav;
+			await this.load();
+			return;
+		}
+		await this.store.mediaControlService.playMedia(this.store.activePlayer, item);
+		this.dispatchEvent(customEvent(MEDIA_ITEM_SELECTED, item));
+	}
 	render() {
 		const config = this.store.config.mediaBrowser ?? {};
 		const playerName = getSpeakerList(this.store.activePlayer, this.store.predefinedGroups);
@@ -9930,19 +9978,62 @@ var MediaBrowserSources = class extends i$5 {
             <hmc-icon-button .path=${mdiStar} @click=${this.goToFavorites} title="Favorites"></hmc-icon-button>
             ${renderLayoutMenu(this.layout, this.handleLayoutChange)}
           </div>`}
-      ${this.loading ? x`<div class="sources-message">Loading…</div>` : this.error ? x`<div class="sources-message">${this.error}</div>` : this.items.length === 0 ? x`<div class="sources-message">Empty</div>` : useGrid ? x`<hmc-favorites-icons .items=${this.items} .store=${this.store} @item-selected=${this.onItemSelected}></hmc-favorites-icons>` : x`<hmc-favorites-list .items=${this.items} .store=${this.store} @item-selected=${this.onItemSelected}></hmc-favorites-list>`}
-      ${this.loading ? E : E}
+      ${this.loading ? x`<div class="sources-message">Loading…</div>` : this.error ? x`<div class="sources-message">${this.error}</div>` : this.items.length === 0 ? x`<div class="sources-message">Empty</div>` : useGrid ? this.renderGrid() : x`<hmc-favorites-list .items=${this.items} .store=${this.store} @item-selected=${this.onItemSelected}></hmc-favorites-list>`}
+    `;
+	}
+	renderGrid() {
+		const itemsPerRow = this.store.config.mediaBrowser?.itemsPerRow || 3;
+		const margin = "1%";
+		const cardStyle = o$1({
+			width: `calc(100% / ${itemsPerRow} - ${margin} * 2)`,
+			margin
+		});
+		return x`
+      <div class="sources-grid">
+        ${this.items.map((item) => {
+			return x`<div style=${cardStyle}>${renderMediaGridCard({
+				item,
+				onClick: () => void this.selectItem(item),
+				thumbnailContent: item.thumbnail ? x`<div class="image" style="background-image:url('${item.thumbnail}')"></div>` : x`<div class="image icon-fallback">
+                <ha-svg-icon .path=${item.massIconPath}></ha-svg-icon>
+              </div>`
+			})}</div>`;
+		})}
+      </div>
     `;
 	}
 	static get styles() {
-		return [mediaBrowserStyles, i$8`
-        hmc-favorites-icons,
+		return [
+			mediaItemTitleStyle,
+			mediaGridCardStyles,
+			mediaBrowserStyles,
+			i$8`
+        .sources-grid {
+          display: flex;
+          flex-wrap: wrap;
+          align-content: flex-start;
+          flex: 1;
+          min-height: 0;
+          overflow: auto;
+        }
         hmc-favorites-list {
           --mdc-icon-size: 24px;
           --media-browse-item-size: 100px;
           flex: 1;
           min-height: 0;
           overflow: auto;
+        }
+        .icon-fallback {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: var(--secondary-background-color);
+          color: var(--secondary-text-color);
+        }
+        .icon-fallback ha-svg-icon {
+          --mdc-icon-size: 45%;
+          width: 45%;
+          height: 45%;
         }
         .sources-message {
           flex: 1;
@@ -9953,7 +10044,8 @@ var MediaBrowserSources = class extends i$5 {
           padding: 1rem;
           color: var(--secondary-text-color);
         }
-      `];
+      `
+		];
 	}
 };
 __decorate$1([n$5({ attribute: false })], MediaBrowserSources.prototype, "store", void 0);

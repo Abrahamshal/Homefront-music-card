@@ -279,6 +279,14 @@ export interface MediaPlayerItem extends Partial<UpstreamMediaPlayerItem> {
  * At the root each entry is a provider/account folder; drilling via `path`
  * yields that account's sub-folders and, eventually, playable items.
  */
+export interface MassBrowseImage {
+  type?: string; // 'thumb' | 'fanart' | ...
+  path?: string; // direct URL when remotely_accessible, else a proxy path
+  provider?: string;
+  remotely_accessible?: boolean;
+  proxy_id?: string | null;
+}
+
 export interface MassBrowseItem {
   item_id: string;
   provider: string; // provider domain, e.g. 'spotify', 'pandora', 'builtin'
@@ -287,9 +295,10 @@ export interface MassBrowseItem {
   is_playable: boolean; // NB: true even for category folders — NOT a reliable leaf signal; use media_type
   media_type: string; // 'folder' | 'track' | 'playlist' | 'album' | 'artist' | 'radio' | ...
   path: string; // navigation path for music/browse, e.g. 'spotify--Umazu89E://' or 'spotify--Umazu89E://playlists'
-  image: string | { path?: string } | null;
+  image: string | { path?: string } | null; // usually null; artwork lives under metadata.images
   sort_name?: string;
   translation_key?: string | null; // category label key when name is empty, e.g. 'playlists'
+  metadata?: { images?: MassBrowseImage[] } | null; // where playlist/track/album artwork actually lives
 }
 
 export interface PredefinedGroup<T = PredefinedGroupPlayer> {
