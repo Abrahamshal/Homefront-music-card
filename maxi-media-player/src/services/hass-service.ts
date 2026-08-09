@@ -28,8 +28,15 @@ export default class HassService {
     }
   }
 
-  async callMediaService(service: string, inOptions: ServiceCallRequest['serviceData']) {
-    await this.callWithLoader(() => this.hass.callService('media_player', service, inOptions));
+  // showLoader: false for high frequency calls (volume/mute) - the loader is a
+  // centered overlay that stays up for a full second, which makes the card flash
+  // and re-render while dragging a slider.
+  async callMediaService(service: string, inOptions: ServiceCallRequest['serviceData'], showLoader = true) {
+    if (showLoader) {
+      await this.callWithLoader(() => this.hass.callService('media_player', service, inOptions));
+    } else {
+      await this.hass.callService('media_player', service, inOptions);
+    }
   }
 
   async callService(domain: string, service: string, serviceData?: Record<string, unknown>) {

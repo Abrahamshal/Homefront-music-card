@@ -2011,6 +2011,8 @@ var convertProgress = (duration) => {
 customElements.define("hmc-progress", PlayerProgress);
 //#endregion
 //#region src/components/volume.ts
+var SLIDE_SEND_INTERVAL_MS = 100;
+var SETTLE_TIMEOUT_MS = 2e3;
 var Volume = class extends i$5 {
 	constructor(..._args) {
 		super(..._args);
@@ -2019,13 +2021,22 @@ var Volume = class extends i$5 {
 		this.isPlayer = false;
 		this.sliderMoving = false;
 		this.startVolumeSliderMoving = 0;
+		this.lastSentAt = 0;
 		this.togglePower = async () => await this.mediaControlService.togglePower(this.player);
+	}
+	willUpdate() {
+		if (!this.sliderMoving && this.localVolume !== void 0 && this.player?.getVolume() === this.localVolume) this.clearLocalVolume();
+	}
+	disconnectedCallback() {
+		this.clearSendTimer();
+		this.clearSettleTimer();
+		super.disconnectedCallback();
 	}
 	render() {
 		this.config = this.store.config;
 		this.playerConfig = this.config.player ?? {};
 		this.mediaControlService = this.store.mediaControlService;
-		const volume = this.player.getVolume();
+		const volume = this.localVolume ?? this.player.getVolume();
 		const max = this.getMax();
 		const muteIcon = (this.updateMembers ? this.player.isGroupMuted() : this.player.isMemberMuted()) ? mdiVolumeMute : mdiVolumeHigh;
 		const disabled = this.player.ignoreVolume;
@@ -2066,26 +2077,69 @@ var Volume = class extends i$5 {
     `;
 	}
 	getMax() {
-		const volume = this.sliderMoving ? this.startVolumeSliderMoving : this.player.getVolume();
+		const volume = this.sliderMoving ? this.startVolumeSliderMoving : this.localVolume ?? this.player.getVolume();
 		const dynamicThreshold = Math.max(0, Math.min(this.config.dynamicVolumeSliderThreshold ?? 20, 100));
 		const dynamicMax = Math.max(0, Math.min(this.config.dynamicVolumeSliderMax ?? 30, 100));
 		return volume < dynamicThreshold && this.config.dynamicVolumeSlider ? dynamicMax : 100;
 	}
-	async sliderMoved(e) {
-		if (this.config.changeVolumeOnSlide) {
-			console.log("slider moved", this.config.changeVolumeOnSlide);
-			if (!this.sliderMoving) this.startVolumeSliderMoving = this.player.getVolume();
+	sliderMoved(e) {
+		const newVolume = volumeFromEvent(e);
+		if (newVolume === void 0) return;
+		if (!this.sliderMoving) {
+			this.startVolumeSliderMoving = this.player.getVolume();
 			this.sliderMoving = true;
-			return await this.setVolume(e);
 		}
+		this.clearSettleTimer();
+		this.localVolume = newVolume;
+		if (this.config.changeVolumeOnSlide) this.queueVolumeSend(newVolume);
 	}
 	async volumeChanged(e) {
 		this.sliderMoving = false;
-		return await this.setVolume(e);
+		this.clearSendTimer();
+		this.pendingVolume = void 0;
+		const newVolume = volumeFromEvent(e) ?? this.localVolume;
+		if (newVolume === void 0) return;
+		this.localVolume = newVolume;
+		this.startSettleTimer();
+		return await this.setVolume(newVolume);
 	}
-	async setVolume(e) {
-		const newVolume = numberFromEvent(e);
-		return await this.mediaControlService.volumeSet(this.player, newVolume, this.updateMembers);
+	queueVolumeSend(volume) {
+		this.pendingVolume = volume;
+		if (this.sendTimer !== void 0) return;
+		const delay = Math.max(0, SLIDE_SEND_INTERVAL_MS - (Date.now() - this.lastSentAt));
+		this.sendTimer = window.setTimeout(() => {
+			this.sendTimer = void 0;
+			const pending = this.pendingVolume;
+			this.pendingVolume = void 0;
+			if (pending !== void 0) this.setVolume(pending);
+		}, delay);
+	}
+	async setVolume(volume) {
+		this.lastSentAt = Date.now();
+		return await this.mediaControlService.volumeSet(this.player, volume, this.updateMembers);
+	}
+	startSettleTimer() {
+		this.clearSettleTimer();
+		this.settleTimer = window.setTimeout(() => {
+			this.settleTimer = void 0;
+			this.clearLocalVolume();
+		}, SETTLE_TIMEOUT_MS);
+	}
+	clearLocalVolume() {
+		this.clearSettleTimer();
+		this.localVolume = void 0;
+	}
+	clearSendTimer() {
+		if (this.sendTimer !== void 0) {
+			clearTimeout(this.sendTimer);
+			this.sendTimer = void 0;
+		}
+	}
+	clearSettleTimer() {
+		if (this.settleTimer !== void 0) {
+			clearTimeout(this.settleTimer);
+			this.settleTimer = void 0;
+		}
 	}
 	async mute() {
 		return await this.mediaControlService.toggleMute(this.player, this.updateMembers);
@@ -2162,8 +2216,10 @@ __decorate$1([n$5()], Volume.prototype, "slim", void 0);
 __decorate$1([n$5()], Volume.prototype, "isPlayer", void 0);
 __decorate$1([r$3()], Volume.prototype, "sliderMoving", void 0);
 __decorate$1([r$3()], Volume.prototype, "startVolumeSliderMoving", void 0);
-function numberFromEvent(e) {
-	return Number.parseInt((e?.target)?.value);
+__decorate$1([r$3()], Volume.prototype, "localVolume", void 0);
+function volumeFromEvent(e) {
+	const value = e.detail?.value ?? Number.parseInt((e?.target)?.value);
+	return Number.isFinite(value) ? Math.round(value) : void 0;
 }
 customElements.define("hmc-volume", Volume);
 //#endregion
@@ -2788,8 +2844,9 @@ var HassService = class {
 			this.card.dispatchEvent(customEvent(CALL_MEDIA_DONE));
 		}
 	}
-	async callMediaService(service, inOptions) {
-		await this.callWithLoader(() => this.hass.callService("media_player", service, inOptions));
+	async callMediaService(service, inOptions, showLoader = true) {
+		if (showLoader) await this.callWithLoader(() => this.hass.callService("media_player", service, inOptions));
+		else await this.hass.callService("media_player", service, inOptions);
 	}
 	async callService(domain, service, serviceData) {
 		await this.hass.callService(domain, service, serviceData);
@@ -3085,7 +3142,7 @@ var MediaControlService = class {
 	}
 	async volumeDefaultStep(mainPlayer, updateMembers, stepDirection) {
 		for (const member of mainPlayer.members) if (mainPlayer.id === member.id || updateMembers) {
-			if (!member.ignoreVolume) await this.hassService.callMediaService(stepDirection, { entity_id: member.id });
+			if (!member.ignoreVolume) await this.hassService.callMediaService(stepDirection, { entity_id: member.id }, false);
 		}
 	}
 	async volumeSet(player, volume, updateMembers) {
@@ -3117,7 +3174,7 @@ var MediaControlService = class {
 			await this.hassService.callMediaService("volume_set", {
 				entity_id: player.id,
 				volume_level: volume
-			});
+			}, false);
 		}
 	}
 	async toggleMute(mediaPlayer, updateMembers = true) {
@@ -3128,7 +3185,7 @@ var MediaControlService = class {
 		for (const member of mediaPlayer.members) if (mediaPlayer.id === member.id || updateMembers) await this.hassService.callMediaService("volume_mute", {
 			entity_id: member.id,
 			is_volume_muted: muteVolume
-		});
+		}, false);
 	}
 	async setSource(mediaPlayer, source) {
 		await this.hassService.callMediaService("select_source", {
@@ -13930,7 +13987,7 @@ var Volumes = class extends i$5 {
 		const playerName = showAll && !hideActivePlayerName ? getSpeakerList(this.store.activePlayer, this.store.predefinedGroups) : "";
 		return x`
       <div ?hidden=${!showAll}>${showAll ? this.volumeWithName(this.store.activePlayer, true, playerName) : E}</div>
-      ${members.map((member) => this.volumeWithName(member, false))}
+      ${c(members, (member) => member.id, (member) => this.volumeWithName(member, false))}
     `;
 	}
 	volumeWithName(player, updateMembers = true, groupName = "") {

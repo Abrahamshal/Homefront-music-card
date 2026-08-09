@@ -7,6 +7,13 @@ import { mdiPower, mdiVolumeHigh, mdiVolumeMute } from '@mdi/js';
 import { MediaPlayer } from '../model/media-player';
 import './icon-button';
 
+// Don't flood the websocket while the user drags - one call per interval, plus a
+// final one on release.
+const SLIDE_SEND_INTERVAL_MS = 100;
+// How long to keep showing the value the user picked before giving up on hass
+// reporting it back (some players quantize the level they were given).
+const SETTLE_TIMEOUT_MS = 2000;
+
 class Volume extends LitElement {
   @property({ attribute: false }) store!: Store;
   private config!: CardConfig;
@@ -19,14 +26,36 @@ class Volume extends LitElement {
   @property() isPlayer: boolean = false;
   @state() private sliderMoving: boolean = false;
   @state() private startVolumeSliderMoving: number = 0;
+  // The value the user is dragging towards. The card rebuilds its store - and with
+  // it every MediaPlayer - on each hass update, so without this we'd keep pushing
+  // the (still stale) volume from hass back into ha-control-slider and the thumb
+  // would snap backwards mid-drag.
+  @state() private localVolume?: number;
+  private pendingVolume?: number;
+  private sendTimer?: number;
+  private settleTimer?: number;
+  private lastSentAt = 0;
   private togglePower = async () => await this.mediaControlService.togglePower(this.player);
+
+  protected willUpdate() {
+    // hass caught up with what the user picked - hand control back to it.
+    if (!this.sliderMoving && this.localVolume !== undefined && this.player?.getVolume() === this.localVolume) {
+      this.clearLocalVolume();
+    }
+  }
+
+  disconnectedCallback() {
+    this.clearSendTimer();
+    this.clearSettleTimer();
+    super.disconnectedCallback();
+  }
 
   render() {
     this.config = this.store.config;
     this.playerConfig = this.config.player ?? {};
     this.mediaControlService = this.store.mediaControlService;
 
-    const volume = this.player.getVolume();
+    const volume = this.localVolume ?? this.player.getVolume();
     const max = this.getMax();
 
     const isMuted = this.updateMembers ? this.player.isGroupMuted() : this.player.isMemberMuted();
@@ -75,31 +104,89 @@ class Volume extends LitElement {
   }
 
   private getMax() {
-    const volume = this.sliderMoving ? this.startVolumeSliderMoving : this.player.getVolume();
+    // Pinned while dragging so the slider doesn't rescale (and the thumb jump) when
+    // the user crosses the dynamic threshold.
+    const volume = this.sliderMoving ? this.startVolumeSliderMoving : (this.localVolume ?? this.player.getVolume());
     const dynamicThreshold = Math.max(0, Math.min(this.config.dynamicVolumeSliderThreshold ?? 20, 100));
     const dynamicMax = Math.max(0, Math.min(this.config.dynamicVolumeSliderMax ?? 30, 100));
     return volume < dynamicThreshold && this.config.dynamicVolumeSlider ? dynamicMax : 100;
   }
 
-  private async sliderMoved(e: Event) {
-    if (this.config.changeVolumeOnSlide) {
-      console.log('slider moved', this.config.changeVolumeOnSlide);
-      if (!this.sliderMoving) {
-        this.startVolumeSliderMoving = this.player.getVolume();
-      }
+  private sliderMoved(e: Event) {
+    const newVolume = volumeFromEvent(e);
+    if (newVolume === undefined) {
+      return;
+    }
+    if (!this.sliderMoving) {
+      this.startVolumeSliderMoving = this.player.getVolume();
       this.sliderMoving = true;
-      return await this.setVolume(e);
+    }
+    this.clearSettleTimer();
+    this.localVolume = newVolume;
+    if (this.config.changeVolumeOnSlide) {
+      this.queueVolumeSend(newVolume);
     }
   }
 
   private async volumeChanged(e: Event) {
     this.sliderMoving = false;
-    return await this.setVolume(e);
+    this.clearSendTimer();
+    this.pendingVolume = undefined;
+    const newVolume = volumeFromEvent(e) ?? this.localVolume;
+    if (newVolume === undefined) {
+      return;
+    }
+    this.localVolume = newVolume;
+    this.startSettleTimer();
+    return await this.setVolume(newVolume);
   }
 
-  private async setVolume(e: Event) {
-    const newVolume = numberFromEvent(e);
-    return await this.mediaControlService.volumeSet(this.player, newVolume, this.updateMembers);
+  private queueVolumeSend(volume: number) {
+    this.pendingVolume = volume;
+    if (this.sendTimer !== undefined) {
+      return;
+    }
+    const delay = Math.max(0, SLIDE_SEND_INTERVAL_MS - (Date.now() - this.lastSentAt));
+    this.sendTimer = window.setTimeout(() => {
+      this.sendTimer = undefined;
+      const pending = this.pendingVolume;
+      this.pendingVolume = undefined;
+      if (pending !== undefined) {
+        void this.setVolume(pending);
+      }
+    }, delay);
+  }
+
+  private async setVolume(volume: number) {
+    this.lastSentAt = Date.now();
+    return await this.mediaControlService.volumeSet(this.player, volume, this.updateMembers);
+  }
+
+  private startSettleTimer() {
+    this.clearSettleTimer();
+    this.settleTimer = window.setTimeout(() => {
+      this.settleTimer = undefined;
+      this.clearLocalVolume();
+    }, SETTLE_TIMEOUT_MS);
+  }
+
+  private clearLocalVolume() {
+    this.clearSettleTimer();
+    this.localVolume = undefined;
+  }
+
+  private clearSendTimer() {
+    if (this.sendTimer !== undefined) {
+      clearTimeout(this.sendTimer);
+      this.sendTimer = undefined;
+    }
+  }
+
+  private clearSettleTimer() {
+    if (this.settleTimer !== undefined) {
+      clearTimeout(this.settleTimer);
+      this.settleTimer = undefined;
+    }
   }
 
   private async mute() {
@@ -170,8 +257,12 @@ class Volume extends LitElement {
     `;
   }
 }
-function numberFromEvent(e: Event) {
-  return Number.parseInt((e?.target as HTMLInputElement)?.value);
+// ha-control-slider only updates its own `value` property when the drag ends, so
+// during a drag the live value is available on the event detail and nowhere else.
+function volumeFromEvent(e: Event): number | undefined {
+  const detailValue = (e as CustomEvent<{ value?: number } | undefined>).detail?.value;
+  const value = detailValue ?? Number.parseInt((e?.target as HTMLInputElement)?.value);
+  return Number.isFinite(value) ? Math.round(value) : undefined;
 }
 
 customElements.define('sonos-volume', Volume);

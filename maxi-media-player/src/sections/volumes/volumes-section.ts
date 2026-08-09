@@ -2,6 +2,7 @@ import { css, html, LitElement, nothing } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import Store from '../../model/store';
 import { until } from 'lit-html/directives/until.js';
+import { repeat } from 'lit/directives/repeat.js';
 import { mdiCog, mdiVolumeMinus, mdiVolumePlus } from '@mdi/js';
 import { MediaPlayer } from '../../model/media-player';
 import { HassEntity } from 'home-assistant-js-websocket';
@@ -20,7 +21,11 @@ export class Volumes extends LitElement {
     const playerName = showAll && !hideActivePlayerName ? getSpeakerList(this.store.activePlayer, this.store.predefinedGroups) : '';
     return html`
       <div ?hidden=${!showAll}>${showAll ? this.volumeWithName(this.store.activePlayer, true, playerName) : nothing}</div>
-      ${members.map((member) => this.volumeWithName(member, false))}
+      ${repeat(
+        members,
+        (member) => member.id,
+        (member) => this.volumeWithName(member, false),
+      )}
     `;
   }
 

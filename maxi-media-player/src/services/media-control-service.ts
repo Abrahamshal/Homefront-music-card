@@ -132,7 +132,7 @@ export default class MediaControlService {
     for (const member of mainPlayer.members) {
       if (mainPlayer.id === member.id || updateMembers) {
         if (!member.ignoreVolume) {
-          await this.hassService.callMediaService(stepDirection, { entity_id: member.id });
+          await this.hassService.callMediaService(stepDirection, { entity_id: member.id }, false);
         }
       }
     }
@@ -177,7 +177,7 @@ export default class MediaControlService {
   async volumeSetSinglePlayer(player: MediaPlayer, volumePercent: number) {
     if (!player.ignoreVolume) {
       const volume = volumePercent / 100;
-      await this.hassService.callMediaService('volume_set', { entity_id: player.id, volume_level: volume });
+      await this.hassService.callMediaService('volume_set', { entity_id: player.id, volume_level: volume }, false);
     }
   }
 
@@ -190,7 +190,7 @@ export default class MediaControlService {
   async setVolumeMute(mediaPlayer: MediaPlayer, muteVolume: boolean, updateMembers = true) {
     for (const member of mediaPlayer.members) {
       if (mediaPlayer.id === member.id || updateMembers) {
-        await this.hassService.callMediaService('volume_mute', { entity_id: member.id, is_volume_muted: muteVolume });
+        await this.hassService.callMediaService('volume_mute', { entity_id: member.id, is_volume_muted: muteVolume }, false);
       }
     }
   }
